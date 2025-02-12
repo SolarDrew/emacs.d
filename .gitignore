@@ -60,3 +60,4 @@ site-lisp/package/
 /bookmarks
 /custom-vars.el
 /custom.el
+tabsession.el
