@@ -53,6 +53,12 @@
 (use-package general
   :config
   (general-evil-setup)
+  ;; Global keys
+  (general-define-key
+    :states '(normal visual motion emacs)
+    "K" 'scroll-down-command
+    "J" 'scroll-up-command
+  )
   ;; Set up 'SPC' as the leader key
   (general-create-definer start/leader-keys
     :states '(normal insert visual motion emacs)
@@ -61,9 +67,12 @@
     :global-prefix "C-SPC") ;; Set global leader key
 
   (start/leader-keys
+    "SPC" '(execute-extended-command :wk "M-x")
     "." '(find-file :wk "Find file")
-    "TAB" '(comment-line :wk "Comment lines")
-    "p" '(projectile-command-map :wk "Projectile command map"))
+    "TAB" '(evil-switch-to-windows-last-buffer :wk "Last buffer")
+    "/" '(+vertico/project-search :wk "Search Project")
+    "p" '(projectile-command-map :wk "Projectile command map")
+  )
 
   (start/leader-keys
     "f" '(:ignore t :wk "Find")
@@ -72,7 +81,9 @@
     "f f" '(consult-fd :wk "Fd search for files")
     "f g" '(consult-ripgrep :wk "Ripgrep search in files")
     "f l" '(consult-line :wk "Find line")
-    "f i" '(consult-imenu :wk "Imenu buffer locations"))
+    "f i" '(consult-imenu :wk "Imenu buffer locations")
+    "f s" '(save-buffer :wk "Save Buffer")
+   )
 
   (start/leader-keys
     "b" '(:ignore t :wk "Buffer Bookmarks")
@@ -82,12 +93,18 @@
     "b n" '(next-buffer :wk "Next buffer")
     "b p" '(previous-buffer :wk "Previous buffer")
     "b r" '(revert-buffer :wk "Reload buffer")
-    "b j" '(consult-bookmark :wk "Bookmark jump"))
+    "b j" '(consult-bookmark :wk "Bookmark jump")
+    "b s" '(scratch-buffer :wk "Scratch Buffer")
+  )
 
   (start/leader-keys
     "d" '(:ignore t :wk "Dired")
-    "d v" '(dired :wk "Open dired")
-    "d j" '(dired-jump :wk "Dired jump to current"))
+    "j v" '(dired :wk "Open dired")
+    "d j" '(dired-jump :wk "Dired jump to current")
+	;; These should really be under p but that's managed by projectile
+    "d a" '(projectile-add-known-project :wk "Add Project")
+    "d t" '(treemacs :wk "Treemacs")
+  )
 
   (start/leader-keys
     "e" '(:ignore t :wk "Eglot Evaluate")
@@ -99,7 +116,7 @@
 
   (start/leader-keys
     "g" '(:ignore t :wk "Git")
-    "g g" '(magit-status :wk "Magit status"))
+    "g s" '(magit-status :wk "Magit status"))
 
   (start/leader-keys
     "h" '(:ignore t :wk "Help") ;; To get more help use C-h commands (describe variable, function, etc.)
@@ -116,6 +133,16 @@
     "t" '(:ignore t :wk "Toggle")
     "t t" '(visual-line-mode :wk "Toggle truncated lines (wrap)")
     "t l" '(display-line-numbers-mode :wk "Toggle line numbers")))
+
+  (start/leader-keys
+    "w" '(:ignore t :wk "Windows and Workspaces")
+    "w h" '(evil-window-left :wk "Window left")
+    "w l" '(evil-window-right :wk "Window right")
+    "w j" '(evil-window-down :wk "Window Down")
+    "w k" '(evil-window-up :wk "Window Up")
+    "w /" '(evil-window-vsplit :wk "Vertical Split")
+    "w -" '(evil-window-split :wk "Vertical Split")
+    "w d" '(evil-window-delete :wk "Close window"))
 
 (use-package emacs
   :custom
@@ -223,6 +250,9 @@
 
 (use-package yasnippet-snippets
   :hook (prog-mode . yas-minor-mode))
+
+(use-package python-mode
+  :mode "\\.py\\'") ;; Only start in a Python file
 
 (use-package org
   :ensure nil
@@ -355,6 +385,64 @@
   :hook
   ('marginalia-mode-hook . 'nerd-icons-completion-marginalia-setup))
 
+(cl-defun +vertico-file-search (&key query in all-files (recursive t) prompt args)
+  "Conduct a file search using ripgrep.
+
+:query STRING
+  Determines the initial input to search for.
+:in PATH
+  Sets what directory to base the search out of. Defaults to the current project's root.
+:recursive BOOL
+  Whether or not to search files recursively from the base directory.
+:args LIST
+  Arguments to be appended to `consult-ripgrep-args'."
+  (declare (indent defun))
+  (unless (executable-find "rg")
+    (user-error "Couldn't find ripgrep in your PATH"))
+  (require 'consult)
+  (setq deactivate-mark t)
+  (let* ((project-root (or default-directory))
+         (directory (or in project-root))
+         (consult-ripgrep-args
+          (concat "rg "
+                  (if all-files "-uu ")
+                  (unless recursive "--maxdepth 1 ")
+                  "--null --line-buffered --color=never --max-columns=1000 "
+                  "--path-separator /   --smart-case --no-heading "
+                  "--with-filename --line-number --search-zip "
+                  "--hidden -g !.git -g !.svn -g !.hg "
+                  (mapconcat #'identity args " ")))
+         (prompt (if (stringp prompt) (string-trim prompt) "Search"))
+         (query)
+         (consult-async-split-style consult-async-split-style)
+         (consult-async-split-styles-alist consult-async-split-styles-alist))
+    ;; Change the split style if the initial query contains the separator.
+    (when query
+      (cl-destructuring-bind (&key type separator initial _function)
+          (consult--async-split-style)
+        (pcase type
+          (`separator
+           (replace-regexp-in-string (regexp-quote (char-to-string separator))
+                                     (concat "\\" (char-to-string separator))
+                                     query t t))
+          (`perl
+           (when (string-match-p initial query)
+             (setf (alist-get 'perlalt consult-async-split-styles-alist)
+                   `(:initial ,(or (cl-loop for char in (list "%" "@" "!" "&" "/" ";")
+                                            unless (string-match-p char query)
+                                            return char)
+                                   "%")
+                     :type perl)
+                   consult-async-split-style 'perlalt))))))
+    (consult--grep prompt #'consult--ripgrep-make-builder directory query)))
+
+(defun +vertico/project-search (&optional arg initial-query directory)
+  "Performs a live project search from the project root using ripgrep.
+If ARG (universal argument), include all files, even hidden or compressed ones,
+in the search."
+  (interactive "P")
+  (+vertico-file-search :query initial-query :in directory :all-files arg))
+
 (use-package consult
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
@@ -424,6 +512,23 @@
   (which-key-idle-delay 0.8)       ;; Set the time delay (in seconds) for the which-key popup to appear
   (which-key-max-description-length 25)
   (which-key-allow-imprecise-window-fit nil)) ;; Fixes which-key window slipping out in Emacs Daemon
+
+(use-package treemacs
+  :ensure t
+  :defer t
+)
+(use-package treemacs-evil
+  :after (treemacs evil)
+  :ensure t
+)
+(use-package treemacs-projectile
+  :after (treemacs projectile)
+  :ensure t
+)
+(use-package treemacs-magit
+  :after (treemacs magit)
+  :ensure t
+)
 
 ;; Make gc pauses faster by decreasing the threshold.
 (setq gc-cons-threshold (* 2 1000 1000))
