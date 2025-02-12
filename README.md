@@ -1,4 +1,3 @@
-https://github.com/MiniApollo/kickstart.emacs/assets/72389030/5c66130d-66b9-459b-a26d-210f3f937459
 
 # Table of Contents
 

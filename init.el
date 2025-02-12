@@ -55,10 +55,10 @@
   (general-evil-setup)
   ;; Global keys
   (general-define-key
-    :states '(normal visual motion emacs)
-    "K" 'scroll-down-command
-    "J" 'scroll-up-command
-  )
+   :states '(normal visual motion emacs)
+   "K" 'scroll-down-command
+   "J" 'scroll-up-command
+   )
   ;; Set up 'SPC' as the leader key
   (general-create-definer start/leader-keys
     :states '(normal insert visual motion emacs)
@@ -67,82 +67,90 @@
     :global-prefix "C-SPC") ;; Set global leader key
 
   (start/leader-keys
-    "SPC" '(execute-extended-command :wk "M-x")
-    "." '(find-file :wk "Find file")
-    "TAB" '(evil-switch-to-windows-last-buffer :wk "Last buffer")
-    "/" '(+vertico/project-search :wk "Search Project")
-    "p" '(projectile-command-map :wk "Projectile command map")
-  )
-
-  (start/leader-keys
-    "f" '(:ignore t :wk "Find")
-    "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
-    "f r" '(consult-recent-file :wk "Recent files")
-    "f f" '(consult-fd :wk "Fd search for files")
-    "f g" '(consult-ripgrep :wk "Ripgrep search in files")
-    "f l" '(consult-line :wk "Find line")
-    "f i" '(consult-imenu :wk "Imenu buffer locations")
-    "f s" '(save-buffer :wk "Save Buffer")
+   "SPC" '(execute-extended-command :wk "M-x")
+   "." '(find-file :wk "Find file")
+   "TAB" '(evil-switch-to-windows-last-buffer :wk "Last buffer")
+   "/" '(+vertico/project-search :wk "Search Project")
+   "p" '(projectile-command-map :wk "Projectile command map")
    )
 
   (start/leader-keys
-    "b" '(:ignore t :wk "Buffer Bookmarks")
-    "b b" '(consult-buffer :wk "Switch buffer")
-    "b k" '(kill-this-buffer :wk "Kill this buffer")
-    "b i" '(ibuffer :wk "Ibuffer")
-    "b n" '(next-buffer :wk "Next buffer")
-    "b p" '(previous-buffer :wk "Previous buffer")
-    "b r" '(revert-buffer :wk "Reload buffer")
-    "b j" '(consult-bookmark :wk "Bookmark jump")
-    "b s" '(scratch-buffer :wk "Scratch Buffer")
+   "f" '(:ignore t :wk "Find")
+   "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
+   "f r" '(consult-recent-file :wk "Recent files")
+   "f f" '(consult-fd :wk "Fd search for files")
+   "f g" '(consult-ripgrep :wk "Ripgrep search in files")
+   "f l" '(consult-line :wk "Find line")
+   "f i" '(consult-imenu :wk "Imenu buffer locations")
+   "f s" '(save-buffer :wk "Save Buffer")
+   )
+
+  (start/leader-keys
+   "b" '(:ignore t :wk "Buffer Bookmarks")
+   "b b" '(persp-switch-to-buffer :wk "Switch project buffer")
+   "b B" '(consult-buffer :wk "Switch buffer")
+   "b d" '(kill-this-buffer :wk "Kill this buffer")
+   "b i" '(ibuffer :wk "Ibuffer")
+   "b n" '(next-buffer :wk "Next buffer")
+   "b p" '(previous-buffer :wk "Previous buffer")
+   "b r" '(revert-buffer :wk "Reload buffer")
+   "b j" '(consult-bookmark :wk "Bookmark jump")
+   "b s" '(scratch-buffer :wk "Scratch Buffer")
+   )
+
+  (start/leader-keys
+   "d" '(:ignore t :wk "Dired")
+   "j v" '(dired :wk "Open dired")
+   "d j" '(dired-jump :wk "Dired jump to current")
+   ;; These should really be under p but that's managed by projectile
+   "d a" '(projectile-add-known-project :wk "Add Project")
+   "d t" '(treemacs :wk "Treemacs")
+   )
+
+  (start/leader-keys
+   "e" '(:ignore t :wk "Eglot Evaluate")
+   "e e" '(eglot-reconnect :wk "Eglot Reconnect")
+   "e f" '(eglot-format :wk "Eglot Format")
+   "e l" '(consult-flymake :wk "Consult Flymake")
+   "e b" '(eval-buffer :wk "Evaluate elisp in buffer")
+   "e r" '(eval-region :wk "Evaluate elisp in region")
+   )
+
+  (start/leader-keys
+   "g" '(:ignore t :wk "Git")
+   "g s" '(magit-status :wk "Magit status")
+   )
+
+  (start/leader-keys
+   "h" '(:ignore t :wk "Help") ;; To get more help use C-h commands (describe variable, function, etc.)
+   "h q" '(save-buffers-kill-emacs :wk "Quit Emacs and Daemon")
+   "h r" '((lambda () (interactive)
+             (load-file "~/.config/emacs/init.el"))
+           :wk "Reload Emacs config")
+   )
+
+  (start/leader-keys
+   "s" '(:ignore t :wk "Show")
+   "s e" '(eat :wk "Eat terminal")
+   )
+
+  (start/leader-keys
+   "t" '(:ignore t :wk "Toggle")
+   "t t" '(visual-line-mode :wk "Toggle truncated lines (wrap)")
+   "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
+   )
+
+  (start/leader-keys
+   "w" '(:ignore t :wk "Windows and Workspaces")
+   "w h" '(evil-window-left :wk "Window left")
+   "w l" '(evil-window-right :wk "Window right")
+   "w j" '(evil-window-down :wk "Window Down")
+   "w k" '(evil-window-up :wk "Window Up")
+   "w /" '(evil-window-vsplit :wk "Vertical Split")
+   "w -" '(evil-window-split :wk "Vertical Split")
+   "w d" '(evil-window-delete :wk "Close window")
+   )
   )
-
-  (start/leader-keys
-    "d" '(:ignore t :wk "Dired")
-    "j v" '(dired :wk "Open dired")
-    "d j" '(dired-jump :wk "Dired jump to current")
-	;; These should really be under p but that's managed by projectile
-    "d a" '(projectile-add-known-project :wk "Add Project")
-    "d t" '(treemacs :wk "Treemacs")
-  )
-
-  (start/leader-keys
-    "e" '(:ignore t :wk "Eglot Evaluate")
-    "e e" '(eglot-reconnect :wk "Eglot Reconnect")
-    "e f" '(eglot-format :wk "Eglot Format")
-    "e l" '(consult-flymake :wk "Consult Flymake")
-    "e b" '(eval-buffer :wk "Evaluate elisp in buffer")
-    "e r" '(eval-region :wk "Evaluate elisp in region"))
-
-  (start/leader-keys
-    "g" '(:ignore t :wk "Git")
-    "g s" '(magit-status :wk "Magit status"))
-
-  (start/leader-keys
-    "h" '(:ignore t :wk "Help") ;; To get more help use C-h commands (describe variable, function, etc.)
-    "h q" '(save-buffers-kill-emacs :wk "Quit Emacs and Daemon")
-    "h r" '((lambda () (interactive)
-              (load-file "~/.config/emacs/init.el"))
-            :wk "Reload Emacs config"))
-
-  (start/leader-keys
-    "s" '(:ignore t :wk "Show")
-    "s e" '(eat :wk "Eat terminal"))
-
-  (start/leader-keys
-    "t" '(:ignore t :wk "Toggle")
-    "t t" '(visual-line-mode :wk "Toggle truncated lines (wrap)")
-    "t l" '(display-line-numbers-mode :wk "Toggle line numbers")))
-
-  (start/leader-keys
-    "w" '(:ignore t :wk "Windows and Workspaces")
-    "w h" '(evil-window-left :wk "Window left")
-    "w l" '(evil-window-right :wk "Window right")
-    "w j" '(evil-window-down :wk "Window Down")
-    "w k" '(evil-window-up :wk "Window Up")
-    "w /" '(evil-window-vsplit :wk "Vertical Split")
-    "w -" '(evil-window-split :wk "Vertical Split")
-    "w d" '(evil-window-delete :wk "Close window"))
 
 (use-package emacs
   :custom
@@ -153,8 +161,7 @@
 
   (delete-selection-mode t)   ;; Select text and delete it by typing.
   (electric-indent-mode nil)  ;; Turn off the weird indenting that Emacs does by default.
-  (electric-pair-mode t)      ;; Turns on automatic parens pairing
-
+  (electric-pair-mode f)      ;; Turns on automatic parens pairing
   (blink-cursor-mode nil)     ;; Don't blink cursor
   (global-auto-revert-mode t) ;; Automatically reload file and show changes if the file has changed
 
@@ -228,9 +235,98 @@
   (projectile-mode)
   :custom
   (projectile-run-use-comint-mode t) ;; Interactive run dialog when running projects inside emacs (like giving input)
-  (projectile-switch-project-action #'projectile-dired) ;; Open dired when switching to a project
-  (projectile-project-search-path '("~/projects/" "~/work/" ("~/github" . 1)))) ;; . 1 means only search the first subdirectory level for projects
+  (projectile-switch-project-action #'projectile-find-file) ;; Open find file when switching to a project
+  (projectile-project-search-path '(("~/Git" . 1) ("~/Git/DKIST" . 1) ("~/Git/Aperio" . 1)))) ;; . 1 means only search the first subdirectory level for projects
 ;; Use Bookmarks for smaller, not standard projects
+
+(use-package persp-mode
+  :ensure t
+  )
+
+(with-eval-after-load "persp-mode"
+  (defvar persp-mode-projectile-bridge-before-switch-selected-window-buffer nil)
+
+  ;; (setq persp-add-buffer-on-find-file 'if-not-autopersp)
+
+  (persp-def-auto-persp "projectile"
+						:parameters '((dont-save-to-file . t)
+									  (persp-mode-projectile-bridge . t))
+						:hooks '(projectile-before-switch-project-hook
+								 projectile-after-switch-project-hook
+								 projectile-find-file-hook
+								 find-file-hook)
+						:dyn-env '((after-switch-to-buffer-adv-suspend t))
+						:switch 'frame
+						:predicate
+						#'(lambda (buffer &optional state)
+							(if (eq 'projectile-before-switch-project-hook
+									(alist-get 'hook state))
+								state
+							  (and
+							   projectile-mode
+							   (buffer-live-p buffer)
+							   (buffer-file-name buffer)
+							   ;; (not git-commit-mode)
+							   (projectile-project-p)
+							   (or state t))))
+						:get-name
+						#'(lambda (state)
+							(if (eq 'projectile-before-switch-project-hook
+									(alist-get 'hook state))
+								state
+							  (push (cons 'persp-name
+										  (concat "p) "
+												  (with-current-buffer (alist-get 'buffer state)
+													(projectile-project-name))))
+									state)
+							  state))
+						:on-match
+						#'(lambda (state)
+							(let ((hook (alist-get 'hook state))
+								  (persp (alist-get 'persp state))
+								  (buffer (alist-get 'buffer state)))
+							  (case hook
+									(projectile-before-switch-project-hook
+									 (let ((win (if (minibuffer-window-active-p (selected-window))
+													(minibuffer-selected-window)
+												  (selected-window))))
+									   (when (window-live-p win)
+										 (setq persp-mode-projectile-bridge-before-switch-selected-window-buffer
+											   (window-buffer win)))))
+
+									(projectile-after-switch-project-hook
+									 (when (buffer-live-p
+											persp-mode-projectile-bridge-before-switch-selected-window-buffer)
+									   (let ((win (selected-window)))
+										 (unless (eq (window-buffer win)
+													 persp-mode-projectile-bridge-before-switch-selected-window-buffer)
+										   (set-window-buffer
+											win persp-mode-projectile-bridge-before-switch-selected-window-buffer)))))
+
+									(find-file-hook
+									 (setcdr (assq :switch state) nil)))
+							  (if (case hook
+										(projectile-before-switch-project-hook nil)
+										(t t))
+								  (persp--auto-persp-default-on-match state)
+								(setcdr (assq :after-match state) nil)))
+							state)
+						:after-match
+						#'(lambda (state)
+							(when (eq 'find-file-hook (alist-get 'hook state))
+							  (run-at-time 0.5 nil
+										   #'(lambda (buf persp)
+											   (when (and (eq persp (get-current-persp))
+														  (not (eq buf (window-buffer (selected-window)))))
+												 ;; (switch-to-buffer buf)
+												 (persp-add-buffer buf persp t nil)))
+										   (alist-get 'buffer state)
+										   (get-current-persp)))
+							(persp--auto-persp-default-after-match state)))
+
+  ;; (add-hook 'persp-after-load-state-functions
+  ;;           #'(lambda (&rest args) (persp-auto-persps-pickup-buffers)) t)
+  )
 
 ;;(use-package eglot
 ;;  :ensure nil ;; Don't install eglot because it's now built-in
