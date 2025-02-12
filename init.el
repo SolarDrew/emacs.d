@@ -59,6 +59,15 @@
    "K" 'scroll-down-command
    "J" 'scroll-up-command
    )
+
+  ;; Set up a local-leader
+  (general-create-definer my-local-leader
+    :prefix ","
+    )
+  (my-local-leader
+   :states 'normal
+   "a" 'ranger
+   )
   ;; Set up 'SPC' as the leader key
   (general-create-definer start/leader-keys
     :states '(normal insert visual motion emacs)
@@ -67,91 +76,99 @@
     :global-prefix "C-SPC") ;; Set global leader key
 
   (start/leader-keys
-	"SPC" '(execute-extended-command :wk "M-x")
-	"." '(find-file :wk "Find file")
-	"TAB" '(evil-switch-to-windows-last-buffer :wk "Last buffer")
-	"/" '(+vertico/project-search :wk "Search Project")
-	;; "p" '(project-prefix-map :wk "Project command map")
-	)
+    "SPC" '(execute-extended-command :wk "M-x")
+    "." '(find-file :wk "Find file")
+    "TAB" '(evil-switch-to-windows-last-buffer :wk "Last buffer")
+    "/" '(+vertico/project-search :wk "Search Project")
+    ;; "p" '(project-prefix-map :wk "Project command map")
+    )
 
   (start/leader-keys
-	"f" '(:ignore t :wk "Find")
-	"f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
-	"f r" '(consult-recent-file :wk "Recent files")
-	"f f" '(consult-fd :wk "Fd search for files")
-	"f g" '(consult-ripgrep :wk "Ripgrep search in files")
-	"f l" '(consult-line :wk "Find line")
-	"f i" '(consult-imenu :wk "Imenu buffer locations")
-	"f s" '(save-buffer :wk "Save Buffer")
-	)
+    "a" '(:ignore t :wk "Applications")
+    "a r" '(ranger :wk "Ranger")
+    )
+
+  ;;(start/leader-keys
+  ;;  "c" '(:ignore t :wk "Code")
+  ;;  "c l" '(comment-or-uncomment-region :wk "Toggle Comments")
+  ;;  )
 
   (start/leader-keys
-	"b" '(:ignore t :wk "Buffer Bookmarks")
-	"b b" '(consult-buffer :wk "Switch buffer")
-	"b d" '(kill-this-buffer :wk "Kill this buffer")
-	"b i" '(ibuffer :wk "Ibuffer")
-	"b n" '(next-buffer :wk "Next buffer")
-	"b p" '(previous-buffer :wk "Previous buffer")
-	"b r" '(revert-buffer :wk "Reload buffer")
-	"b j" '(consult-bookmark :wk "Bookmark jump")
-	"b s" '(scratch-buffer :wk "Scratch Buffer")
-	)
+    "f" '(:ignore t :wk "Find")
+    "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
+    "f r" '(consult-recent-file :wk "Recent files")
+    "f f" '(consult-fd :wk "Fd search for files")
+    "f g" '(consult-ripgrep :wk "Ripgrep search in files")
+    "f l" '(consult-line :wk "Find line")
+    "f i" '(consult-imenu :wk "Imenu buffer locations")
+    "f s" '(save-buffer :wk "Save Buffer")
+    )
 
   (start/leader-keys
-	"d" '(:ignore t :wk "Dired")
-	"j v" '(dired :wk "Open dired")
-	"d j" '(dired-jump :wk "Dired jump to current")
-	;; These should really be under p but that's managed by projectile
-	)
+    "b" '(:ignore t :wk "Buffer Bookmarks")
+    "b b" '(consult-buffer :wk "Switch buffer")
+    "b d" '(kill-current-buffer :wk "Kill buffer")
+    "b i" '(ibuffer :wk "Ibuffer")
+    "b n" '(next-buffer :wk "Next buffer")
+    "b p" '(previous-buffer :wk "Previous buffer")
+    "b r" '(revert-buffer :wk "Reload buffer")
+    "b j" '(consult-bookmark :wk "Bookmark jump")
+    "b s" '(scratch-buffer :wk "Scratch Buffer")
+    )
 
   (start/leader-keys
-	"e" '(:ignore t :wk "Eglot Evaluate")
-	"e e" '(eglot-reconnect :wk "Eglot Reconnect")
-	"e f" '(eglot-format :wk "Eglot Format")
-	"e l" '(consult-flymake :wk "Consult Flymake")
-	"e b" '(eval-buffer :wk "Evaluate elisp in buffer")
-	"e r" '(eval-region :wk "Evaluate elisp in region")
-	)
+    "d" '(:ignore t :wk "Dired")
+    "j v" '(dired :wk "Open dired")
+    "d j" '(dired-jump :wk "Dired jump to current")
+    )
 
   (start/leader-keys
-	"g" '(:ignore t :wk "Git")
-	"g s" '(magit-status :wk "Magit status")
-	)
+    "e" '(:ignore t :wk "Eglot Evaluate")
+    "e e" '(eglot-reconnect :wk "Eglot Reconnect")
+    "e f" '(eglot-format :wk "Eglot Format")
+    "e l" '(consult-flymake :wk "Consult Flymake")
+    "e b" '(eval-buffer :wk "Evaluate elisp in buffer")
+    "e r" '(eval-region :wk "Evaluate elisp in region")
+    )
 
   (start/leader-keys
-	"h" '(:ignore t :wk "Help") ;; To get more help use C-h commands (describe variable, function, etc.)
-	"h q" '(save-buffers-kill-emacs :wk "Quit Emacs and Daemon")
-	"h r" '((lambda () (interactive)
+    "g" '(:ignore t :wk "Git")
+    "g s" '(magit-status :wk "Magit status")
+    )
+
+  (start/leader-keys
+    "h" '(:ignore t :wk "Help") ;; To get more help use C-h commands (describe variable, function, etc.)
+    "h q" '(save-buffers-kill-emacs :wk "Quit Emacs and Daemon")
+    "h r" '((lambda () (interactive)
               (load-file "~/.config/emacs/init.el"))
-			:wk "Reload Emacs config")
-	)
+        	:wk "Reload Emacs config")
+    )
 
   (start/leader-keys
-	"s" '(:ignore t :wk "Show")
-	"s e" '(eat :wk "Eat terminal")
-	)
+    "s" '(:ignore t :wk "Show")
+    "s e" '(eat :wk "Eat terminal")
+    )
 
   (start/leader-keys
-	"t" '(:ignore t :wk "Toggle")
-	"t t" '(visual-line-mode :wk "Toggle truncated lines (wrap)")
-	"t l" '(display-line-numbers-mode :wk "Toggle line numbers")
-	)
+    "t" '(:ignore t :wk "Toggle")
+    "t t" '(visual-line-mode :wk "Toggle truncated lines (wrap)")
+    "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
+    )
 
   (start/leader-keys
-	"w" '(:ignore t :wk "Windows and Workspaces")
-	"w h" '(evil-window-left :wk "Window left")
-	"w l" '(evil-window-right :wk "Window right")
-	"w j" '(evil-window-down :wk "Window Down")
-	"w k" '(evil-window-up :wk "Window Up")
-	"w /" '(evil-window-vsplit :wk "Vertical Split")
-	"w -" '(evil-window-split :wk "Vertical Split")
-	"w d" '(evil-window-delete :wk "Close window")
-	)
+    "w" '(:ignore t :wk "Windows and Workspaces")
+    "w h" '(evil-window-left :wk "Window left")
+    "w l" '(evil-window-right :wk "Window right")
+    "w j" '(evil-window-down :wk "Window Down")
+    "w k" '(evil-window-up :wk "Window Up")
+    "w /" '(evil-window-vsplit :wk "Vertical Split")
+    "w -" '(evil-window-split :wk "Vertical Split")
+    "w d" '(evil-window-delete :wk "Close window")
+    )
 
   (start/leader-keys
     "p" '(:ignore t :wk "Projects")
-	"p a" '(projectile-add-known-project :wk "Add Project")
-	"p t" '(treemacs :wk "Treemacs")
+    "p t" '(treemacs :wk "Treemacs")
     ;; Copied from project.el
     "p !" '(project-shell-command :wk "Run command")
     "p &" '(project-async-shell-command :wk "Run command (async)")
@@ -165,13 +182,14 @@
     "p c" '(project-compile :wk "Compile Project")
     "p e" '(project-eshell :wk "Run Shell")
     "p k" '(project-kill-buffers :wk "Kill all buffers")
-    "p p" '(project-switch-project :wk "Switch Project")
+    "p p" '(tabspaces-open-or-create-project-and-workspace :wk "Switch Tabspaces")
+    "p P" '(project-switch-project :wk "Switch Project")
     "p g" '(project-find-regexp :wk "Find matches for regexp")
     "p G" '(project-or-external-find-regexp :wk "Find matches for regexp in project or external")
     "p r" '(project-query-replace-regexp :wk "Replace regexp")
     "p x" '(project-execute-extended-command :wk "Execute extended command")
     "p o" '(project-any-command :wk "Execute any command")
-	)
+    )
 
   (start/leader-keys
     "l" '(:ignore t :wk "Tabspaces")
@@ -185,11 +203,11 @@
     "l l" '(tabspaces-switch-or-create-workspace :wk "Switch or Create Workspace")
     "l t" '(tabspaces-switch-buffer-and-tab :wk "Switch Buffer and tab")
     ;; General Tab Control
-	"l TAB" '(tab-previous :wk "Previous Tab")
-	"l L" '(tab-move :wk "Move Tab Right")
-	"l H" '((lambda () 
+    "l TAB" '(tab-previous :wk "Previous Tab")
+    "l L" '(tab-move :wk "Move Tab Right")
+    "l H" '((lambda () 
               (tab-move -1))
-			:wk "Move Tab Left")
+        	:wk "Move Tab Left")
     )
   )
 
@@ -314,27 +332,188 @@
 	"Set workspace buffer list for consult-buffer.")
   (add-to-list 'consult-buffer-sources 'consult--source-workspace))
 
-;;(use-package eglot
-;;  :ensure nil ;; Don't install eglot because it's now built-in
-;;  :hook ((c-mode c++-mode ;; Autostart lsp servers for a given mode
-;;                 lua-mode) ;; Lua-mode needs to be installed
-;;         . eglot-ensure)
-;;  :custom
-;;  ;; Good default
-;;  (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
-;;  (eglot-autoshutdown t);; Shutdown unused servers.
-;;  (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
-;;  ;; Manual lsp servers
-;;  :config
-;;  (add-to-list 'eglot-server-programs
-;;               `(lua-mode . ("PATH_TO_THE_LSP_FOLDER/bin/lua-language-server" "-lsp"))) ;; Adds our lua lsp server to eglot's server list
-;;  )
+(use-package eglot
+  :ensure nil ;; Don't install eglot because it's now built-in
+  :hook ((python-mode ;; Autostart lsp servers for a given mode
+          pytohn-ts-mode)
+         . eglot-ensure)
+  :custom
+  ;; Good default
+  (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
+  (eglot-autoshutdown t);; Shutdown unused servers.
+  (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
+  (eglot-workspace-configuration
+   '((pylsp
+      (plugins
+       (ruff
+    	(lineLength . 150)
+    	(exclude . "E501")
+    	)
+       (jedi_completion
+    	(fuzzy . t)
+    	)
+       )
+      ))
+   )
+  ;; Manual lsp servers
+  ;;:config
+  ;;(add-to-list 'eglot-server-programs
+  ;;             `(python-mode . ,(eglot-alternatives
+  ;;                               '(("ruff-lsp")
+  ;;                                 ("pylsp" "-v"))))
+  ;;             )
+  )
 
 (use-package yasnippet-snippets
   :hook (prog-mode . yas-minor-mode))
 
-(use-package python-mode
-  :mode "\\.py\\'") ;; Only start in a Python file
+(setq major-mode-remap-alist
+      '((python-mode . python-ts-mode)))
+
+(use-package python-pytest)
+
+;; Add to __all__
+(defsubst python-in-string/comment ()
+  "Return non-nil if point is in a Python literal (a comment or string)."
+  ;; We don't need to save the match data.
+  (nth 8 (syntax-ppss)))
+
+(defun python-add-to-all ()
+  "Take the symbol under the point and add it to the __all__ list, if it's not already there."
+  (interactive)
+  (save-excursion
+    (let ((thing (thing-at-point 'symbol)))
+      (if (progn (goto-char (point-min))
+                 (let (found)
+                   (while (and (not found)
+                               (re-search-forward (rx symbol-start "__all__" symbol-end
+                                                      (0+ space) "=" (0+ space)
+                                                      (syntax open-parenthesis))
+                                                  nil t))
+                     (setq found (not (python-in-string/comment))))
+                   found))
+          (when (not (looking-at (rx-to-string
+                                  `(and (0+ (not (syntax close-parenthesis)))
+                                        (syntax string-quote) ,thing (syntax string-quote)))))
+            (insert (format "\'%s\', " thing)))
+        (beginning-of-buffer)
+        ;; Put before any import lines, or if none, the first class or
+        ;; function.
+        (when (re-search-forward (rx bol (or "import" "from") symbol-end) nil t)
+          (re-search-forward (rx symbol-start (or "def" "class") symbol-end) nil t))
+        (forward-line -1)
+        (insert (format "\n__all__ = [\'%s\']\n\n" thing))))))
+
+(defun +python-executable-find (exe)
+  "Resolve the path to the EXE executable.
+    Tries to be aware of your active conda/pipenv/virtualenv environment, before
+    falling back on searching your PATH."
+  (if (file-name-absolute-p exe)
+      (and (file-executable-p exe)
+           exe)
+    (let ((exe-root (format "bin/%s" exe)))
+      (cond ((when python-shell-virtualenv-root
+               (let ((bin (expand-file-name exe-root python-shell-virtualenv-root)))
+                 (if (file-exists-p bin) bin))))
+            ((when (require 'conda nil t)
+               (let ((bin (expand-file-name (concat conda-env-current-name "/" exe-root)
+                                            (conda-env-default-location))))
+                 (if (file-executable-p bin) bin))))
+            ((when-let (bin (projectile-locate-dominating-file default-directory exe-root))
+               (setq-local doom-modeline-python-executable (expand-file-name exe-root bin))))
+            ((executable-find exe))))))
+
+(defun +python/open-repl ()
+  "Open the Python REPL."
+  (interactive)
+  (require 'python)
+  (unless python-shell-interpreter
+    (user-error "`python-shell-interpreter' isn't set"))
+  (pop-to-buffer
+   (process-buffer
+    (let ((dedicated (bound-and-true-p python-shell-dedicated)))
+      (if-let* ((pipenv (+python-executable-find "pipenv"))
+                (pipenv-project (pipenv-project-p)))
+          (let ((default-directory pipenv-project)
+                (python-shell-interpreter-args
+                 (format "run %s %s"
+                         python-shell-interpreter
+                         python-shell-interpreter-args))
+                (python-shell-interpreter pipenv))
+            (run-python nil dedicated t))
+        (run-python nil dedicated t))))))
+
+(defun +python/open-ipython-repl ()
+  "Open an IPython REPL."
+  (interactive)
+  (require 'python)
+  (let ((python-shell-interpreter
+         (or (+python-executable-find (car +python-ipython-command))
+             "ipython"))
+        (python-shell-interpreter-args
+         (string-join (cdr +python-ipython-command) " ")))
+    (+python/open-repl)))
+
+(defvar +python-ipython-command '("ipython" "-i" "--simple-prompt" "--no-color-info")
+  "Command to initialize the ipython REPL for `+python/open-ipython-repl'.")
+
+(defun cadair/run-restart-repl ()
+  "Run a new python repl in a window which does not have focus."
+  (interactive)
+  (setq initial-buffer (current-buffer))
+  (if (python-shell-get-buffer)
+      (kill-buffer (python-shell-get-buffer)))
+  (+python/open-ipython-repl)
+  (evil-normal-state)
+  (pop-to-buffer initial-buffer)
+  )
+
+(defun cadair/run-in-repl (arg)
+  "Run a python buffer in a new ipython repl"
+  (interactive "P")
+  (cadair/run-restart-repl)
+  (run-at-time 0.5 nil 'python-shell-send-buffer)
+  )
+
+(defun cadair/run-in-repl-switch (arg)
+  "Run a python buffer in a new ipython repl"
+  (interactive "P")
+  (cadair/run-restart-repl)
+  (run-at-time 0.5 nil 'python-shell-send-buffer)
+  (run-at-time 1.0 nil (pop-to-buffer (python-shell-get-buffer)))
+  )
+
+(defun cadair/python-execute-file (arg)
+  "Execute a python script in a shell."
+  (interactive "P")
+  ;; set compile command to buffer-file-name
+  ;; universal argument put compile buffer in comint mode
+  (let ((universal-argument t)
+        (compile-command (format "python %s"
+                                 (shell-quote-argument (file-name-nondirectory buffer-file-name)))))
+    (if arg
+        (call-interactively 'compile)
+      (compile compile-command t)
+      (with-current-buffer (get-buffer "*compilation*")
+        (inferior-python-mode)))))
+
+(my-local-leader
+  :states 'normal
+  :keymaps 'python-ts-mode-map
+  "t a" 'python-pytest
+  "t f" 'python-pytest-file-dwim
+  "t F" 'python-pytest-file
+  "t t" 'python-pytest-run-def-or-class-at-point-dwim
+  "t T" 'python-pytest-run-def-or-class-at-point
+  "t r" 'python-pytest-repeat
+  "t p" 'python-pytest-dispatch
+
+  "c" 'cadair/python-execute-file
+  "r" 'cadair/run-in-repl
+  "R" 'cadair/run-in-repl-switch
+  "a" 'python-add-to-all
+  "g g" 'evil-goto-definition
+  )
 
 (use-package org
   :ensure nil
@@ -564,14 +743,14 @@ in the search."
   ;; By default `consult-project-function' uses `project-root' from project.el.
   ;; Optionally configure a different project root function.
    ;;;; 1. project.el (the default)
-  ;; (setq consult-project-function #'consult--default-project--function)
+   ;; (setq consult-project-function #'consult--default-project--function)
    ;;;; 2. vc.el (vc-root-dir)
   ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
    ;;;; 3. locate-dominating-file
   ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
    ;;;; 4. projectile.el (projectile-project-root)
-  (autoload 'projectile-project-root "projectile")
-  (setq consult-project-function (lambda (_) (projectile-project-root)))
+  ;; (autoload 'projectile-project-root "projectile")
+  ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
    ;;;; 5. No project support
   ;; (setq consult-project-function nil)
   )
@@ -598,19 +777,18 @@ in the search."
 (use-package treemacs
   :ensure t
   :defer t
-)
+  :init (treemacs-project-follow-mode)
+  )
 (use-package treemacs-evil
   :after (treemacs evil)
   :ensure t
-)
-(use-package treemacs-projectile
-  :after (treemacs projectile)
-  :ensure t
-)
+  )
 (use-package treemacs-magit
   :after (treemacs magit)
   :ensure t
-)
+  )
+
+(use-package ranger)
 
 ;; Make gc pauses faster by decreasing the threshold.
 (setq gc-cons-threshold (* 2 1000 1000))
