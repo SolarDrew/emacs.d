@@ -27,28 +27,8 @@
                          ("elpa" . "https://elpa.gnu.org/packages/")
                          ("nongnu" . "https://elpa.nongnu.org/nongnu/"))) ;; For Eat Terminal
 
-(use-package evil
-  :init ;; Execute code Before a package is loaded
-  (evil-mode)
-  :config ;; Execute code After a package is loaded
-  (evil-set-initial-state 'eat-mode 'insert) ;; Set initial state in eat terminal to insert mode
-  :custom ;; Customization of package custom variables
-  (evil-want-keybinding nil)    ;; Disable evil bindings in other modes (It's not consistent and not good)
-  (evil-want-C-u-scroll t)      ;; Set C-u to scroll up
-  (evil-want-C-i-jump nil)      ;; Disables C-i jump
-  (evil-undo-system 'undo-redo) ;; C-r to redo
-  (org-return-follows-link t)   ;; Sets RETURN key in org-mode to follow links
-  ;; Unmap keys in 'evil-maps. If not done, org-return-follows-link will not work
-  :bind (:map evil-motion-state-map
-              ("SPC" . nil)
-              ("RET" . nil)
-              ("TAB" . nil)))
-(use-package evil-collection
-  :after evil
-  :config
-  ;; Setting where to use evil-collection
-  (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult))
-  (evil-collection-init))
+;;(use-package quelpa)
+;;(use-package quelpa-use-package)
 
 (use-package general
   :config
@@ -264,15 +244,15 @@
 (add-to-list 'default-frame-alist '(alpha-background . 90)) ;; For all new frames henceforth
 
 (set-face-attribute 'default nil
-                    ;; :font "JetBrains Mono" ;; Set your favorite type of font or download JetBrains Mono
+                    :font "JetBrains Mono"
                     :height 120
                     :weight 'medium)
 ;; This sets the default font on all graphical frames created after restarting Emacs.
 ;; Does the same thing as 'set-face-attribute default' above, but emacsclient fonts
 ;; are not right unless I also add this method of setting the default font.
 
-;;(add-to-list 'default-frame-alist '(font . "JetBrains Mono")) ;; Set your favorite font
-(setq-default line-spacing 0.12)
+(add-to-list 'default-frame-alist '(font . "JetBrains Mono")) ;; Set your favorite font
+(setq-default line-spacing 0.01)
 
 (use-package emacs
   :bind
@@ -286,8 +266,7 @@
   :custom
   (doom-modeline-height 25)     ;; Sets modeline height
   (doom-modeline-bar-width 5)   ;; Sets right bar width
-  (doom-modeline-persp-name t)  ;; Adds perspective name to modeline
-  (doom-modeline-persp-icon t)) ;; Adds folder icon next to persp name
+  )
 
 (use-package project
   :custom
@@ -335,34 +314,24 @@
 (use-package eglot
   :ensure nil ;; Don't install eglot because it's now built-in
   :hook ((python-mode ;; Autostart lsp servers for a given mode
-          pytohn-ts-mode)
+          python-ts-mode)
          . eglot-ensure)
   :custom
-  ;; Good default
   (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
   (eglot-autoshutdown t);; Shutdown unused servers.
   (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
-  (eglot-workspace-configuration
-   '((pylsp
-      (plugins
-       (ruff
-    	(lineLength . 150)
-    	(exclude . "E501")
-    	)
-       (jedi_completion
-    	(fuzzy . t)
-    	)
-       )
-      ))
-   )
-  ;; Manual lsp servers
-  ;;:config
-  ;;(add-to-list 'eglot-server-programs
-  ;;             `(python-mode . ,(eglot-alternatives
-  ;;                               '(("ruff-lsp")
-  ;;                                 ("pylsp" "-v"))))
-  ;;             )
   )
+
+(defun restart-eglot ()
+  (interactive)
+  ;; Check if there's an active Eglot server
+  (let ((current-server (eglot-current-server)))
+    ;; If a server exists, prompt the user to continue
+    (if current-server
+          ;; Shut down the server if user confirms
+          (eglot-shutdown current-server)))
+  ;; Restart Eglot for the current buffer
+  (eglot-ensure))
 
 (use-package yasnippet-snippets
   :hook (prog-mode . yas-minor-mode))
@@ -371,6 +340,15 @@
       '((python-mode . python-ts-mode)))
 
 (use-package python-pytest)
+
+(use-package flymake-ruff
+  :ensure t
+  :hook (eglot-managed-mode . flymake-ruff-load))
+
+(use-package micromamba
+  :ensure t
+  :hook (micromamba-postactivate-hook . restart-eglot)
+  )
 
 ;; Add to __all__
 (defsubst python-in-string/comment ()

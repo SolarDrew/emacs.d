@@ -61,3 +61,5 @@ site-lisp/package/
 /custom-vars.el
 /custom.el
 tabsession.el
+/quelpa
+/straight

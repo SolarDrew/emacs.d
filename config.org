@@ -1,9 +1,9 @@
 (#+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes)
-#+Title: Emacs Kickstarter
-#+Author: MiniApollo
-#+Description: A starting point for Gnu Emacs with good defaults and packages that most people may want to use.
+#+Title: Cadair's Emacs Config
+#+Author: Stuart Mumford
+#+Description: Based on the excellent Kickstart https://github.com/MiniApollo/kickstart.emacs
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes
-#+Startup: showeverything
+#+Startup: Overview
 #+Options: toc:2
 
 * Table Of Contents :toc:
@@ -23,7 +23,8 @@
   - [[#modeline][Modeline]]
 - [[#development][Development]]
   - [[#projects][Projects]]
-  - [[#eglot][Eglot]]
+  - [[#language-server][Language Server]]
+  - [[#reformatting][Reformatting]]
   - [[#yasnippet][Yasnippet]]
   - [[#language-modes][Language modes]]
   - [[#terminal][Terminal]]
@@ -108,7 +109,30 @@ With Emacs 29 use-package is now built-in.
                              ("nongnu" . "https://elpa.nongnu.org/nongnu/"))) ;; For Eat Terminal
 #+end_src
 
-*** TODO Add Quelpa
+*** Quelpa
+#+begin_src emacs-lisp
+;;(use-package quelpa)
+;;(use-package quelpa-use-package)
+#+end_src
+*** Straight
+
+#+begin_src emacs-lisp
+;;    (defvar bootstrap-version)
+;;    (let ((bootstrap-file
+;;           (expand-file-name
+;;            "straight/repos/straight.el/bootstrap.el"
+;;            (or (bound-and-true-p straight-base-dir)
+;;                user-emacs-directory)))
+;;          (bootstrap-version 7))
+;;      (unless (file-exists-p bootstrap-file)
+;;        (with-current-buffer
+;;            (url-retrieve-synchronously
+;;             "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+;;             'silent 'inhibit-cookies)
+;;          (goto-char (point-max))
+;;          (eval-print-last-sexp)))
+;;      (load bootstrap-file nil 'nomessage))
+;;      #+end_src
 ** Evil Mode
 An extensible vi/vim layer for Emacs. Because…let’s face it. The Vim keybindings are just plain better.
 Notes:
@@ -374,15 +398,15 @@ With Emacs version 29, true transparency has been added.
 *** Setting fonts
 #+begin_src emacs-lisp
     (set-face-attribute 'default nil
-                        ;; :font "JetBrains Mono" ;; Set your favorite type of font or download JetBrains Mono
+                        :font "JetBrains Mono"
                         :height 120
                         :weight 'medium)
     ;; This sets the default font on all graphical frames created after restarting Emacs.
     ;; Does the same thing as 'set-face-attribute default' above, but emacsclient fonts
     ;; are not right unless I also add this method of setting the default font.
 
-    ;;(add-to-list 'default-frame-alist '(font . "JetBrains Mono")) ;; Set your favorite font
-    (setq-default line-spacing 0.12)
+    (add-to-list 'default-frame-alist '(font . "JetBrains Mono")) ;; Set your favorite font
+    (setq-default line-spacing 0.01)
 #+end_src
 
 *** Zooming In/Out
@@ -399,14 +423,13 @@ You can use the bindings C-+ C-- for zooming in/out. You can also use CTRL plus 
 ** Modeline
 Replace the default modeline with a prettier more useful.
 #+begin_src emacs-lisp
-    (use-package doom-modeline
-      :init (doom-modeline-mode 1)
-      :custom
-      (doom-modeline-height 25)     ;; Sets modeline height
-      (doom-modeline-bar-width 5)   ;; Sets right bar width
-      (doom-modeline-persp-name t)  ;; Adds perspective name to modeline
-      (doom-modeline-persp-icon t)) ;; Adds folder icon next to persp name
-#+end_src
+(use-package doom-modeline
+  :init (doom-modeline-mode 1)
+  :custom
+  (doom-modeline-height 25)     ;; Sets modeline height
+  (doom-modeline-bar-width 5)   ;; Sets right bar width
+  )
+      #+end_src
 
 * Development
 ** Projects
@@ -463,7 +486,8 @@ Then tabspaces
     	"Set workspace buffer list for consult-buffer.")
       (add-to-list 'consult-buffer-sources 'consult--source-workspace))
 #+END_SRC
-** Eglot
+** Language Server
+*** Eglot
 Language Server Protocol Support for Emacs. The built-in is now Eglot (with emacs 29).
 
 Eglot is fast and minimal, but requires manual setup for LSP servers (downloading).
@@ -472,50 +496,52 @@ For more [[https://www.gnu.org/software/emacs/manual/html_mono/eglot.html][infor
 Eglot is easy to set up, but the only difficult part is downloading and setting up the lsp servers.
 After that just add a hook with eglot-ensure to automatically start eglot for a given file type. And you are done.
 
-As an example to use C, C++ you need to install clangd(or ccls) and uncomment the following lines. Now the language server will start automatically when opening any c,c++ file.
-
-A harder example is Lua. Download the lua-language-server from their git repository, make the lua-language-server file executable at lua-language-server/bin.
-Uncomment the following lines and change the path to the language server executable. Now the language server will work.
-Or add the lua-language-server executable to your path.
-
 If you can use a package manager just install the lsp server and add a hook.
 Use visual block to uncomment easily in Org documents (C-v).
 #+begin_src emacs-lisp
     (use-package eglot
       :ensure nil ;; Don't install eglot because it's now built-in
       :hook ((python-mode ;; Autostart lsp servers for a given mode
-              pytohn-ts-mode)
+              python-ts-mode)
              . eglot-ensure)
       :custom
-      ;; Good default
       (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
       (eglot-autoshutdown t);; Shutdown unused servers.
       (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
-      (eglot-workspace-configuration
-       '((pylsp
-          (plugins
-           (ruff
-        	(lineLength . 150)
-        	(exclude . "E501")
-        	)
-           (jedi_completion
-        	(fuzzy . t)
-        	)
-           )
-          ))
-       )
-      ;; Manual lsp servers
-      ;;:config
-      ;;(add-to-list 'eglot-server-programs
-      ;;             `(python-mode . ,(eglot-alternatives
-      ;;                               '(("ruff-lsp")
-      ;;                                 ("pylsp" "-v"))))
-      ;;             )
       )
-
-
 #+end_src
 
+#+BEGIN_SRC emacs-lisp
+(defun restart-eglot ()
+  (interactive)
+  ;; Check if there's an active Eglot server
+  (let ((current-server (eglot-current-server)))
+    ;; If a server exists, prompt the user to continue
+    (if current-server
+          ;; Shut down the server if user confirms
+          (eglot-shutdown current-server)))
+  ;; Restart Eglot for the current buffer
+  (eglot-ensure))
+#+END_SRC
+*** lsp-bridge                                                    :ARCHIVE:
+https://github.com/manateelazycat/lsp-bridge
+#+begin_src emacs-lisp
+;;    (use-package markdown-mode)    
+;;    (use-package lsp-bridge
+;;      :straight '(lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
+;;    						 :files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
+;;    						 :build (:not compile))
+;;      :init
+;;      (global-lsp-bridge-mode))
+;;    :custom
+;;    (setq lsp-bridge-python-command "/home/stuart/.nix-profile/bin/python3.12")
+;;    (setq lsp-bridge-python-lsp-server "ruff")
+;;    (setq lsp-bridge-python-multi-lsp-server "pylsp_ruff")
+;;    (setq lsp-bridge-enable-hover-diagnostic t)
+#+end_src
+** TODO Reformatting
+Would be nice to have ruff --fix and ruff-format, isort etc all available.
+https://melpa.org/#/reformatter
 ** Yasnippet
 A template system for Emacs. And yasnippet-snippets is a snippet collection package.
 To use it write out the full keyword (or use autocompletion) and press Tab.
@@ -534,13 +560,28 @@ Currently it's tedious to use Treesitter, because emacs has not yet fully migrat
 Going "modern" with Python here, going to use tree-sitter and eglot for now.
 Some of this borrowed from https://gist.github.com/habamax/290cda0e0cdc6118eb9a06121b9bc0d7
 
+To install the grammar for a language run ~treesit-install-language-grammar~.
+
 #+begin_src emacs-lisp
     (setq major-mode-remap-alist
           '((python-mode . python-ts-mode)))
 
     (use-package python-pytest)
+
+    (use-package flymake-ruff
+      :ensure t
+      :hook (eglot-managed-mode . flymake-ruff-load))
+
+    (use-package micromamba
+      :ensure t
+      :hook (micromamba-postactivate-hook . restart-eglot)
+      )
 #+end_src
+***** TODO Use nixpkgs for treesitter grammars
 **** Custom Functions
+:PROPERTIES:
+:VISIBILITY: folded
+:END:
 Custom written functions for Python related stuff
 #+begin_src emacs-lisp
     ;; Add to __all__
@@ -689,8 +730,6 @@ Custom written functions for Python related stuff
       "g g" 'evil-goto-definition
       )
 #+end_src
-**** TODO lsp-bridge
-https://github.com/manateelazycat/lsp-bridge
 
 *** Org Mode
 Org mode is one of the things that emacs is loved for.
