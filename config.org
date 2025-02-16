@@ -7,6 +7,9 @@
 #+Options: toc:2
 
 * Table Of Contents :toc:
+:PROPERTIES:
+:VISIBILITY: all
+:END:
 - [[#introduction][Introduction]]
 - [[#important-to-load-first][Important to load first]]
   - [[#startup-performance][Startup Performance]]
@@ -66,7 +69,6 @@ Make startup faster by reducing the frequency of garbage collection. This will b
     ;; The default is 800 kilobytes. Measured in bytes.
     (setq gc-cons-threshold (* 50 1000 1000))
 #+end_src
-
 ** Auto-tangle Configuration file
 Auto-Tangle Org configuration file for better startup times.
 If you want to use this don't forget to add this to the top of the org document (#+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes)
@@ -88,7 +90,6 @@ automatically exports the configuration here to the associated output files.
 
     (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'start/org-babel-tangle-config)))
 #+end_src
-
 ** Use Package
 We use the default package manager package.el with use-package. Alternative package managers (straight.el, elpaca, etc.) are useful if you want to
 install packages from git repositories, if you want a specific, not very popular package that is not available on elpa or melpa,
@@ -115,7 +116,6 @@ With Emacs 29 use-package is now built-in.
 ;;(use-package quelpa-use-package)
 #+end_src
 *** Straight
-
 #+begin_src emacs-lisp
 ;;    (defvar bootstrap-version)
 ;;    (let ((bootstrap-file
@@ -132,13 +132,13 @@ With Emacs 29 use-package is now built-in.
 ;;          (goto-char (point-max))
 ;;          (eval-print-last-sexp)))
 ;;      (load bootstrap-file nil 'nomessage))
-;;      #+end_src
+#+end_src
 ** Evil Mode
 An extensible vi/vim layer for Emacs. Because…let’s face it. The Vim keybindings are just plain better.
 Notes:
 - You can toggle evil mode with C-z.
 - To paste without copy (yank) select the text and use P (shift-p).
-#+begin_src emacs-lisp
+  #+begin_src emacs-lisp
     (use-package evil
       :init ;; Execute code Before a package is loaded
       (evil-mode)
@@ -155,6 +155,7 @@ Notes:
                   ("SPC" . nil)
                   ("RET" . nil)
                   ("TAB" . nil)))
+
     (use-package evil-collection
       :after evil
       :config
@@ -336,11 +337,11 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
       (menu-bar-mode nil)         ;; Disable the menu bar
       (scroll-bar-mode nil)       ;; Disable the scroll bar
       (tool-bar-mode nil)         ;; Disable the tool bar
-      ;;(inhibit-startup-screen t)  ;; Disable welcome screen
+      (inhibit-startup-screen t)  ;; Disable welcome screen
 
       (delete-selection-mode t)   ;; Select text and delete it by typing.
-      (electric-indent-mode nil)  ;; Turn off the weird indenting that Emacs does by default.
-      (electric-pair-mode f)      ;; Turns on automatic parens pairing
+      (electric-indent-mode t)    ;; Turn off the weird indenting that Emacs does by default.
+      (electric-pair-mode nil)    ;; Turns off automatic parens pairing
       (blink-cursor-mode nil)     ;; Don't blink cursor
       (global-auto-revert-mode t) ;; Automatically reload file and show changes if the file has changed
 
@@ -499,6 +500,13 @@ After that just add a hook with eglot-ensure to automatically start eglot for a 
 If you can use a package manager just install the lsp server and add a hook.
 Use visual block to uncomment easily in Org documents (C-v).
 #+begin_src emacs-lisp
+  (defun get-python-env-root ()
+    "Return the value of `python-shell-virtualenv-root` if defined, otherwise nil."
+    ;; This should work for micromamba and venvs
+    (if (bound-and-true-p python-shell-virtualenv-root)
+        python-shell-virtualenv-root
+      nil))
+
     (use-package eglot
       :ensure nil ;; Don't install eglot because it's now built-in
       :hook ((python-mode ;; Autostart lsp servers for a given mode
@@ -508,6 +516,22 @@ Use visual block to uncomment easily in Org documents (C-v).
       (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
       (eglot-autoshutdown t);; Shutdown unused servers.
       (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
+  	
+  	;; Dynamically load the workspace configuration so that we set jedi to use the active workspace
+      (eglot-workspace-configuration
+       (lambda (&rest args)
+         (let ((venv-directory (get-pyton-env-root)))
+           (message "Located venv: %s" venv-directory)
+           `((:pylsp .
+              (:plugins
+               (:jedi_completion (:fuzzy t)
+                :jedi (:environment ,venv-directory)
+                :pydocstyle (:enabled nil)
+                :pycodestyle (:enabled nil)
+                :mccabe (:enabled nil)
+                :pyflakes (:enabled nil)
+                :flake8 (:enabled nil)
+                :black (:enabled nil))))))))
       )
 #+end_src
 
@@ -518,8 +542,8 @@ Use visual block to uncomment easily in Org documents (C-v).
   (let ((current-server (eglot-current-server)))
     ;; If a server exists, prompt the user to continue
     (if current-server
-          ;; Shut down the server if user confirms
-          (eglot-shutdown current-server)))
+        ;; Shut down the server if user confirms
+        (eglot-shutdown current-server)))
   ;; Restart Eglot for the current buffer
   (eglot-ensure))
 #+END_SRC
@@ -563,19 +587,21 @@ Some of this borrowed from https://gist.github.com/habamax/290cda0e0cdc6118eb9a0
 To install the grammar for a language run ~treesit-install-language-grammar~.
 
 #+begin_src emacs-lisp
-    (setq major-mode-remap-alist
-          '((python-mode . python-ts-mode)))
+  (setq major-mode-remap-alist
+        '((python-mode . python-ts-mode)))
 
-    (use-package python-pytest)
+  (use-package python-pytest)
 
-    (use-package flymake-ruff
-      :ensure t
-      :hook (eglot-managed-mode . flymake-ruff-load))
+  (use-package flymake-ruff
+    :ensure t
+    :hook (eglot-managed-mode . flymake-ruff-load))
 
-    (use-package micromamba
-      :ensure t
-      :hook (micromamba-postactivate-hook . restart-eglot)
-      )
+  (use-package pyvenv)
+  
+  (use-package micromamba
+    :ensure t
+    :hook (micromamba-postactivate-hook . restart-eglot)
+    )
 #+end_src
 ***** TODO Use nixpkgs for treesitter grammars
 **** Custom Functions
@@ -740,7 +766,7 @@ much like the literate programming ideas that Donald Knuth made famous.
     (use-package org
       :ensure nil
       :custom
-      (org-edit-src-content-indentation 4) ;; Set src block automatic indent to 4 instead of 2.
+      (org-edit-src-content-indentation 2) ;; Set src block automatic indent to 4 instead of 2.
 
       :hook
       (org-mode . org-indent-mode) ;; Indent text

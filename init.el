@@ -30,6 +30,46 @@
 ;;(use-package quelpa)
 ;;(use-package quelpa-use-package)
 
+;;    (defvar bootstrap-version)
+;;    (let ((bootstrap-file
+;;           (expand-file-name
+;;            "straight/repos/straight.el/bootstrap.el"
+;;            (or (bound-and-true-p straight-base-dir)
+;;                user-emacs-directory)))
+;;          (bootstrap-version 7))
+;;      (unless (file-exists-p bootstrap-file)
+;;        (with-current-buffer
+;;            (url-retrieve-synchronously
+;;             "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+;;             'silent 'inhibit-cookies)
+;;          (goto-char (point-max))
+;;          (eval-print-last-sexp)))
+;;      (load bootstrap-file nil 'nomessage))
+
+(use-package evil
+  :init ;; Execute code Before a package is loaded
+  (evil-mode)
+  :config ;; Execute code After a package is loaded
+  (evil-set-initial-state 'eat-mode 'insert) ;; Set initial state in eat terminal to insert mode
+  :custom ;; Customization of package custom variables
+  (evil-want-keybinding nil)    ;; Disable evil bindings in other modes (It's not consistent and not good)
+  (evil-want-C-u-scroll t)      ;; Set C-u to scroll up
+  (evil-want-C-i-jump nil)      ;; Disables C-i jump
+  (evil-undo-system 'undo-redo) ;; C-r to redo
+  (org-return-follows-link t)   ;; Sets RETURN key in org-mode to follow links
+  ;; Unmap keys in 'evil-maps. If not done, org-return-follows-link will not work
+  :bind (:map evil-motion-state-map
+              ("SPC" . nil)
+              ("RET" . nil)
+              ("TAB" . nil)))
+
+(use-package evil-collection
+  :after evil
+  :config
+  ;; Setting where to use evil-collection
+  (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult))
+  (evil-collection-init))
+
 (use-package general
   :config
   (general-evil-setup)
@@ -196,11 +236,11 @@
   (menu-bar-mode nil)         ;; Disable the menu bar
   (scroll-bar-mode nil)       ;; Disable the scroll bar
   (tool-bar-mode nil)         ;; Disable the tool bar
-  ;;(inhibit-startup-screen t)  ;; Disable welcome screen
+  (inhibit-startup-screen t)  ;; Disable welcome screen
 
   (delete-selection-mode t)   ;; Select text and delete it by typing.
-  (electric-indent-mode nil)  ;; Turn off the weird indenting that Emacs does by default.
-  (electric-pair-mode f)      ;; Turns on automatic parens pairing
+  (electric-indent-mode t)    ;; Turn off the weird indenting that Emacs does by default.
+  (electric-pair-mode nil)    ;; Turns off automatic parens pairing
   (blink-cursor-mode nil)     ;; Don't blink cursor
   (global-auto-revert-mode t) ;; Automatically reload file and show changes if the file has changed
 
@@ -311,16 +351,39 @@
 	"Set workspace buffer list for consult-buffer.")
   (add-to-list 'consult-buffer-sources 'consult--source-workspace))
 
-(use-package eglot
-  :ensure nil ;; Don't install eglot because it's now built-in
-  :hook ((python-mode ;; Autostart lsp servers for a given mode
-          python-ts-mode)
-         . eglot-ensure)
-  :custom
-  (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
-  (eglot-autoshutdown t);; Shutdown unused servers.
-  (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
-  )
+(defun get-python-env-root ()
+  "Return the value of `python-shell-virtualenv-root` if defined, otherwise nil."
+  ;; This should work for micromamba and venvs
+  (if (bound-and-true-p python-shell-virtualenv-root)
+      python-shell-virtualenv-root
+    nil))
+
+  (use-package eglot
+    :ensure nil ;; Don't install eglot because it's now built-in
+    :hook ((python-mode ;; Autostart lsp servers for a given mode
+            python-ts-mode)
+           . eglot-ensure)
+    :custom
+    (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
+    (eglot-autoshutdown t);; Shutdown unused servers.
+    (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
+	
+	;; Dynamically load the workspace configuration so that we set jedi to use the active workspace
+    (eglot-workspace-configuration
+     (lambda (&rest args)
+       (let ((venv-directory (get-pyton-env-root)))
+         (message "Located venv: %s" venv-directory)
+         `((:pylsp .
+            (:plugins
+             (:jedi_completion (:fuzzy t)
+              :jedi (:environment ,venv-directory)
+              :pydocstyle (:enabled nil)
+              :pycodestyle (:enabled nil)
+              :mccabe (:enabled nil)
+              :pyflakes (:enabled nil)
+              :flake8 (:enabled nil)
+              :black (:enabled nil))))))))
+    )
 
 (defun restart-eglot ()
   (interactive)
@@ -328,8 +391,8 @@
   (let ((current-server (eglot-current-server)))
     ;; If a server exists, prompt the user to continue
     (if current-server
-          ;; Shut down the server if user confirms
-          (eglot-shutdown current-server)))
+        ;; Shut down the server if user confirms
+        (eglot-shutdown current-server)))
   ;; Restart Eglot for the current buffer
   (eglot-ensure))
 
@@ -344,6 +407,8 @@
 (use-package flymake-ruff
   :ensure t
   :hook (eglot-managed-mode . flymake-ruff-load))
+
+(use-package pyvenv)
 
 (use-package micromamba
   :ensure t
@@ -496,7 +561,7 @@
 (use-package org
   :ensure nil
   :custom
-  (org-edit-src-content-indentation 4) ;; Set src block automatic indent to 4 instead of 2.
+  (org-edit-src-content-indentation 2) ;; Set src block automatic indent to 4 instead of 2.
 
   :hook
   (org-mode . org-indent-mode) ;; Indent text
