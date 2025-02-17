@@ -31,6 +31,7 @@
   - [[#yasnippet][Yasnippet]]
   - [[#language-modes][Language modes]]
   - [[#terminal][Terminal]]
+  - [[#combobulate][Combobulate]]
 - [[#multi-file-example][Multi File Example]]
   - [[#adding-the-lisp-directory-to-load-path][Adding the lisp directory to load-path]]
   - [[#sourcing-the-files][Sourcing the files]]
@@ -48,6 +49,7 @@
   - [[#which-key][Which-Key]]
   - [[#treemacs][Treemacs]]
   - [[#ranger][Ranger]]
+  - [[#dashboard][Dashboard]]
 - [[#runtime-performance][Runtime Performance]]
 
 * Introduction
@@ -160,7 +162,7 @@ Notes:
       :after evil
       :config
       ;; Setting where to use evil-collection
-      (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult))
+      (setq evil-collection-mode-list '(dired ibuffer magit forge corfu vertico consult eglot dashboard))
       (evil-collection-init))
 #+end_src
 
@@ -463,7 +465,7 @@ Then tabspaces
       (tabspaces-initialize-project-with-todo nil)
       ;; sessions
       (tabspaces-session t)
-      (tabspaces-session-auto-restore t)
+      (tabspaces-session-auto-restore nil)
       (tab-bar-new-tab-choice "*scratch*")
       )
 
@@ -507,32 +509,30 @@ Use visual block to uncomment easily in Org documents (C-v).
         python-shell-virtualenv-root
       nil))
 
-    (use-package eglot
-      :ensure nil ;; Don't install eglot because it's now built-in
-      :hook ((python-mode ;; Autostart lsp servers for a given mode
-              python-ts-mode)
-             . eglot-ensure)
-      :custom
-      (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
-      (eglot-autoshutdown t);; Shutdown unused servers.
-      (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
-  	
-  	;; Dynamically load the workspace configuration so that we set jedi to use the active workspace
-      (eglot-workspace-configuration
-       (lambda (&rest args)
-         (let ((venv-directory (get-pyton-env-root)))
-           (message "Located venv: %s" venv-directory)
-           `((:pylsp .
-              (:plugins
-               (:jedi_completion (:fuzzy t)
-                :jedi (:environment ,venv-directory)
-                :pydocstyle (:enabled nil)
-                :pycodestyle (:enabled nil)
-                :mccabe (:enabled nil)
-                :pyflakes (:enabled nil)
-                :flake8 (:enabled nil)
-                :black (:enabled nil))))))))
-      )
+  (use-package eglot
+    :ensure nil ;; Don't install eglot because it's now built-in
+    :hook ((python-mode python-ts-mode) . eglot-ensure)
+    :custom
+    (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
+    (eglot-autoshutdown t);; Shutdown unused servers.
+    (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
+    
+    ;; Dynamically load the workspace configuration so that we set jedi to use the active workspace
+    (eglot-workspace-configuration
+     (lambda (&rest args)
+       (let ((venv-directory (get-python-env-root)))
+         (message "Located venv: %s" venv-directory)
+         `((:pylsp .
+                   (:plugins
+  				  (:jedi_completion (:fuzzy t)
+  									:jedi (:environment ,venv-directory)
+  									:pydocstyle (:enabled nil)
+  									:pycodestyle (:enabled nil)
+  									:mccabe (:enabled nil)
+  									:pyflakes (:enabled nil)
+  									:flake8 (:enabled nil)
+  									:black (:enabled nil))))))))
+    )
 #+end_src
 
 #+BEGIN_SRC emacs-lisp
@@ -547,22 +547,6 @@ Use visual block to uncomment easily in Org documents (C-v).
   ;; Restart Eglot for the current buffer
   (eglot-ensure))
 #+END_SRC
-*** lsp-bridge                                                    :ARCHIVE:
-https://github.com/manateelazycat/lsp-bridge
-#+begin_src emacs-lisp
-;;    (use-package markdown-mode)    
-;;    (use-package lsp-bridge
-;;      :straight '(lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
-;;    						 :files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
-;;    						 :build (:not compile))
-;;      :init
-;;      (global-lsp-bridge-mode))
-;;    :custom
-;;    (setq lsp-bridge-python-command "/home/stuart/.nix-profile/bin/python3.12")
-;;    (setq lsp-bridge-python-lsp-server "ruff")
-;;    (setq lsp-bridge-python-multi-lsp-server "pylsp_ruff")
-;;    (setq lsp-bridge-enable-hover-diagnostic t)
-#+end_src
 ** TODO Reformatting
 Would be nice to have ruff --fix and ruff-format, isort etc all available.
 https://melpa.org/#/reformatter
@@ -587,21 +571,25 @@ Some of this borrowed from https://gist.github.com/habamax/290cda0e0cdc6118eb9a0
 To install the grammar for a language run ~treesit-install-language-grammar~.
 
 #+begin_src emacs-lisp
-  (setq major-mode-remap-alist
-        '((python-mode . python-ts-mode)))
+    (setq major-mode-remap-alist
+          '((python-mode . python-ts-mode)))
 
-  (use-package python-pytest)
+    (use-package python-pytest)
 
-  (use-package flymake-ruff
-    :ensure t
-    :hook (eglot-managed-mode . flymake-ruff-load))
+    (use-package flymake-ruff
+      :ensure t
+      :hook (eglot-managed-mode . flymake-ruff-load)
+  	)
 
-  (use-package pyvenv)
-  
-  (use-package micromamba
-    :ensure t
-    :hook (micromamba-postactivate-hook . restart-eglot)
+    (use-package pyvenv
+      :ensure t
+      :hook (pyvenv-post-activate-hooks . restart-eglot)
     )
+
+    (use-package micromamba
+      :ensure t
+      :hook (micromamba-postactivate-hook . restart-eglot)
+      )
 #+end_src
 ***** TODO Use nixpkgs for treesitter grammars
 **** Custom Functions
@@ -812,7 +800,20 @@ We setup eat with eshell, if you want to use bash, zsh etc., check out their git
     (use-package eat
       :hook ('eshell-load-hook #'eat-eshell-mode))
 #+end_src
-
+** TODO Combobulate
+#+begin_src emacs-lisp
+  (use-package combobulate
+    :custom
+    ;; You can customize Combobulate's key prefix here.
+    ;; Note that you may have to restart Emacs for this to take effect!
+    (combobulate-key-prefix "C-c o")
+    :hook ((prog-mode . combobulate-mode))
+    ;; Amend this to the directory where you keep Combobulate's source
+    ;; code.
+    :vc (:url "https://github.com/mickeynp/combobulate"
+         :branch "main")
+    )
+     #+end_src
 * Multi File Example
 ** Adding the lisp directory to load-path
 Adds the lisp directory to emacs's load path to search for elisp files.
@@ -862,8 +863,11 @@ While nerd-icons supports both GUI and TUI.
 *** Magit
 Complete text-based user interface to Git.
 #+begin_src emacs-lisp
-    (use-package magit
-      :commands magit-status)
+  (use-package magit
+    :commands magit-status)
+  (use-package forge
+    :after magit
+  )
 #+end_src
 
 *** Diff-hl
@@ -945,8 +949,10 @@ Read the [[https://github.com/minad/cape#configuration][configuration section]] 
       ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345) ;; Complete Unicode char using RFC 1345 mnemonics
       )
 #+end_src
+*** TODO See about setting some capf's only in certain modes
+** TODO Orderless
+Learn to use more fancy parts of orderless: https://github.com/oantolin/orderless?tab=readme-ov-file#component-matching-styles
 
-** Orderless
 Completion style that divides the pattern into space-separated components, and matches candidates that match all of the components in any order.
 Recomended for packages like vertico, corfu.
 #+begin_src emacs-lisp
@@ -1101,7 +1107,7 @@ Check out their [[https://github.com/minad/consult][git repository]] for more aw
       ;; (setq consult-project-function nil)
       )
 #+end_src
-
+*** TODO Learn this!
 ** Diminish
 This package implements hiding or abbreviation of the modeline displays (lighters) of minor-modes.
 With this package installed, you can add ‘:diminish’ to any use-package block to hide that particular mode in the modeline.
@@ -1155,6 +1161,27 @@ Which-key is a helper utility for keychords (which key to press).
 #+begin_src emacs-lisp
     (use-package ranger)
 #+END_SRC
+
+** Dashboard
+#+begin_src emacs-lisp
+  ;; use-package with package.el:
+  (use-package dashboard
+    :ensure t
+    :config
+    (dashboard-setup-startup-hook)
+    :custom
+    (dashboard-display-icons-p t)     ; display icons on both GUI and terminal
+    (dashboard-icon-type 'nerd-icons) ; use `nerd-icons' package
+    (dashboard-center-content t)
+    (dashboard-vertically-center-content t)
+    (dashboard-items '(
+                       (projects  . 5)
+  					 (recents   . 5)
+                       (agenda    . 5)
+  					 ))
+    )
+
+#+end_src
 * Runtime Performance
 Dial the GC threshold back down so that garbage collection happens more frequently but in less time.
 We also increase Read Process Output Max so emacs can read more data.

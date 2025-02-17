@@ -67,7 +67,7 @@
   :after evil
   :config
   ;; Setting where to use evil-collection
-  (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult))
+  (setq evil-collection-mode-list '(dired ibuffer magit forge corfu vertico consult eglot dashboard))
   (evil-collection-init))
 
 (use-package general
@@ -327,7 +327,7 @@
   (tabspaces-initialize-project-with-todo nil)
   ;; sessions
   (tabspaces-session t)
-  (tabspaces-session-auto-restore t)
+  (tabspaces-session-auto-restore nil)
   (tab-bar-new-tab-choice "*scratch*")
   )
 
@@ -358,32 +358,30 @@
       python-shell-virtualenv-root
     nil))
 
-  (use-package eglot
-    :ensure nil ;; Don't install eglot because it's now built-in
-    :hook ((python-mode ;; Autostart lsp servers for a given mode
-            python-ts-mode)
-           . eglot-ensure)
-    :custom
-    (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
-    (eglot-autoshutdown t);; Shutdown unused servers.
-    (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
-	
-	;; Dynamically load the workspace configuration so that we set jedi to use the active workspace
-    (eglot-workspace-configuration
-     (lambda (&rest args)
-       (let ((venv-directory (get-pyton-env-root)))
-         (message "Located venv: %s" venv-directory)
-         `((:pylsp .
-            (:plugins
-             (:jedi_completion (:fuzzy t)
-              :jedi (:environment ,venv-directory)
-              :pydocstyle (:enabled nil)
-              :pycodestyle (:enabled nil)
-              :mccabe (:enabled nil)
-              :pyflakes (:enabled nil)
-              :flake8 (:enabled nil)
-              :black (:enabled nil))))))))
-    )
+(use-package eglot
+  :ensure nil ;; Don't install eglot because it's now built-in
+  :hook ((python-mode python-ts-mode) . eglot-ensure)
+  :custom
+  (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
+  (eglot-autoshutdown t);; Shutdown unused servers.
+  (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
+  
+  ;; Dynamically load the workspace configuration so that we set jedi to use the active workspace
+  (eglot-workspace-configuration
+   (lambda (&rest args)
+     (let ((venv-directory (get-python-env-root)))
+       (message "Located venv: %s" venv-directory)
+       `((:pylsp .
+                 (:plugins
+				  (:jedi_completion (:fuzzy t)
+									:jedi (:environment ,venv-directory)
+									:pydocstyle (:enabled nil)
+									:pycodestyle (:enabled nil)
+									:mccabe (:enabled nil)
+									:pyflakes (:enabled nil)
+									:flake8 (:enabled nil)
+									:black (:enabled nil))))))))
+  )
 
 (defun restart-eglot ()
   (interactive)
@@ -406,9 +404,13 @@
 
 (use-package flymake-ruff
   :ensure t
-  :hook (eglot-managed-mode . flymake-ruff-load))
+  :hook (eglot-managed-mode . flymake-ruff-load)
+)
 
-(use-package pyvenv)
+(use-package pyvenv
+  :ensure t
+  :hook (pyvenv-post-activate-hooks . restart-eglot)
+)
 
 (use-package micromamba
   :ensure t
@@ -588,6 +590,18 @@
 (use-package eat
   :hook ('eshell-load-hook #'eat-eshell-mode))
 
+(use-package combobulate
+  :custom
+  ;; You can customize Combobulate's key prefix here.
+  ;; Note that you may have to restart Emacs for this to take effect!
+  (combobulate-key-prefix "C-c o")
+  :hook ((prog-mode . combobulate-mode))
+  ;; Amend this to the directory where you keep Combobulate's source
+  ;; code.
+  :vc (:url "https://github.com/mickeynp/combobulate"
+       :branch "main")
+  )
+
 ;; (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 
 ;; (require 'start-multiFileExample)
@@ -605,6 +619,9 @@
 
 (use-package magit
   :commands magit-status)
+(use-package forge
+  :after magit
+)
 
 (use-package diff-hl
   :hook ((dired-mode         . diff-hl-dired-mode-unless-remote)
@@ -832,6 +849,23 @@ in the search."
   )
 
 (use-package ranger)
+
+;; use-package with package.el:
+(use-package dashboard
+  :ensure t
+  :config
+  (dashboard-setup-startup-hook)
+  :custom
+  (dashboard-display-icons-p t)     ; display icons on both GUI and terminal
+  (dashboard-icon-type 'nerd-icons) ; use `nerd-icons' package
+  (dashboard-center-content t)
+  (dashboard-vertically-center-content t)
+  (dashboard-items '(
+                     (projects  . 5)
+					 (recents   . 5)
+                     (agenda    . 5)
+					 ))
+  )
 
 ;; Make gc pauses faster by decreasing the threshold.
 (setq gc-cons-threshold (* 2 1000 1000))
