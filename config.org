@@ -50,6 +50,7 @@
   - [[#treemacs][Treemacs]]
   - [[#ranger][Ranger]]
   - [[#dashboard][Dashboard]]
+  - [[#browse-kill-ring][Browse Kill-Ring]]
 - [[#runtime-performance][Runtime Performance]]
 
 * Introduction
@@ -162,173 +163,184 @@ Notes:
       :after evil
       :config
       ;; Setting where to use evil-collection
-      (setq evil-collection-mode-list '(dired ibuffer magit forge corfu vertico consult eglot dashboard))
+      (setq evil-collection-mode-list '(dired ibuffer magit forge corfu vertico consult dashboard))
       (evil-collection-init))
 #+end_src
 
 * Keybindings
 A keybinding framework to set keybindings easily. Uses https://github.com/noctuid/general.el
 #+begin_src emacs-lisp
-    (use-package general
-      :config
-      (general-evil-setup)
-      ;; Global keys
-      (general-define-key
-       :states '(normal visual motion emacs)
-       "K" 'scroll-down-command
-       "J" 'scroll-up-command
-       )
+  (use-package general
+    :config
+    (general-evil-setup)
+    ;; Global keys
+    (general-define-key
+     :states '(normal visual motion emacs)
+     "K" 'scroll-down-command
+     "J" 'scroll-up-command
+     )
 
-      ;; Set up a local-leader
-      (general-create-definer my-local-leader
-        :prefix ","
-        )
-      (my-local-leader
-       :states 'normal
-       "a" 'ranger
-       )
-      ;; Set up 'SPC' as the leader key
-      (general-create-definer start/leader-keys
-        :states '(normal insert visual motion emacs)
-        :keymaps 'override
-        :prefix "SPC"           ;; Set leader key
-        :global-prefix "C-SPC") ;; Set global leader key
-
-      (start/leader-keys
-        "SPC" '(execute-extended-command :wk "M-x")
-        "." '(find-file :wk "Find file")
-        "TAB" '(evil-switch-to-windows-last-buffer :wk "Last buffer")
-        "/" '(+vertico/project-search :wk "Search Project")
-        ;; "p" '(project-prefix-map :wk "Project command map")
-        )
-
-      (start/leader-keys
-        "a" '(:ignore t :wk "Applications")
-        "a r" '(ranger :wk "Ranger")
-        )
-
-      ;;(start/leader-keys
-      ;;  "c" '(:ignore t :wk "Code")
-      ;;  "c l" '(comment-or-uncomment-region :wk "Toggle Comments")
-      ;;  )
-
-      (start/leader-keys
-        "f" '(:ignore t :wk "Find")
-        "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
-        "f r" '(consult-recent-file :wk "Recent files")
-        "f f" '(consult-fd :wk "Fd search for files")
-        "f g" '(consult-ripgrep :wk "Ripgrep search in files")
-        "f l" '(consult-line :wk "Find line")
-        "f i" '(consult-imenu :wk "Imenu buffer locations")
-        "f s" '(save-buffer :wk "Save Buffer")
-        )
-
-      (start/leader-keys
-        "b" '(:ignore t :wk "Buffer Bookmarks")
-        "b b" '(consult-buffer :wk "Switch buffer")
-        "b d" '(kill-current-buffer :wk "Kill buffer")
-        "b i" '(ibuffer :wk "Ibuffer")
-        "b n" '(next-buffer :wk "Next buffer")
-        "b p" '(previous-buffer :wk "Previous buffer")
-        "b r" '(revert-buffer :wk "Reload buffer")
-        "b j" '(consult-bookmark :wk "Bookmark jump")
-        "b s" '(scratch-buffer :wk "Scratch Buffer")
-        )
-
-      (start/leader-keys
-        "d" '(:ignore t :wk "Dired")
-        "j v" '(dired :wk "Open dired")
-        "d j" '(dired-jump :wk "Dired jump to current")
-        )
-
-      (start/leader-keys
-        "e" '(:ignore t :wk "Eglot Evaluate")
-        "e e" '(eglot-reconnect :wk "Eglot Reconnect")
-        "e f" '(eglot-format :wk "Eglot Format")
-        "e l" '(consult-flymake :wk "Consult Flymake")
-        "e b" '(eval-buffer :wk "Evaluate elisp in buffer")
-        "e r" '(eval-region :wk "Evaluate elisp in region")
-        )
-
-      (start/leader-keys
-        "g" '(:ignore t :wk "Git")
-        "g s" '(magit-status :wk "Magit status")
-        )
-
-      (start/leader-keys
-        "h" '(:ignore t :wk "Help") ;; To get more help use C-h commands (describe variable, function, etc.)
-        "h q" '(save-buffers-kill-emacs :wk "Quit Emacs and Daemon")
-        "h r" '((lambda () (interactive)
-                  (load-file "~/.config/emacs/init.el"))
-            	:wk "Reload Emacs config")
-        )
-
-      (start/leader-keys
-        "s" '(:ignore t :wk "Show")
-        "s e" '(eat :wk "Eat terminal")
-        )
-
-      (start/leader-keys
-        "t" '(:ignore t :wk "Toggle")
-        "t t" '(visual-line-mode :wk "Toggle truncated lines (wrap)")
-        "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
-        )
-
-      (start/leader-keys
-        "w" '(:ignore t :wk "Windows and Workspaces")
-        "w h" '(evil-window-left :wk "Window left")
-        "w l" '(evil-window-right :wk "Window right")
-        "w j" '(evil-window-down :wk "Window Down")
-        "w k" '(evil-window-up :wk "Window Up")
-        "w /" '(evil-window-vsplit :wk "Vertical Split")
-        "w -" '(evil-window-split :wk "Vertical Split")
-        "w d" '(evil-window-delete :wk "Close window")
-        )
-
-      (start/leader-keys
-        "p" '(:ignore t :wk "Projects")
-        "p t" '(treemacs :wk "Treemacs")
-        ;; Copied from project.el
-        "p !" '(project-shell-command :wk "Run command")
-        "p &" '(project-async-shell-command :wk "Run command (async)")
-        "p f" '(project-find-file :wk "Find file")
-        "p F" '(project-or-external-find-file :wk "Find file in project or external roots")
-        "p b" '(project-switch-to-buffer :wk "Switch to project buffer")
-        "p s" '(project-shell :wk "Run shell in project")
-        "p d" '(project-find-dir :wk "Find directory")
-        "p D" '(project-dired :wk "Dired")
-        "p v" '(project-vc-dir :wk "Run VC-Dir")
-        "p c" '(project-compile :wk "Compile Project")
-        "p e" '(project-eshell :wk "Run Shell")
-        "p k" '(project-kill-buffers :wk "Kill all buffers")
-        "p p" '(tabspaces-open-or-create-project-and-workspace :wk "Switch Tabspaces")
-        "p P" '(project-switch-project :wk "Switch Project")
-        "p g" '(project-find-regexp :wk "Find matches for regexp")
-        "p G" '(project-or-external-find-regexp :wk "Find matches for regexp in project or external")
-        "p r" '(project-query-replace-regexp :wk "Replace regexp")
-        "p x" '(project-execute-extended-command :wk "Execute extended command")
-        "p o" '(project-any-command :wk "Execute any command")
-        )
-
-      (start/leader-keys
-        "l" '(:ignore t :wk "Tabspaces")
-        "l C" '(tabspaces-clear-buffers :wk "Clear all Buffers")
-        "l b" '(tabspaces-switch-to-buffer :wk "Switch to Buffer")
-        "l d" '(tabspaces-close-workspace :wk "Close Workspace")
-        "l k" '(tabspaces-kill-buffers-close-workspace :wk "Kill Buffers and Close Workspace")
-        "l o" '(tabspaces-open-or-create-project-and-workspace :wk "Open Project and Workspace")
-        "l r" '(tabspaces-remove-current-buffer :wk "Remove current buffer")
-        "l R" '(tabspaces-remove-selected-buffer :wk "Remove selected buffer")
-        "l l" '(tabspaces-switch-or-create-workspace :wk "Switch or Create Workspace")
-        "l t" '(tabspaces-switch-buffer-and-tab :wk "Switch Buffer and tab")
-        ;; General Tab Control
-        "l TAB" '(tab-previous :wk "Previous Tab")
-        "l L" '(tab-move :wk "Move Tab Right")
-        "l H" '((lambda () 
-                  (tab-move -1))
-            	:wk "Move Tab Left")
-        )
+    ;; Set up a local-leader
+    (general-create-definer my-local-leader
+      :prefix ","
       )
+    (my-local-leader
+     :states 'normal
+     "a" 'ranger
+     )
+    ;; Set up 'SPC' as the leader key
+    (general-create-definer start/leader-keys
+      :states '(normal insert visual motion emacs)
+      :keymaps 'override
+      :prefix "SPC"           ;; Set leader key
+      :global-prefix "C-SPC") ;; Set global leader key
+
+    (start/leader-keys
+      "SPC" '(execute-extended-command :wk "M-x")
+      "." '(find-file :wk "Find file")
+      "TAB" '(evil-switch-to-windows-last-buffer :wk "Last buffer")
+      "/" '(+vertico/project-search :wk "Search Project")
+      )
+
+    (start/leader-keys
+      "a" '(:ignore t :wk "Applications")
+      "a r" '(ranger :wk "Ranger")
+      )
+
+    (start/leader-keys
+      "c" '(:ignore t :wk "Code")
+      "c l" '(comment-line :wk "Toggle Comments")
+      )
+
+    (start/leader-keys
+      "f" '(:ignore t :wk "Find")
+      "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
+      "f r" '(consult-recent-file :wk "Recent files")
+      "f f" '(consult-fd :wk "Fd search for files")
+      "f g" '(consult-ripgrep :wk "Ripgrep search in files")
+      "f l" '(consult-line :wk "Find line")
+      "f i" '(consult-imenu :wk "Imenu buffer locations")
+      "f s" '(save-buffer :wk "Save Buffer")
+      )
+
+    (start/leader-keys
+      "b" '(:ignore t :wk "Buffer Bookmarks")
+      "b b" '(consult-buffer :wk "Switch buffer")
+      "b d" '(kill-current-buffer :wk "Kill buffer")
+      "b i" '(ibuffer :wk "Ibuffer")
+      "b n" '(next-buffer :wk "Next buffer")
+      "b p" '(previous-buffer :wk "Previous buffer")
+      "b r" '(revert-buffer :wk "Reload buffer")
+      "b j" '(consult-bookmark :wk "Bookmark jump")
+      "b s" '(scratch-buffer :wk "Scratch Buffer")
+  	"b s" '(view-echo-area-messages :wk "Messages Buffer")
+      )
+
+    (start/leader-keys
+      "d" '(:ignore t :wk "Dired")
+      "j v" '(dired :wk "Open dired")
+      "d j" '(dired-jump :wk "Dired jump to current")
+      )
+
+    (start/leader-keys
+      "e" '(:ignore t :wk "Eglot Evaluate")
+      "e e" '(eglot-reconnect :wk "Eglot Reconnect")
+      "e f" '(eglot-format :wk "Eglot Format")
+      "e l" '(consult-flymake :wk "Consult Flymake")
+      "e b" '(eval-buffer :wk "Evaluate elisp in buffer")
+      "e r" '(eval-region :wk "Evaluate elisp in region")
+  	"e g d" '(xref-find-definitions :wk "Goto Definition")
+  	"e g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
+  	"e g r" '(xref-find-references :wk "Find references")
+  	"e d" '('eldoc-doc-buffer :wk "Documentation")
+      )
+
+    (start/leader-keys
+      "g" '(:ignore t :wk "Git")
+      "g s" '(magit-status :wk "Magit status")
+  	"g b" '(magit-blame :wk "Git blame")
+  	"g l" '(git-link :wk "Link to selection")
+      )
+
+    (start/leader-keys
+      "h" '(:ignore t :wk "Help") ;; To get more help use C-h commands (describe variable, function, etc.)
+      )
+
+    (start/leader-keys
+      "s" '(:ignore t :wk "Show")
+      "s e" '(eat :wk "Eat terminal")
+  	"s k" '(browse-kill-ring :wk "Show kill-ring")
+      )
+
+    (start/leader-keys
+      "t" '(:ignore t :wk "Toggle")
+      "t t" '(visual-line-mode :wk "Toggle truncated lines (wrap)")
+      "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
+      )
+
+    (start/leader-keys
+      "w" '(:ignore t :wk "Windows and Workspaces")
+      "w h" '(evil-window-left :wk "Window left")
+      "w l" '(evil-window-right :wk "Window right")
+      "w j" '(evil-window-down :wk "Window Down")
+      "w k" '(evil-window-up :wk "Window Up")
+      "w /" '(evil-window-vsplit :wk "Vertical Split")
+      "w -" '(evil-window-split :wk "Vertical Split")
+      "w d" '(evil-window-delete :wk "Close window")
+      )
+
+    (start/leader-keys
+      "p" '(:ignore t :wk "Projects")
+      "p t" '(treemacs :wk "Treemacs")
+      ;; Copied from project.el
+      "p !" '(project-shell-command :wk "Run command")
+      "p &" '(project-async-shell-command :wk "Run command (async)")
+      "p f" '(project-find-file :wk "Find file")
+      "p F" '(project-or-external-find-file :wk "Find file in project or external roots")
+      "p b" '(project-switch-to-buffer :wk "Switch to project buffer")
+      "p s" '(project-shell :wk "Run shell in project")
+      "p d" '(project-find-dir :wk "Find directory")
+      "p D" '(project-dired :wk "Dired")
+      "p v" '(project-vc-dir :wk "Run VC-Dir")
+      "p c" '(project-compile :wk "Compile Project")
+      "p e" '(project-eshell :wk "Run Shell")
+      "p k" '(project-kill-buffers :wk "Kill all buffers")
+      "p p" '(tabspaces-open-or-create-project-and-workspace :wk "Switch Tabspaces")
+      "p P" '(project-switch-project :wk "Switch Project")
+      "p g" '(project-find-regexp :wk "Find matches for regexp")
+      "p G" '(project-or-external-find-regexp :wk "Find matches for regexp in project or external")
+      "p r" '(project-query-replace-regexp :wk "Replace regexp")
+      "p x" '(project-execute-extended-command :wk "Execute extended command")
+      "p o" '(project-any-command :wk "Execute any command")
+      )
+
+    (start/leader-keys
+      "l" '(:ignore t :wk "Tabspaces")
+      "l C" '(tabspaces-clear-buffers :wk "Clear all Buffers")
+      "l b" '(tabspaces-switch-to-buffer :wk "Switch to Buffer")
+      "l d" '(tabspaces-close-workspace :wk "Close Workspace")
+      "l k" '(tabspaces-kill-buffers-close-workspace :wk "Kill Buffers and Close Workspace")
+      "l o" '(tabspaces-open-or-create-project-and-workspace :wk "Open Project and Workspace")
+      "l r" '(tabspaces-remove-current-buffer :wk "Remove current buffer")
+      "l R" '(tabspaces-restore-session :wk "Restore previous session")
+      "l l" '(tabspaces-switch-or-create-workspace :wk "Switch or Create Workspace")
+      "l t" '(tabspaces-switch-buffer-and-tab :wk "Switch Buffer and tab")
+      ;; General Tab Control
+      "l TAB" '(tab-previous :wk "Previous Tab")
+      "l L" '(tab-move :wk "Move Tab Right")
+      "l H" '((lambda () 
+                (tab-move -1))
+          	:wk "Move Tab Left")
+      )
+    
+    (start/leader-keys
+      "q" '(:ignore t :wk "Quit / Session")
+      "q q" '(save-buffers-kill-emacs :wk "Quit Emacs and Daemon")
+      "q r" '((lambda () (interactive)
+                (load-file "~/SyncBox/new.emacs.d/init.el"))
+          	:wk "Reload Emacs config")
+  	)
+    )
 
 #+end_src
 
@@ -571,27 +583,37 @@ Some of this borrowed from https://gist.github.com/habamax/290cda0e0cdc6118eb9a0
 To install the grammar for a language run ~treesit-install-language-grammar~.
 
 #+begin_src emacs-lisp
-    (setq major-mode-remap-alist
-          '((python-mode . python-ts-mode)))
+  (setq major-mode-remap-alist
+        '((python-mode . python-ts-mode)))
 
-    (use-package python-pytest)
-
-    (use-package flymake-ruff
-      :ensure t
-      :hook (eglot-managed-mode . flymake-ruff-load)
+  (use-package python-pytest
+    :config
+    (transient-append-suffix 'python-pytest-dispatch
+  	'(-2)
+  	["Remote data"
+  	 ("--rd" "Remote data" "--remote-data=any")]
   	)
-
-    (use-package pyvenv
-      :ensure t
-      :hook (pyvenv-post-activate-hooks . restart-eglot)
     )
 
-    (use-package micromamba
-      :ensure t
-      :hook (micromamba-postactivate-hook . restart-eglot)
-      )
+  (use-package flymake-ruff
+    :load-path "local-packages/flymake-ruff"
+    :ensure t
+    :hook (eglot-managed-mode . flymake-ruff-load)
+    :custom
+    (flymake-ruff-error-regex "SyntaxError")
+    (flymake-ruff-warning-regex ".*")
+    )
+
+  (use-package pyvenv
+    :ensure t
+    :hook (pyvenv-post-activate-hooks . restart-eglot)
+    )
+
+  (use-package micromamba
+    :ensure t
+    :hook (micromamba-postactivate-hook . restart-eglot)
+    )
 #+end_src
-***** TODO Use nixpkgs for treesitter grammars
 **** Custom Functions
 :PROPERTIES:
 :VISIBILITY: folded
@@ -726,23 +748,28 @@ Custom written functions for Python related stuff
 #+end_src
 **** Keybindings
 #+begin_src emacs-lisp
-    (my-local-leader
-      :states 'normal
-      :keymaps 'python-ts-mode-map
-      "t a" 'python-pytest
-      "t f" 'python-pytest-file-dwim
-      "t F" 'python-pytest-file
-      "t t" 'python-pytest-run-def-or-class-at-point-dwim
-      "t T" 'python-pytest-run-def-or-class-at-point
-      "t r" 'python-pytest-repeat
-      "t p" 'python-pytest-dispatch
+  (my-local-leader
+    :states 'normal
+    :keymaps 'python-ts-mode-map
+    "t a" 'python-pytest
+    "t f" 'python-pytest-file-dwim
+    "t F" 'python-pytest-file
+    "t t" 'python-pytest-run-def-or-class-at-point-dwim
+    "t T" 'python-pytest-run-def-or-class-at-point
+    "t r" 'python-pytest-repeat
+    "t p" 'python-pytest-dispatch
 
-      "c" 'cadair/python-execute-file
-      "r" 'cadair/run-in-repl
-      "R" 'cadair/run-in-repl-switch
-      "a" 'python-add-to-all
-      "g g" 'evil-goto-definition
-      )
+    "c" 'cadair/python-execute-file
+    "r" 'cadair/run-in-repl
+    "R" 'cadair/run-in-repl-switch
+    "a" 'python-add-to-all
+    "g g" 'evil-goto-definition
+
+    "m a" 'micromamba-activate
+    "m d" 'micromamba-deactivate
+    "v a" 'pyvenv-workon
+    "v d" 'pyvenv-deactivate
+    )
 #+end_src
 
 *** Org Mode
@@ -879,7 +906,14 @@ Highlights uncommitted changes on the left side of the window (area also known a
              (magit-post-refresh . diff-hl-magit-post-refresh))
       :init (global-diff-hl-mode))
 #+end_src
-
+*** git-link
+Creates URLs to forges
+#+begin_src emacs-lisp
+  (use-package git-link
+    :custom
+    (git-link-use-commit t)
+  )
+#+end_src
 ** Corfu
 Enhances in-buffer completion with a small completion popup.
 Corfu is a small package, which relies on the Emacs completion facilities and concentrates on providing a polished completion.
@@ -971,23 +1005,37 @@ Recomended for packages like vertico, corfu.
 We use this packages, because they use emacs native functions. Unlike Ivy or Helm.
 One alternative is ivy and counsel, check out the [[https://github.com/MiniApollo/kickstart.emacs/wiki][project wiki]] for more inforomation.
 #+begin_src emacs-lisp
-    (use-package vertico
-      :init
-      (vertico-mode))
+  (use-package vertico
+    :init
+    (vertico-mode))
 
-    (savehist-mode) ;; Enables save history mode
+  (use-package vertico-posframe
+    :init
+    (setq vertico-posframe-parameters   '((left-fringe  . 12)    ;; Fringes
+  										(right-fringe . 12)
+  										(undecorated  . nil))) ;; Rounded frame
+    :config
+    (vertico-posframe-mode 1)
+    (setq vertico-posframe-width        120                      ;; Narrow frame
+  		vertico-posframe-height       25                       ;; Default height
+  		;; Don't create posframe for these commands
+  		vertico-multiform-commands    '((consult-line    (:not posframe))
+  										(consult-ripgrep (:not posframe))))
+    )
 
-    (use-package marginalia
-      :after vertico
-      :init
-      (marginalia-mode))
+  (savehist-mode) ;; Enables save history mode
 
-    (use-package nerd-icons-completion
-      :after marginalia
-      :config
-      (nerd-icons-completion-mode)
-      :hook
-      ('marginalia-mode-hook . 'nerd-icons-completion-marginalia-setup))
+  (use-package marginalia
+    :after vertico
+    :init
+    (marginalia-mode))
+
+  (use-package nerd-icons-completion
+    :after marginalia
+    :config
+    (nerd-icons-completion-mode)
+    :hook
+    ('marginalia-mode-hook . 'nerd-icons-completion-marginalia-setup))
 #+end_src
 
 *** Project wide text search from doomemacs
@@ -1181,6 +1229,11 @@ Which-key is a helper utility for keychords (which key to press).
   					 ))
     )
 
+#+end_src
+
+** Browse Kill-Ring
+#+begin_src emacs-lisp
+  (use-package browse-kill-ring)
 #+end_src
 * Runtime Performance
 Dial the GC threshold back down so that garbage collection happens more frequently but in less time.

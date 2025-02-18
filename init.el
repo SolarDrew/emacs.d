@@ -67,7 +67,7 @@
   :after evil
   :config
   ;; Setting where to use evil-collection
-  (setq evil-collection-mode-list '(dired ibuffer magit forge corfu vertico consult eglot dashboard))
+  (setq evil-collection-mode-list '(dired ibuffer magit forge corfu vertico consult dashboard))
   (evil-collection-init))
 
 (use-package general
@@ -100,7 +100,6 @@
     "." '(find-file :wk "Find file")
     "TAB" '(evil-switch-to-windows-last-buffer :wk "Last buffer")
     "/" '(+vertico/project-search :wk "Search Project")
-    ;; "p" '(project-prefix-map :wk "Project command map")
     )
 
   (start/leader-keys
@@ -108,10 +107,10 @@
     "a r" '(ranger :wk "Ranger")
     )
 
-  ;;(start/leader-keys
-  ;;  "c" '(:ignore t :wk "Code")
-  ;;  "c l" '(comment-or-uncomment-region :wk "Toggle Comments")
-  ;;  )
+  (start/leader-keys
+    "c" '(:ignore t :wk "Code")
+    "c l" '(comment-line :wk "Toggle Comments")
+    )
 
   (start/leader-keys
     "f" '(:ignore t :wk "Find")
@@ -134,6 +133,7 @@
     "b r" '(revert-buffer :wk "Reload buffer")
     "b j" '(consult-bookmark :wk "Bookmark jump")
     "b s" '(scratch-buffer :wk "Scratch Buffer")
+	"b s" '(view-echo-area-messages :wk "Messages Buffer")
     )
 
   (start/leader-keys
@@ -149,24 +149,27 @@
     "e l" '(consult-flymake :wk "Consult Flymake")
     "e b" '(eval-buffer :wk "Evaluate elisp in buffer")
     "e r" '(eval-region :wk "Evaluate elisp in region")
+	"e g d" '(xref-find-definitions :wk "Goto Definition")
+	"e g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
+	"e g r" '(xref-find-references :wk "Find references")
+	"e d" '('eldoc-doc-buffer :wk "Documentation")
     )
 
   (start/leader-keys
     "g" '(:ignore t :wk "Git")
     "g s" '(magit-status :wk "Magit status")
+	"g b" '(magit-blame :wk "Git blame")
+	"g l" '(git-link :wk "Link to selection")
     )
 
   (start/leader-keys
     "h" '(:ignore t :wk "Help") ;; To get more help use C-h commands (describe variable, function, etc.)
-    "h q" '(save-buffers-kill-emacs :wk "Quit Emacs and Daemon")
-    "h r" '((lambda () (interactive)
-              (load-file "~/.config/emacs/init.el"))
-        	:wk "Reload Emacs config")
     )
 
   (start/leader-keys
     "s" '(:ignore t :wk "Show")
     "s e" '(eat :wk "Eat terminal")
+	"s k" '(browse-kill-ring :wk "Show kill-ring")
     )
 
   (start/leader-keys
@@ -219,7 +222,7 @@
     "l k" '(tabspaces-kill-buffers-close-workspace :wk "Kill Buffers and Close Workspace")
     "l o" '(tabspaces-open-or-create-project-and-workspace :wk "Open Project and Workspace")
     "l r" '(tabspaces-remove-current-buffer :wk "Remove current buffer")
-    "l R" '(tabspaces-remove-selected-buffer :wk "Remove selected buffer")
+    "l R" '(tabspaces-restore-session :wk "Restore previous session")
     "l l" '(tabspaces-switch-or-create-workspace :wk "Switch or Create Workspace")
     "l t" '(tabspaces-switch-buffer-and-tab :wk "Switch Buffer and tab")
     ;; General Tab Control
@@ -229,6 +232,14 @@
               (tab-move -1))
         	:wk "Move Tab Left")
     )
+  
+  (start/leader-keys
+    "q" '(:ignore t :wk "Quit / Session")
+    "q q" '(save-buffers-kill-emacs :wk "Quit Emacs and Daemon")
+    "q r" '((lambda () (interactive)
+              (load-file "~/SyncBox/new.emacs.d/init.el"))
+        	:wk "Reload Emacs config")
+	)
   )
 
 (use-package emacs
@@ -400,17 +411,28 @@
 (setq major-mode-remap-alist
       '((python-mode . python-ts-mode)))
 
-(use-package python-pytest)
+(use-package python-pytest
+  :config
+  (transient-append-suffix 'python-pytest-dispatch
+	'(-2)
+	["Remote data"
+	 ("--rd" "Remote data" "--remote-data=any")]
+	)
+  )
 
 (use-package flymake-ruff
+  :load-path "local-packages/flymake-ruff"
   :ensure t
   :hook (eglot-managed-mode . flymake-ruff-load)
-)
+  :custom
+  (flymake-ruff-error-regex "SyntaxError")
+  (flymake-ruff-warning-regex ".*")
+  )
 
 (use-package pyvenv
   :ensure t
   :hook (pyvenv-post-activate-hooks . restart-eglot)
-)
+  )
 
 (use-package micromamba
   :ensure t
@@ -558,6 +580,11 @@
   "R" 'cadair/run-in-repl-switch
   "a" 'python-add-to-all
   "g g" 'evil-goto-definition
+
+  "m a" 'micromamba-activate
+  "m d" 'micromamba-deactivate
+  "v a" 'pyvenv-workon
+  "v d" 'pyvenv-deactivate
   )
 
 (use-package org
@@ -629,6 +656,11 @@
          (magit-post-refresh . diff-hl-magit-post-refresh))
   :init (global-diff-hl-mode))
 
+(use-package git-link
+  :custom
+  (git-link-use-commit t)
+)
+
 (use-package corfu
   ;; Optional customizations
   :custom
@@ -691,6 +723,20 @@
 (use-package vertico
   :init
   (vertico-mode))
+
+(use-package vertico-posframe
+  :init
+  (setq vertico-posframe-parameters   '((left-fringe  . 12)    ;; Fringes
+										(right-fringe . 12)
+										(undecorated  . nil))) ;; Rounded frame
+  :config
+  (vertico-posframe-mode 1)
+  (setq vertico-posframe-width        120                      ;; Narrow frame
+		vertico-posframe-height       25                       ;; Default height
+		;; Don't create posframe for these commands
+		vertico-multiform-commands    '((consult-line    (:not posframe))
+										(consult-ripgrep (:not posframe))))
+  )
 
 (savehist-mode) ;; Enables save history mode
 
@@ -866,6 +912,8 @@ in the search."
                      (agenda    . 5)
 					 ))
   )
+
+(use-package browse-kill-ring)
 
 ;; Make gc pauses faster by decreasing the threshold.
 (setq gc-cons-threshold (* 2 1000 1000))
