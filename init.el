@@ -1,12 +1,3 @@
-;; Kickstart.emacs is *not* a distribution.
-;; It's a template for your own configuration.
-
-;; It is *recommeded* to configure it from the *config.org* file.
-;; The goal is that you read every line, top-to-bottom, understand
-;; what your configuration is doing, and modify it to suit your needs.
-
-;; You can delete this when you're done. It's your config now. :)
-
 ;; The default is 800 kilobytes. Measured in bytes.
 (setq gc-cons-threshold (* 50 1000 1000))
 
@@ -80,14 +71,11 @@
    "J" 'scroll-up-command
    )
 
-  ;; Set up a local-leader
+  ;; Set up a local-leader used for language mode specific functionality
   (general-create-definer my-local-leader
     :prefix ","
     )
-  (my-local-leader
-   :states 'normal
-   "a" 'ranger
-   )
+  
   ;; Set up 'SPC' as the leader key
   (general-create-definer start/leader-keys
     :states '(normal insert visual motion emacs)
@@ -411,6 +399,16 @@
 (setq major-mode-remap-alist
       '((python-mode . python-ts-mode)))
 
+(use-package pyvenv
+  :ensure t
+  :hook (pyvenv-post-activate-hooks . restart-eglot)
+  )
+
+(use-package micromamba
+  :ensure t
+  :hook (micromamba-postactivate-hook . restart-eglot)
+  )
+
 (use-package python-pytest
   :config
   (transient-append-suffix 'python-pytest-dispatch
@@ -427,16 +425,6 @@
   :custom
   (flymake-ruff-error-regex "SyntaxError")
   (flymake-ruff-warning-regex ".*")
-  )
-
-(use-package pyvenv
-  :ensure t
-  :hook (pyvenv-post-activate-hooks . restart-eglot)
-  )
-
-(use-package micromamba
-  :ensure t
-  :hook (micromamba-postactivate-hook . restart-eglot)
   )
 
 ;; Add to __all__
@@ -579,7 +567,6 @@
   "r" 'cadair/run-in-repl
   "R" 'cadair/run-in-repl-switch
   "a" 'python-add-to-all
-  "g g" 'evil-goto-definition
 
   "m a" 'micromamba-activate
   "m d" 'micromamba-deactivate

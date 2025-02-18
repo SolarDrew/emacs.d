@@ -6,11 +6,20 @@
 #+Startup: Overview
 #+Options: toc:2
 
+* About
+
+This is my Emacs config, I use it primarily for Python development and also Org mode (although not implemented yet).
+
+I use evil mode, and like the spacemacs style of a ~SPC~ leader key.
+The keybinds I have are a combination of ones I learned in spacemace, doom and various other editors I have used over the years!
+
+This literate config is was started from the excellent [[https://github.com/MiniApollo/kickstart.emacs/][kickstart.emacs]].
+
 * Table Of Contents :toc:
 :PROPERTIES:
 :VISIBILITY: all
 :END:
-- [[#introduction][Introduction]]
+- [[#about][About]]
 - [[#important-to-load-first][Important to load first]]
   - [[#startup-performance][Startup Performance]]
   - [[#auto-tangle-configuration-file][Auto-tangle Configuration file]]
@@ -18,7 +27,6 @@
   - [[#evil-mode][Evil Mode]]
 - [[#keybindings][Keybindings]]
 - [[#good-defaults][Good Defaults]]
-  - [[#reload-config][Reload Config]]
 - [[#appearance][Appearance]]
   - [[#set-theme][Set Theme]]
   - [[#transparency][Transparency]]
@@ -53,18 +61,6 @@
   - [[#browse-kill-ring][Browse Kill-Ring]]
 - [[#runtime-performance][Runtime Performance]]
 
-* Introduction
-#+begin_src emacs-lisp
-    ;; Kickstart.emacs is *not* a distribution.
-    ;; It's a template for your own configuration.
-
-    ;; It is *recommeded* to configure it from the *config.org* file.
-    ;; The goal is that you read every line, top-to-bottom, understand
-    ;; what your configuration is doing, and modify it to suit your needs.
-
-    ;; You can delete this when you're done. It's your config now. :)
-#+end_src
-
 * Important to load first
 ** Startup Performance
 Make startup faster by reducing the frequency of garbage collection. This will be set back when startup finishes.
@@ -74,7 +70,6 @@ Make startup faster by reducing the frequency of garbage collection. This will b
 #+end_src
 ** Auto-tangle Configuration file
 Auto-Tangle Org configuration file for better startup times.
-If you want to use this don't forget to add this to the top of the org document (#+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes)
 
 *Remember*, if this code can't be loaded (errors before this code), the init.el file won't update on change!
 To fix this, you need to find this file (C-x C-f), fix the error and press C-c C-v t to tangle it manually.
@@ -180,14 +175,11 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
      "J" 'scroll-up-command
      )
 
-    ;; Set up a local-leader
+    ;; Set up a local-leader used for language mode specific functionality
     (general-create-definer my-local-leader
       :prefix ","
       )
-    (my-local-leader
-     :states 'normal
-     "a" 'ranger
-     )
+    
     ;; Set up 'SPC' as the leader key
     (general-create-definer start/leader-keys
       :states '(normal insert visual motion emacs)
@@ -392,7 +384,7 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
               nil nil t)
       )
 #+end_src
-** TODO Reload Config
+
 * Appearance
 ** Set Theme
 Set gruvbox theme, if you want some themes try out doom-themes.
@@ -406,33 +398,33 @@ Use consult-theme to easily try out themes (*Epilepsy* Warning).
 ** Transparency
 With Emacs version 29, true transparency has been added.
 #+begin_src emacs-lisp
-    (add-to-list 'default-frame-alist '(alpha-background . 90)) ;; For all new frames henceforth
+  (add-to-list 'default-frame-alist '(alpha-background . 90)) ;; For all new frames henceforth
 #+end_src
 
 ** Fonts
 *** Setting fonts
 #+begin_src emacs-lisp
-    (set-face-attribute 'default nil
-                        :font "JetBrains Mono"
-                        :height 120
-                        :weight 'medium)
-    ;; This sets the default font on all graphical frames created after restarting Emacs.
-    ;; Does the same thing as 'set-face-attribute default' above, but emacsclient fonts
-    ;; are not right unless I also add this method of setting the default font.
+  (set-face-attribute 'default nil
+                      :font "JetBrains Mono"
+                      :height 120
+                      :weight 'medium)
+  ;; This sets the default font on all graphical frames created after restarting Emacs.
+  ;; Does the same thing as 'set-face-attribute default' above, but emacsclient fonts
+  ;; are not right unless I also add this method of setting the default font.
 
-    (add-to-list 'default-frame-alist '(font . "JetBrains Mono")) ;; Set your favorite font
-    (setq-default line-spacing 0.01)
+  (add-to-list 'default-frame-alist '(font . "JetBrains Mono")) ;; Set your favorite font
+  (setq-default line-spacing 0.01)
 #+end_src
 
 *** Zooming In/Out
 You can use the bindings C-+ C-- for zooming in/out. You can also use CTRL plus the mouse wheel for zooming in/out.
 #+begin_src emacs-lisp
-    (use-package emacs
-      :bind
-      ("C-+" . text-scale-increase)
-      ("C--" . text-scale-decrease)
-      ("<C-wheel-up>" . text-scale-increase)
-      ("<C-wheel-down>" . text-scale-decrease))
+  (use-package emacs
+    :bind
+    ("C-+" . text-scale-increase)
+    ("C--" . text-scale-decrease)
+    ("<C-wheel-up>" . text-scale-increase)
+    ("<C-wheel-down>" . text-scale-decrease))
 #+end_src
 
 ** Modeline
@@ -566,44 +558,28 @@ https://melpa.org/#/reformatter
 A template system for Emacs. And yasnippet-snippets is a snippet collection package.
 To use it write out the full keyword (or use autocompletion) and press Tab.
 #+begin_src emacs-lisp
-    (use-package yasnippet-snippets
-      :hook (prog-mode . yas-minor-mode))
+  (use-package yasnippet-snippets
+    :hook (prog-mode . yas-minor-mode))
 #+end_src
 
 ** Language modes
-It's not required for every language like C,C++,C#,Java,Javascript etc. to install language mode packages,
-but for more specific languages it is necessary for syntax highlighting.
-If you want to use TreeSitter, check out this [[https://www.masteringemacs.org/article/how-to-get-started-tree-sitter][website]] or try out [[https://github.com/renzmann/treesit-auto][Treesit-auto]].
-Currently it's tedious to use Treesitter, because emacs has not yet fully migrated to it.
-*** Python mode and packages
-
-Going "modern" with Python here, going to use tree-sitter and eglot for now.
+I am using tree-sitter, with the Language grammars installed by nixos.
 Some of this borrowed from https://gist.github.com/habamax/290cda0e0cdc6118eb9a06121b9bc0d7
 
-To install the grammar for a language run ~treesit-install-language-grammar~.
+To manually install the grammar for a language run ~treesit-install-language-grammar~.
+
+*** Python mode and packages
+
+First, we map the tree-sitter mode to the non-treesitter mode so things hooked into ~python-mode~ also works in ~python-ts-mode~.
 
 #+begin_src emacs-lisp
   (setq major-mode-remap-alist
         '((python-mode . python-ts-mode)))
+#+end_src
 
-  (use-package python-pytest
-    :config
-    (transient-append-suffix 'python-pytest-dispatch
-  	'(-2)
-  	["Remote data"
-  	 ("--rd" "Remote data" "--remote-data=any")]
-  	)
-    )
+I am using both micromamba and virtualenvwrapper-style virtual envs, so we enable packages for both of those:
 
-  (use-package flymake-ruff
-    :load-path "local-packages/flymake-ruff"
-    :ensure t
-    :hook (eglot-managed-mode . flymake-ruff-load)
-    :custom
-    (flymake-ruff-error-regex "SyntaxError")
-    (flymake-ruff-warning-regex ".*")
-    )
-
+#+begin_src emacs-lisp
   (use-package pyvenv
     :ensure t
     :hook (pyvenv-post-activate-hooks . restart-eglot)
@@ -614,6 +590,33 @@ To install the grammar for a language run ~treesit-install-language-grammar~.
     :hook (micromamba-postactivate-hook . restart-eglot)
     )
 #+end_src
+
+Enable the excellent pytest package, and setup an extra hook for [[https://github.com/astropy/pytest-remotedata][pytest-remotedata]].
+
+#+begin_src emacs-lisp
+  (use-package python-pytest
+    :config
+    (transient-append-suffix 'python-pytest-dispatch
+  	'(-2)
+  	["Remote data"
+  	 ("--rd" "Remote data" "--remote-data=any")]
+  	)
+    )
+#+end_src
+
+Finally, setup the flymake-ruff package, currently my own fork of it where I am working on enabling different levels of errors.
+
+#+begin_src emacs-lisp
+  (use-package flymake-ruff
+    :load-path "local-packages/flymake-ruff"
+    :ensure t
+    :hook (eglot-managed-mode . flymake-ruff-load)
+    :custom
+    (flymake-ruff-error-regex "SyntaxError")
+    (flymake-ruff-warning-regex ".*")
+    )
+#+end_src
+
 **** Custom Functions
 :PROPERTIES:
 :VISIBILITY: folded
@@ -746,7 +749,11 @@ Custom written functions for Python related stuff
             (inferior-python-mode)))))
 
 #+end_src
+
 **** Keybindings
+
+A bunch of language specific key binds, using ~,~ as the leader key.
+
 #+begin_src emacs-lisp
   (my-local-leader
     :states 'normal
@@ -763,7 +770,6 @@ Custom written functions for Python related stuff
     "r" 'cadair/run-in-repl
     "R" 'cadair/run-in-repl-switch
     "a" 'python-add-to-all
-    "g g" 'evil-goto-definition
 
     "m a" 'micromamba-activate
     "m d" 'micromamba-deactivate
