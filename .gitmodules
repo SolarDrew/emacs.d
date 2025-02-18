@@ -1,0 +1,3 @@
+[submodule "local-packages/flymake-ruff"]
+	path = local-packages/flymake-ruff
+	url = https://github.com/erickgnavar/flymake-ruff
