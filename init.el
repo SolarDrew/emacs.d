@@ -80,13 +80,13 @@
   (my-local-leader
     :states '(normal visual)
 	;; If I only enable this in eglot-mode-map then setting major-mode specific binds override this one
-	;;:keymaps 'eglot-mode-map
-	"g" '(:ignore t :wk "Eglot goto")
-	"g d" '(xref-find-definitions :wk "Goto Definition")
-	"g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
-	"g r" '(xref-find-references :wk "Find references")
-	"d" '('eldoc-doc-buffer :wk "Documentation")
-	)
+    ;;:keymaps 'eglot-mode-map
+    "g" '(:ignore t :wk "Eglot goto")
+    "g d" '(xref-find-definitions :wk "Goto Definition")
+    "g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
+    "g r" '(xref-find-references :wk "Find references")
+    "d" '('eldoc-doc-buffer :wk "Documentation")
+    )
   
   ;; Set up 'SPC' as primary leader key
   (general-create-definer start/leader-keys
