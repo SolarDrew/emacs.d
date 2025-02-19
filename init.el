@@ -75,8 +75,20 @@
   (general-create-definer my-local-leader
     :prefix ","
     )
+
+  ;; Add some eglot related things to , because my muscle memory demands it 
+  (my-local-leader
+    :states '(normal visual)
+	;; If I only enable this in eglot-mode-map then setting major-mode specific binds override this one
+	;;:keymaps 'eglot-mode-map
+	"g" '(:ignore t :wk "Eglot goto")
+	"g d" '(xref-find-definitions :wk "Goto Definition")
+	"g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
+	"g r" '(xref-find-references :wk "Find references")
+	"d" '('eldoc-doc-buffer :wk "Documentation")
+	)
   
-  ;; Set up 'SPC' as the leader key
+  ;; Set up 'SPC' as primary leader key
   (general-create-definer start/leader-keys
     :states '(normal insert visual motion emacs)
     :keymaps 'override
@@ -96,22 +108,6 @@
     )
 
   (start/leader-keys
-    "c" '(:ignore t :wk "Code")
-    "c l" '(comment-line :wk "Toggle Comments")
-    )
-
-  (start/leader-keys
-    "f" '(:ignore t :wk "Find")
-    "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
-    "f r" '(consult-recent-file :wk "Recent files")
-    "f f" '(consult-fd :wk "Fd search for files")
-    "f g" '(consult-ripgrep :wk "Ripgrep search in files")
-    "f l" '(consult-line :wk "Find line")
-    "f i" '(consult-imenu :wk "Imenu buffer locations")
-    "f s" '(save-buffer :wk "Save Buffer")
-    )
-
-  (start/leader-keys
     "b" '(:ignore t :wk "Buffer Bookmarks")
     "b b" '(consult-buffer :wk "Switch buffer")
     "b d" '(kill-current-buffer :wk "Kill buffer")
@@ -122,6 +118,11 @@
     "b j" '(consult-bookmark :wk "Bookmark jump")
     "b s" '(scratch-buffer :wk "Scratch Buffer")
 	"b s" '(view-echo-area-messages :wk "Messages Buffer")
+    )
+
+  (start/leader-keys
+    "c" '(:ignore t :wk "Code")
+    "c l" '(comment-or-uncomment-region :wk "Toggle Comments")
     )
 
   (start/leader-keys
@@ -144,37 +145,50 @@
     )
 
   (start/leader-keys
+    "f" '(:ignore t :wk "Find")
+    "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
+    "f r" '(consult-recent-file :wk "Recent files")
+    "f f" '(consult-fd :wk "Fd search for files")
+    "f g" '(consult-ripgrep :wk "Ripgrep search in files")
+    "f l" '(consult-line :wk "Find line")
+    "f i" '(consult-imenu :wk "Imenu buffer locations")
+    "f s" '(save-buffer :wk "Save Buffer")
+    )
+
+  (start/leader-keys
     "g" '(:ignore t :wk "Git")
     "g s" '(magit-status :wk "Magit status")
 	"g b" '(magit-blame :wk "Git blame")
 	"g l" '(git-link :wk "Link to selection")
     )
 
+  ;; TODO: It would be nice if I could just rebind C-h to SPC h
   (start/leader-keys
     "h" '(:ignore t :wk "Help") ;; To get more help use C-h commands (describe variable, function, etc.)
+  	"h k" '(describe-key :wk "Describe Key")
+  	"h s" '(describe-symbol :wk "Describe Symbol")
+  	"h v" '(describe-variable :wk "Describe Variable")
+  	"h f" '(describe-function :wk "Describe Function")
+  	"h b" '(describe-bindings :wk "Describe Bindings")
     )
 
   (start/leader-keys
-    "s" '(:ignore t :wk "Show")
-    "s e" '(eat :wk "Eat terminal")
-	"s k" '(browse-kill-ring :wk "Show kill-ring")
-    )
-
-  (start/leader-keys
-    "t" '(:ignore t :wk "Toggle")
-    "t t" '(visual-line-mode :wk "Toggle truncated lines (wrap)")
-    "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
-    )
-
-  (start/leader-keys
-    "w" '(:ignore t :wk "Windows and Workspaces")
-    "w h" '(evil-window-left :wk "Window left")
-    "w l" '(evil-window-right :wk "Window right")
-    "w j" '(evil-window-down :wk "Window Down")
-    "w k" '(evil-window-up :wk "Window Up")
-    "w /" '(evil-window-vsplit :wk "Vertical Split")
-    "w -" '(evil-window-split :wk "Vertical Split")
-    "w d" '(evil-window-delete :wk "Close window")
+    "l" '(:ignore t :wk "Tabspaces")
+    "l C" '(tabspaces-clear-buffers :wk "Clear all Buffers")
+    "l b" '(tabspaces-switch-to-buffer :wk "Switch to Buffer")
+    "l d" '(tabspaces-close-workspace :wk "Close Workspace")
+    "l k" '(tabspaces-kill-buffers-close-workspace :wk "Kill Buffers and Close Workspace")
+    "l o" '(tabspaces-open-or-create-project-and-workspace :wk "Open Project and Workspace")
+    "l r" '(tabspaces-remove-current-buffer :wk "Remove current buffer")
+    "l R" '(tabspaces-restore-session :wk "Restore previous session")
+    "l l" '(tabspaces-switch-or-create-workspace :wk "Switch or Create Workspace")
+    "l t" '(tabspaces-switch-buffer-and-tab :wk "Switch Buffer and tab")
+    ;; General Tab Control
+    "l TAB" '(tab-previous :wk "Previous Tab")
+    "l L" '(tab-move :wk "Move Tab Right")
+    "l H" '((lambda () 
+              (tab-move -1))
+        	:wk "Move Tab Left")
     )
 
   (start/leader-keys
@@ -201,25 +215,6 @@
     "p x" '(project-execute-extended-command :wk "Execute extended command")
     "p o" '(project-any-command :wk "Execute any command")
     )
-
-  (start/leader-keys
-    "l" '(:ignore t :wk "Tabspaces")
-    "l C" '(tabspaces-clear-buffers :wk "Clear all Buffers")
-    "l b" '(tabspaces-switch-to-buffer :wk "Switch to Buffer")
-    "l d" '(tabspaces-close-workspace :wk "Close Workspace")
-    "l k" '(tabspaces-kill-buffers-close-workspace :wk "Kill Buffers and Close Workspace")
-    "l o" '(tabspaces-open-or-create-project-and-workspace :wk "Open Project and Workspace")
-    "l r" '(tabspaces-remove-current-buffer :wk "Remove current buffer")
-    "l R" '(tabspaces-restore-session :wk "Restore previous session")
-    "l l" '(tabspaces-switch-or-create-workspace :wk "Switch or Create Workspace")
-    "l t" '(tabspaces-switch-buffer-and-tab :wk "Switch Buffer and tab")
-    ;; General Tab Control
-    "l TAB" '(tab-previous :wk "Previous Tab")
-    "l L" '(tab-move :wk "Move Tab Right")
-    "l H" '((lambda () 
-              (tab-move -1))
-        	:wk "Move Tab Left")
-    )
   
   (start/leader-keys
     "q" '(:ignore t :wk "Quit / Session")
@@ -228,6 +223,32 @@
               (load-file "~/SyncBox/new.emacs.d/init.el"))
         	:wk "Reload Emacs config")
 	)
+
+  (start/leader-keys
+    "s" '(:ignore t :wk "Show / Spell")
+    "s e" '(eat :wk "Eat terminal")
+	"s k" '(browse-kill-ring :wk "Show kill-ring")
+    "s c" '(flyspell-correct-word-before-point :wk "Correct word at point")
+    "s s" '(flyspell-toggle :wk "Toggle flyspell")
+	"s n" '(evil-next-flyspell-error :wk "Next spelling error")
+    )
+
+  (start/leader-keys
+    "t" '(:ignore t :wk "Toggle")
+    "t t" '(visual-line-mode :wk "Toggle truncated lines (wrap)")
+    "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
+    )
+
+  (start/leader-keys
+    "w" '(:ignore t :wk "Windows and Workspaces")
+    "w h" '(evil-window-left :wk "Window left")
+    "w l" '(evil-window-right :wk "Window right")
+    "w j" '(evil-window-down :wk "Window Down")
+    "w k" '(evil-window-up :wk "Window Up")
+    "w /" '(evil-window-vsplit :wk "Vertical Split")
+    "w -" '(evil-window-split :wk "Vertical Split")
+    "w d" '(evil-window-delete :wk "Close window")
+    )
   )
 
 (use-package emacs
@@ -359,8 +380,9 @@
 
 (use-package eglot
   :ensure nil ;; Don't install eglot because it's now built-in
-  :hook ((python-mode python-ts-mode) . eglot-ensure)
+  :hook ((python-mode python-ts-mode nix-mode) . eglot-ensure)
   :custom
+  (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
   (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
   (eglot-autoshutdown t);; Shutdown unused servers.
   (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
@@ -601,6 +623,14 @@
   :ensure nil
   :after org)
 
+(use-package nix-mode)
+
+(my-local-leader
+  :states 'normal
+  :keymaps 'nix-mode-map
+  "f" 'nix-flake
+  )
+
 (use-package eat
   :hook ('eshell-load-hook #'eat-eshell-mode))
 
@@ -608,7 +638,7 @@
   :custom
   ;; You can customize Combobulate's key prefix here.
   ;; Note that you may have to restart Emacs for this to take effect!
-  (combobulate-key-prefix "C-c o")
+  (combobulate-key-prefix "SPC o")
   :hook ((prog-mode . combobulate-mode))
   ;; Amend this to the directory where you keep Combobulate's source
   ;; code.
@@ -647,6 +677,8 @@
   :custom
   (git-link-use-commit t)
 )
+
+(use-package git-timemachine)
 
 (use-package corfu
   ;; Optional customizations
@@ -901,6 +933,34 @@ in the search."
   )
 
 (use-package browse-kill-ring)
+
+(defun flyspell-on-for-buffer-type ()
+  "Enable Flyspell appropriately for the major mode of the current buffer.  Uses `flyspell-prog-mode' for modes derived from `prog-mode', so only strings and comments get checked.  All other buffers get `flyspell-mode' to check all text.  If flyspell is already enabled, does nothing."
+  (interactive)
+  (if (not (symbol-value flyspell-mode)) ; if not already on
+	  (progn
+		(if (derived-mode-p 'prog-mode)
+			(progn
+			  (message "Flyspell on (code)")
+			  (flyspell-prog-mode))
+		  ;; else
+		  (progn
+			(message "Flyspell on (text)")
+			(flyspell-mode 1)))
+		;; I tried putting (flyspell-buffer) here but it didn't seem to work
+		)))
+
+(defun flyspell-toggle ()
+  "Turn Flyspell on if it is off, or off if it is on.  When turning on, it uses `flyspell-on-for-buffer-type' so code-vs-text is handled appropriately."
+  (interactive)
+  (if (symbol-value flyspell-mode)
+	  (progn ; flyspell is on, turn it off
+		(message "Flyspell off")
+		(flyspell-mode -1))
+										; else - flyspell is off, turn it on
+    (flyspell-on-for-buffer-type)))
+
+(add-hook 'find-file-hook 'flyspell-on-for-buffer-type)
 
 ;; Make gc pauses faster by decreasing the threshold.
 (setq gc-cons-threshold (* 2 1000 1000))
