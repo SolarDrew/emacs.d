@@ -138,7 +138,9 @@
     "c g d" '(xref-find-definitions :wk "Goto Definition")
     "c g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
     "c g r" '(xref-find-references :wk "Find references")
-    "c l"   '(comment-or-uncomment-region :wk "Toggle Comments")
+	"c i"   '(indent-region :wk "Indent Region")
+    "c l"   '(evilnc-comment-or-uncomment-lines :wk "Toggle Comments")
+    "c L"   '(evilnc-toggle-comment-empty-lines :wk "Toggle commenting empty lines")
     )
 
   (start/leader-keys
@@ -156,65 +158,65 @@
   (start/leader-keys
     "f" '(:ignore t :wk "Find / Files")
     "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
-	"f C" '(doom/copy-this-file :wk "Copy this file")
+  	"f C" '(doom/copy-this-file :wk "Copy this file")
     "f f" '(find-file :wk "Find file")
     "f g" '(consult-ripgrep :wk "Ripgrep search in files")
     "f i" '(consult-imenu :wk "Imenu buffer locations")
     "f l" '(consult-line :wk "Find line")
-	"f L" '(locate :wk "Locate file")
+  	"f L" '(locate :wk "Locate file")
     "f r" '(consult-recent-file :wk "Recent files")
-	"f R" '(doom/move-this-file :wk "Rename/Move file")
+  	"f R" '(doom/move-this-file :wk "Rename/Move file")
     "f s" '(save-buffer :wk "Save Buffer")
     "f S" '(write-file :wk "Save file as...")
     )
 
   (start/leader-keys
     "g" '(:ignore t :wk "Git")
-	"g s"   '(magit                              :wk "Magit")
-	"g R"   '(vc-revert                          :wk "Revert file")
-	"g y"   '(git-link-homepage                  :wk "Copy link to remote")
-	"g t"   '(git-timemachine-toggle             :wk "Git time machine")
-	"g /"   '(magit-dispatch                     :wk "Magit dispatch")
-	"g ."   '(magit-file-dispatch                :wk "Magit file dispatch")
-	"g '"   '(forge-dispatch                     :wk "Forge dispatch")
-	"g -"   '(blamer-mode                        :wk "Toggle blamer")
-	"g b"   '(magit-branch-checkout              :wk "Magit switch branch")
-	"g b"   '(magit-blame-addition               :wk "Magit blame")
-	"g g"   '(magit-status                       :wk "Magit status")
-	"g G"   '(magit-status-here                  :wk "Magit status here")
-	"g D"   '(magit-file-delete                  :wk "Magit file delete")
-	"g C"   '(magit-clone                        :wk "Magit clone")
-	"g F"   '(magit-fetch                        :wk "Magit fetch")
-	"g L"   '(git-link                           :wk "Link to selection")
-	"g S"   '(magit-stage-buffer-file            :wk "Git stage this file")
-	"g U"   '(magit-unstage-buffer-file          :wk "Git unstage this file")
-	"g f"   '(:ignore t :wk "find")
-	"g f f" '(magit-find-file                    :wk "Find file")
-	"g f g" '(magit-find-git-config-file         :wk "Find gitconfig file")
-	"g f c" '(magit-show-commit                  :wk "Find commit")
-	"g f i" '(forge-visit-issue                  :wk "Find issue")
-	"g f p" '(forge-visit-pullreq                :wk "Find pull request")
-	"g o"   '(:ignore t :wk "open in browser")
-	"g o r" '(forge-browse-remote                :wk "Browse remote")
-	"g o c" '(forge-browse-commit                :wk "Browse commit")
-	"g o i" '(forge-browse-issue                 :wk "Browse an issue")
-	"g o p" '(forge-browse-pullreq               :wk "Browse a pull request")
-	"g o I" '(forge-browse-issues                :wk "Browse issues")
-	"g o P" '(forge-browse-pullreqs              :wk "Browse pull requests")
-	"g l"   '(:ignore t :wk "list")
-	;;"g l g" '(+gist:list                         :wk "List gists")
-	"g l r" '(magit-list-repositories            :wk "List repositories")
-	"g l s" '(magit-list-submodules              :wk "List submodules")
-	"g l i" '(forge-list-issues                  :wk "List issues")
-	"g l p" '(forge-list-pullreqs                :wk "List pull requests")
-	"g l n" '(forge-list-notifications           :wk "List notifications")
-	"g c"   '(:ignore t :wk "create")
-	"g c r" '(magit-init                         :wk "Initialize repo")
-	"g c R" '(magit-clone                        :wk "Clone repo")
-	"g c c" '(magit-commit-create                :wk "Commit")
-	"g c f" '(magit-commit-fixup                 :wk "Fixup")
-	"g c b" '(magit-branch-and-checkout          :wk "Branch")
-	"g c i" '(forge-create-issue                 :wk "Issue")
+  	"g s"   '(magit                              :wk "Magit")
+  	"g R"   '(vc-revert                          :wk "Revert file")
+  	"g y"   '(git-link-homepage                  :wk "Copy link to remote")
+  	"g t"   '(git-timemachine-toggle             :wk "Git time machine")
+  	"g /"   '(magit-dispatch                     :wk "Magit dispatch")
+  	"g ."   '(magit-file-dispatch                :wk "Magit file dispatch")
+  	"g '"   '(forge-dispatch                     :wk "Forge dispatch")
+  	"g -"   '(blamer-mode                        :wk "Toggle blamer")
+  	"g b"   '(magit-branch-checkout              :wk "Magit switch branch")
+  	"g b"   '(magit-blame-addition               :wk "Magit blame")
+  	"g g"   '(magit-status                       :wk "Magit status")
+  	"g G"   '(magit-status-here                  :wk "Magit status here")
+  	"g D"   '(magit-file-delete                  :wk "Magit file delete")
+  	"g C"   '(magit-clone                        :wk "Magit clone")
+  	"g F"   '(magit-fetch                        :wk "Magit fetch")
+  	"g L"   '(git-link                           :wk "Link to selection")
+  	"g S"   '(magit-stage-buffer-file            :wk "Git stage this file")
+  	"g U"   '(magit-unstage-buffer-file          :wk "Git unstage this file")
+  	"g f"   '(:ignore t :wk "find")
+  	"g f f" '(magit-find-file                    :wk "Find file")
+  	"g f g" '(magit-find-git-config-file         :wk "Find gitconfig file")
+  	"g f c" '(magit-show-commit                  :wk "Find commit")
+  	"g f i" '(forge-visit-issue                  :wk "Find issue")
+  	"g f p" '(forge-visit-pullreq                :wk "Find pull request")
+  	"g o"   '(:ignore t :wk "open in browser")
+  	"g o r" '(forge-browse-remote                :wk "Browse remote")
+  	"g o c" '(forge-browse-commit                :wk "Browse commit")
+  	"g o i" '(forge-browse-issue                 :wk "Browse an issue")
+  	"g o p" '(forge-browse-pullreq               :wk "Browse a pull request")
+  	"g o I" '(forge-browse-issues                :wk "Browse issues")
+  	"g o P" '(forge-browse-pullreqs              :wk "Browse pull requests")
+  	"g l"   '(:ignore t :wk "list")
+  	;;"g l g" '(+gist:list                         :wk "List gists")
+  	"g l r" '(magit-list-repositories            :wk "List repositories")
+  	"g l s" '(magit-list-submodules              :wk "List submodules")
+  	"g l i" '(forge-list-issues                  :wk "List issues")
+  	"g l p" '(forge-list-pullreqs                :wk "List pull requests")
+  	"g l n" '(forge-list-notifications           :wk "List notifications")
+  	"g c"   '(:ignore t :wk "create")
+  	"g c r" '(magit-init                         :wk "Initialize repo")
+  	"g c R" '(magit-clone                        :wk "Clone repo")
+  	"g c c" '(magit-commit-create                :wk "Commit")
+  	"g c f" '(magit-commit-fixup                 :wk "Fixup")
+  	"g c b" '(magit-branch-and-checkout          :wk "Branch")
+  	"g c i" '(forge-create-issue                 :wk "Issue")
     "g c p" '(forge-create-pullreq               :wk "Pull request")
     )
 
@@ -274,7 +276,7 @@
 
   (start/leader-keys
     "q" '(:ignore t :wk "Quit / Session")
-    "q q" '(save-buffers-kill-emacs :wk "Quit Emacs and Daemon")
+    "q q" '(save-buffers-kill-terminal :wk "Quit Emacs")
     "q r" '((lambda () (interactive)
               (load-file "~/SyncBox/new.emacs.d/init.el"))
             :wk "Reload Emacs config")
@@ -319,14 +321,8 @@
   (electric-pair-mode nil)    ;; Turns off automatic parens pairing
   (blink-cursor-mode nil)     ;; Don't blink cursor
   (global-auto-revert-mode t) ;; Automatically reload file and show changes if the file has changed
-
-  ;;(dired-kill-when-opening-new-dired-buffer t) ;; Dired don't create new buffer
-  ;;(recentf-mode t) ;; Enable recent file mode
-
-  ;;(global-visual-line-mode t)           ;; Enable truncated lines
-  ;;(display-line-numbers-type 'relative) ;; Relative line numbers
   (global-display-line-numbers-mode t)  ;; Display line numbers
-
+  
   (mouse-wheel-progressive-speed nil) ;; Disable progressive speed when scrolling
   (scroll-conservatively 10) ;; Smooth scrolling
   ;;(scroll-margin 8)
@@ -476,9 +472,9 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
           :state    #'consult--buffer-state
           :default  t
           :items    (lambda () (consult--buffer-query
-                                                            :predicate #'tabspaces--local-buffer-p
-                                                            :sort 'visibility
-                                                            :as #'buffer-name)))
+                                :predicate #'tabspaces--local-buffer-p
+                                :sort 'visibility
+                                :as #'buffer-name)))
 
     "Set workspace buffer list for consult-buffer.")
   (add-to-list 'consult-buffer-sources 'consult--source-workspace))
@@ -506,14 +502,14 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
        (message "Located venv: %s" venv-directory)
        `((:pylsp .
                  (:plugins
-                                (:jedi_completion (:fuzzy t)
-                                                                      :jedi (:environment ,venv-directory)
-                                                                      :pydocstyle (:enabled nil)
-                                                                      :pycodestyle (:enabled nil)
-                                                                      :mccabe (:enabled nil)
-                                                                      :pyflakes (:enabled nil)
-                                                                      :flake8 (:enabled nil)
-                                                                      :black (:enabled nil))))))))
+                  (:jedi_completion (:fuzzy t)
+                                    :jedi (:environment ,venv-directory)
+                                    :pydocstyle (:enabled nil)
+                                    :pycodestyle (:enabled nil)
+                                    :mccabe (:enabled nil)
+                                    :pyflakes (:enabled nil)
+                                    :flake8 (:enabled nil)
+                                    :black (:enabled nil))))))))
   )
 
 (defun restart-eglot ()
@@ -546,10 +542,10 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 (use-package python-pytest
   :config
   (transient-append-suffix 'python-pytest-dispatch
-      '(-2)
-      ["Remote data"
-       ("--rd" "Remote data" "--remote-data=any")]
-      )
+    '(-2)
+    ["Remote data"
+     ("--rd" "Remote data" "--remote-data=any")]
+    )
   )
 
 (use-package flymake-ruff
@@ -608,8 +604,6 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
                (let ((bin (expand-file-name (concat conda-env-current-name "/" exe-root)
                                             (conda-env-default-location))))
                  (if (file-executable-p bin) bin))))
-            ((when-let (bin (projectile-locate-dominating-file default-directory exe-root))
-               (setq-local doom-modeline-python-executable (expand-file-name exe-root bin))))
             ((executable-find exe))))))
 
 (defun +python/open-repl ()
@@ -755,7 +749,7 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   ;; Amend this to the directory where you keep Combobulate's source
   ;; code.
   :vc (:url "https://github.com/mickeynp/combobulate"
-       :branch "main")
+			:branch "main")
   )
 
 (use-package nerd-icons
@@ -771,7 +765,7 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   :commands magit-status)
 (use-package forge
   :after magit
-)
+  )
 
 (use-package diff-hl
   :hook ((dired-mode         . diff-hl-dired-mode-unless-remote)
@@ -782,7 +776,7 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 (use-package git-link
   :custom
   (git-link-use-commit t)
-)
+  )
 
 (use-package git-timemachine)
 
@@ -849,20 +843,23 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 
 (use-package vertico
   :init
-  (vertico-mode))
+  (vertico-mode)
+  :custom
+  (vertico-count 20)
+)
 
 (use-package vertico-posframe
   :init
   (setq vertico-posframe-parameters   '((left-fringe  . 12)    ;; Fringes
-                                                                              (right-fringe . 12)
-                                                                              (undecorated  . nil))) ;; Rounded frame
+                                        (right-fringe . 12)
+                                        (undecorated  . nil))) ;; Rounded frame
   :config
   (vertico-posframe-mode 1)
   (setq vertico-posframe-width        120                      ;; Narrow frame
-              vertico-posframe-height       25                       ;; Default height
-              ;; Don't create posframe for these commands
-              vertico-multiform-commands    '((consult-line    (:not posframe))
-                                                                              (consult-ripgrep (:not posframe))))
+        vertico-posframe-height       vertico-count            ;; Default height
+        ;; Don't create posframe for these commands
+        vertico-multiform-commands    '((consult-line    (:not posframe))
+                                        (consult-ripgrep (:not posframe))))
   )
 
 (savehist-mode) ;; Enables save history mode
@@ -1069,6 +1066,8 @@ in the search."
     (flyspell-on-for-buffer-type)))
 
 (add-hook 'find-file-hook 'flyspell-on-for-buffer-type)
+
+(use-package evil-nerd-commenter)
 
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 

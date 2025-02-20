@@ -58,6 +58,7 @@ This literate config is was started from the excellent [[https://github.com/Mini
   - [[#dashboard][Dashboard]]
   - [[#browse-kill-ring][Browse Kill-Ring]]
   - [[#flyspell][Flyspell]]
+  - [[#evil-nerd-commenter][Evil-nerd-commenter]]
 - [[#config-split-into-other-files][Config Split into Other Files]]
   - [[#adding-the-lisp-directory-to-load-path][Adding the lisp directory to load-path]]
   - [[#org-mode][Org Mode]]
@@ -67,8 +68,8 @@ This literate config is was started from the excellent [[https://github.com/Mini
 ** Startup Performance
 Make startup faster by reducing the frequency of garbage collection. This will be set back when startup finishes.
 #+begin_src emacs-lisp
-    ;; The default is 800 kilobytes. Measured in bytes.
-    (setq gc-cons-threshold (* 50 1000 1000))
+  ;; The default is 800 kilobytes. Measured in bytes.
+  (setq gc-cons-threshold (* 50 1000 1000))
 #+end_src
 ** Auto-tangle Configuration file
 Auto-Tangle Org configuration file for better startup times.
@@ -80,15 +81,15 @@ This snippet adds a hook to org-mode buffers so that start/org-babel-tangle-conf
 This function checks to see if the file being saved is the Emacs.org file you’re looking at right now, and if so,
 automatically exports the configuration here to the associated output files.
 #+begin_src emacs-lisp
-    (defun start/org-babel-tangle-config ()
-      "Automatically tangle our Emacs.org config file when we save it. Credit to Emacs From Scratch for this one!"
-      (when (string-equal (file-name-directory (buffer-file-name))
-                          (expand-file-name user-emacs-directory))
-        ;; Dynamic scoping to the rescue
-        (let ((org-confirm-babel-evaluate nil))
-          (org-babel-tangle))))
+  (defun start/org-babel-tangle-config ()
+    "Automatically tangle our Emacs.org config file when we save it. Credit to Emacs From Scratch for this one!"
+    (when (string-equal (file-name-directory (buffer-file-name))
+                        (expand-file-name user-emacs-directory))
+      ;; Dynamic scoping to the rescue
+      (let ((org-confirm-babel-evaluate nil))
+        (org-babel-tangle))))
 
-    (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'start/org-babel-tangle-config)))
+  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'start/org-babel-tangle-config)))
 #+end_src
 ** Use Package
 We use the default package manager package.el with use-package. Alternative package managers (straight.el, elpaca, etc.) are useful if you want to
@@ -102,36 +103,36 @@ To update/upgrade packages, use the package-upgrade-all command.
 Check out the use-package [[https://www.gnu.org/software/emacs/manual/use-package.html][documentation]] to see how to use it.
 With Emacs 29 use-package is now built-in.
 #+begin_src emacs-lisp
-    (require 'use-package-ensure) ;; Load use-package-always-ensure
-    (setq use-package-always-ensure t) ;; Always ensures that a package is installed
-    (setq package-archives '(("melpa" . "https://melpa.org/packages/") ;; Sets default package repositories
-                             ("org" . "https://orgmode.org/elpa/")
-                             ("elpa" . "https://elpa.gnu.org/packages/")
-                             ("nongnu" . "https://elpa.nongnu.org/nongnu/"))) ;; For Eat Terminal
+  (require 'use-package-ensure) ;; Load use-package-always-ensure
+  (setq use-package-always-ensure t) ;; Always ensures that a package is installed
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/") ;; Sets default package repositories
+                           ("org" . "https://orgmode.org/elpa/")
+                           ("elpa" . "https://elpa.gnu.org/packages/")
+                           ("nongnu" . "https://elpa.nongnu.org/nongnu/"))) ;; For Eat Terminal
 #+end_src
 
 *** Quelpa
 #+begin_src emacs-lisp
-;;(use-package quelpa)
-;;(use-package quelpa-use-package)
+  ;;(use-package quelpa)
+  ;;(use-package quelpa-use-package)
 #+end_src
 *** Straight
 #+begin_src emacs-lisp
-;;    (defvar bootstrap-version)
-;;    (let ((bootstrap-file
-;;           (expand-file-name
-;;            "straight/repos/straight.el/bootstrap.el"
-;;            (or (bound-and-true-p straight-base-dir)
-;;                user-emacs-directory)))
-;;          (bootstrap-version 7))
-;;      (unless (file-exists-p bootstrap-file)
-;;        (with-current-buffer
-;;            (url-retrieve-synchronously
-;;             "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-;;             'silent 'inhibit-cookies)
-;;          (goto-char (point-max))
-;;          (eval-print-last-sexp)))
-;;      (load bootstrap-file nil 'nomessage))
+  ;;    (defvar bootstrap-version)
+  ;;    (let ((bootstrap-file
+  ;;           (expand-file-name
+  ;;            "straight/repos/straight.el/bootstrap.el"
+  ;;            (or (bound-and-true-p straight-base-dir)
+  ;;                user-emacs-directory)))
+  ;;          (bootstrap-version 7))
+  ;;      (unless (file-exists-p bootstrap-file)
+  ;;        (with-current-buffer
+  ;;            (url-retrieve-synchronously
+  ;;             "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+  ;;             'silent 'inhibit-cookies)
+  ;;          (goto-char (point-max))
+  ;;          (eval-print-last-sexp)))
+  ;;      (load bootstrap-file nil 'nomessage))
 #+end_src
 ** Evil Mode
 An extensible vi/vim layer for Emacs. Because…let’s face it. The Vim keybindings are just plain better.
@@ -162,7 +163,7 @@ Notes:
       ;; Setting where to use evil-collection
       (setq evil-collection-mode-list '(dired ibuffer magit forge corfu vertico consult dashboard))
       (evil-collection-init))
-#+end_src
+  #+end_src
 
 * Keybindings
 A keybinding framework to set keybindings easily. Uses https://github.com/noctuid/general.el
@@ -244,7 +245,9 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
       "c g d" '(xref-find-definitions :wk "Goto Definition")
       "c g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
       "c g r" '(xref-find-references :wk "Find references")
-      "c l"   '(comment-or-uncomment-region :wk "Toggle Comments")
+  	"c i"   '(indent-region :wk "Indent Region")
+      "c l"   '(evilnc-comment-or-uncomment-lines :wk "Toggle Comments")
+      "c L"   '(evilnc-toggle-comment-empty-lines :wk "Toggle commenting empty lines")
       )
 
     (start/leader-keys
@@ -262,65 +265,65 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
     (start/leader-keys
       "f" '(:ignore t :wk "Find / Files")
       "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
-  	"f C" '(doom/copy-this-file :wk "Copy this file")
+    	"f C" '(doom/copy-this-file :wk "Copy this file")
       "f f" '(find-file :wk "Find file")
       "f g" '(consult-ripgrep :wk "Ripgrep search in files")
       "f i" '(consult-imenu :wk "Imenu buffer locations")
       "f l" '(consult-line :wk "Find line")
-  	"f L" '(locate :wk "Locate file")
+    	"f L" '(locate :wk "Locate file")
       "f r" '(consult-recent-file :wk "Recent files")
-  	"f R" '(doom/move-this-file :wk "Rename/Move file")
+    	"f R" '(doom/move-this-file :wk "Rename/Move file")
       "f s" '(save-buffer :wk "Save Buffer")
       "f S" '(write-file :wk "Save file as...")
       )
 
     (start/leader-keys
       "g" '(:ignore t :wk "Git")
-  	"g s"   '(magit                              :wk "Magit")
-  	"g R"   '(vc-revert                          :wk "Revert file")
-  	"g y"   '(git-link-homepage                  :wk "Copy link to remote")
-  	"g t"   '(git-timemachine-toggle             :wk "Git time machine")
-  	"g /"   '(magit-dispatch                     :wk "Magit dispatch")
-  	"g ."   '(magit-file-dispatch                :wk "Magit file dispatch")
-  	"g '"   '(forge-dispatch                     :wk "Forge dispatch")
-  	"g -"   '(blamer-mode                        :wk "Toggle blamer")
-  	"g b"   '(magit-branch-checkout              :wk "Magit switch branch")
-  	"g b"   '(magit-blame-addition               :wk "Magit blame")
-  	"g g"   '(magit-status                       :wk "Magit status")
-  	"g G"   '(magit-status-here                  :wk "Magit status here")
-  	"g D"   '(magit-file-delete                  :wk "Magit file delete")
-  	"g C"   '(magit-clone                        :wk "Magit clone")
-  	"g F"   '(magit-fetch                        :wk "Magit fetch")
-  	"g L"   '(git-link                           :wk "Link to selection")
-  	"g S"   '(magit-stage-buffer-file            :wk "Git stage this file")
-  	"g U"   '(magit-unstage-buffer-file          :wk "Git unstage this file")
-  	"g f"   '(:ignore t :wk "find")
-  	"g f f" '(magit-find-file                    :wk "Find file")
-  	"g f g" '(magit-find-git-config-file         :wk "Find gitconfig file")
-  	"g f c" '(magit-show-commit                  :wk "Find commit")
-  	"g f i" '(forge-visit-issue                  :wk "Find issue")
-  	"g f p" '(forge-visit-pullreq                :wk "Find pull request")
-  	"g o"   '(:ignore t :wk "open in browser")
-  	"g o r" '(forge-browse-remote                :wk "Browse remote")
-  	"g o c" '(forge-browse-commit                :wk "Browse commit")
-  	"g o i" '(forge-browse-issue                 :wk "Browse an issue")
-  	"g o p" '(forge-browse-pullreq               :wk "Browse a pull request")
-  	"g o I" '(forge-browse-issues                :wk "Browse issues")
-  	"g o P" '(forge-browse-pullreqs              :wk "Browse pull requests")
-  	"g l"   '(:ignore t :wk "list")
-  	;;"g l g" '(+gist:list                         :wk "List gists")
-  	"g l r" '(magit-list-repositories            :wk "List repositories")
-  	"g l s" '(magit-list-submodules              :wk "List submodules")
-  	"g l i" '(forge-list-issues                  :wk "List issues")
-  	"g l p" '(forge-list-pullreqs                :wk "List pull requests")
-  	"g l n" '(forge-list-notifications           :wk "List notifications")
-  	"g c"   '(:ignore t :wk "create")
-  	"g c r" '(magit-init                         :wk "Initialize repo")
-  	"g c R" '(magit-clone                        :wk "Clone repo")
-  	"g c c" '(magit-commit-create                :wk "Commit")
-  	"g c f" '(magit-commit-fixup                 :wk "Fixup")
-  	"g c b" '(magit-branch-and-checkout          :wk "Branch")
-  	"g c i" '(forge-create-issue                 :wk "Issue")
+    	"g s"   '(magit                              :wk "Magit")
+    	"g R"   '(vc-revert                          :wk "Revert file")
+    	"g y"   '(git-link-homepage                  :wk "Copy link to remote")
+    	"g t"   '(git-timemachine-toggle             :wk "Git time machine")
+    	"g /"   '(magit-dispatch                     :wk "Magit dispatch")
+    	"g ."   '(magit-file-dispatch                :wk "Magit file dispatch")
+    	"g '"   '(forge-dispatch                     :wk "Forge dispatch")
+    	"g -"   '(blamer-mode                        :wk "Toggle blamer")
+    	"g b"   '(magit-branch-checkout              :wk "Magit switch branch")
+    	"g b"   '(magit-blame-addition               :wk "Magit blame")
+    	"g g"   '(magit-status                       :wk "Magit status")
+    	"g G"   '(magit-status-here                  :wk "Magit status here")
+    	"g D"   '(magit-file-delete                  :wk "Magit file delete")
+    	"g C"   '(magit-clone                        :wk "Magit clone")
+    	"g F"   '(magit-fetch                        :wk "Magit fetch")
+    	"g L"   '(git-link                           :wk "Link to selection")
+    	"g S"   '(magit-stage-buffer-file            :wk "Git stage this file")
+    	"g U"   '(magit-unstage-buffer-file          :wk "Git unstage this file")
+    	"g f"   '(:ignore t :wk "find")
+    	"g f f" '(magit-find-file                    :wk "Find file")
+    	"g f g" '(magit-find-git-config-file         :wk "Find gitconfig file")
+    	"g f c" '(magit-show-commit                  :wk "Find commit")
+    	"g f i" '(forge-visit-issue                  :wk "Find issue")
+    	"g f p" '(forge-visit-pullreq                :wk "Find pull request")
+    	"g o"   '(:ignore t :wk "open in browser")
+    	"g o r" '(forge-browse-remote                :wk "Browse remote")
+    	"g o c" '(forge-browse-commit                :wk "Browse commit")
+    	"g o i" '(forge-browse-issue                 :wk "Browse an issue")
+    	"g o p" '(forge-browse-pullreq               :wk "Browse a pull request")
+    	"g o I" '(forge-browse-issues                :wk "Browse issues")
+    	"g o P" '(forge-browse-pullreqs              :wk "Browse pull requests")
+    	"g l"   '(:ignore t :wk "list")
+    	;;"g l g" '(+gist:list                         :wk "List gists")
+    	"g l r" '(magit-list-repositories            :wk "List repositories")
+    	"g l s" '(magit-list-submodules              :wk "List submodules")
+    	"g l i" '(forge-list-issues                  :wk "List issues")
+    	"g l p" '(forge-list-pullreqs                :wk "List pull requests")
+    	"g l n" '(forge-list-notifications           :wk "List notifications")
+    	"g c"   '(:ignore t :wk "create")
+    	"g c r" '(magit-init                         :wk "Initialize repo")
+    	"g c R" '(magit-clone                        :wk "Clone repo")
+    	"g c c" '(magit-commit-create                :wk "Commit")
+    	"g c f" '(magit-commit-fixup                 :wk "Fixup")
+    	"g c b" '(magit-branch-and-checkout          :wk "Branch")
+    	"g c i" '(forge-create-issue                 :wk "Issue")
       "g c p" '(forge-create-pullreq               :wk "Pull request")
       )
 
@@ -380,7 +383,7 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
 
     (start/leader-keys
       "q" '(:ignore t :wk "Quit / Session")
-      "q q" '(save-buffers-kill-emacs :wk "Quit Emacs and Daemon")
+      "q q" '(save-buffers-kill-terminal :wk "Quit Emacs")
       "q r" '((lambda () (interactive)
                 (load-file "~/SyncBox/new.emacs.d/init.el"))
               :wk "Reload Emacs config")
@@ -416,51 +419,45 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
 
 * Good Defaults
 #+begin_src emacs-lisp
-    (use-package emacs
-      :custom
-      (menu-bar-mode nil)         ;; Disable the menu bar
-      (scroll-bar-mode nil)       ;; Disable the scroll bar
-      (tool-bar-mode nil)         ;; Disable the tool bar
-      (inhibit-startup-screen t)  ;; Disable welcome screen
+  (use-package emacs
+    :custom
+    (menu-bar-mode nil)         ;; Disable the menu bar
+    (scroll-bar-mode nil)       ;; Disable the scroll bar
+    (tool-bar-mode nil)         ;; Disable the tool bar
+    (inhibit-startup-screen t)  ;; Disable welcome screen
 
-      (delete-selection-mode t)   ;; Select text and delete it by typing.
-      (electric-indent-mode t)    ;; Turn off the weird indenting that Emacs does by default.
-      (electric-pair-mode nil)    ;; Turns off automatic parens pairing
-      (blink-cursor-mode nil)     ;; Don't blink cursor
-      (global-auto-revert-mode t) ;; Automatically reload file and show changes if the file has changed
+    (delete-selection-mode t)   ;; Select text and delete it by typing.
+    (electric-indent-mode t)    ;; Turn off the weird indenting that Emacs does by default.
+    (electric-pair-mode nil)    ;; Turns off automatic parens pairing
+    (blink-cursor-mode nil)     ;; Don't blink cursor
+    (global-auto-revert-mode t) ;; Automatically reload file and show changes if the file has changed
+    (global-display-line-numbers-mode t)  ;; Display line numbers
+    
+    (mouse-wheel-progressive-speed nil) ;; Disable progressive speed when scrolling
+    (scroll-conservatively 10) ;; Smooth scrolling
+    ;;(scroll-margin 8)
 
-      ;;(dired-kill-when-opening-new-dired-buffer t) ;; Dired don't create new buffer
-      ;;(recentf-mode t) ;; Enable recent file mode
+    (tab-width 4)
 
-      ;;(global-visual-line-mode t)           ;; Enable truncated lines
-      ;;(display-line-numbers-type 'relative) ;; Relative line numbers
-      (global-display-line-numbers-mode t)  ;; Display line numbers
-
-      (mouse-wheel-progressive-speed nil) ;; Disable progressive speed when scrolling
-      (scroll-conservatively 10) ;; Smooth scrolling
-      ;;(scroll-margin 8)
-
-      (tab-width 4)
-
-      (make-backup-files nil) ;; Stop creating ~ backup files
-      (auto-save-default nil) ;; Stop creating # auto save files
-      :hook
-      (prog-mode . (lambda () (hs-minor-mode t))) ;; Enable folding hide/show globally
-      :config
-      ;; Move customization variables to a separate file and load it, avoid filling up init.el with unnecessary variables
-      (setq custom-file (locate-user-emacs-file "custom-vars.el"))
-      (load custom-file 'noerror 'nomessage)
-      :bind (
-             ([escape] . keyboard-escape-quit) ;; Makes Escape quit prompts (Minibuffer Escape)
-             )
-      ;; Fix general.el leader key not working instantly in messages buffer with evil mode
-      :ghook ('after-init-hook
-              (lambda (&rest _)
-                (when-let ((messages-buffer (get-buffer "*Messages*")))
-                  (with-current-buffer messages-buffer
-                    (evil-normalize-keymaps))))
-              nil nil t)
-      )
+    (make-backup-files nil) ;; Stop creating ~ backup files
+    (auto-save-default nil) ;; Stop creating # auto save files
+    :hook
+    (prog-mode . (lambda () (hs-minor-mode t))) ;; Enable folding hide/show globally
+    :config
+    ;; Move customization variables to a separate file and load it, avoid filling up init.el with unnecessary variables
+    (setq custom-file (locate-user-emacs-file "custom-vars.el"))
+    (load custom-file 'noerror 'nomessage)
+    :bind (
+           ([escape] . keyboard-escape-quit) ;; Makes Escape quit prompts (Minibuffer Escape)
+           )
+    ;; Fix general.el leader key not working instantly in messages buffer with evil mode
+    :ghook ('after-init-hook
+            (lambda (&rest _)
+              (when-let ((messages-buffer (get-buffer "*Messages*")))
+                (with-current-buffer messages-buffer
+                  (evil-normalize-keymaps))))
+            nil nil t)
+    )
 #+end_src
 
 * Appearance
@@ -468,9 +465,9 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
 Set gruvbox theme, if you want some themes try out doom-themes.
 Use consult-theme to easily try out themes (*Epilepsy* Warning).
 #+begin_src emacs-lisp
-    (use-package gruvbox-theme
-      :config
-      (load-theme 'gruvbox-dark-medium t)) ;; We need to add t to trust this package
+  (use-package gruvbox-theme
+    :config
+    (load-theme 'gruvbox-dark-medium t)) ;; We need to add t to trust this package
 #+end_src
 
 ** Transparency
@@ -581,54 +578,54 @@ We are going to try and use tabspaces / project.el
 
 First setup project.el
 #+BEGIN_SRC emacs-lisp
-    (use-package project
-      :custom
-      (project-switch-commands 'project-find-file)  ;; Always open find file after switching project
-      )
+  (use-package project
+    :custom
+    (project-switch-commands 'project-find-file)  ;; Always open find file after switching project
+    )
 #+END_SRC
 
 Then tab-bar
 #+BEGIN_SRC emacs-lisp
-    (use-package tab-bar
-      :hook (after-init . tab-bar-mode)
-      )
-  #+END_SRC
+  (use-package tab-bar
+    :hook (after-init . tab-bar-mode)
+    )
+#+END_SRC
 
 Then tabspaces
 #+BEGIN_SRC emacs-lisp
-    (use-package tabspaces
-      :hook (after-init . tabspaces-mode)
-      :custom
-      (tabspaces-use-filtered-buffers-as-default t)
-      (tabspaces-default-tab "Default")
-      (tabspaces-remove-to-default t)
-      (tabspaces-include-buffers '("*scratch*"))
-      (tabspaces-initialize-project-with-todo nil)
-      ;; sessions
-      (tabspaces-session t)
-      (tabspaces-session-auto-restore nil)
-      (tab-bar-new-tab-choice "*scratch*")
-      )
+  (use-package tabspaces
+    :hook (after-init . tabspaces-mode)
+    :custom
+    (tabspaces-use-filtered-buffers-as-default t)
+    (tabspaces-default-tab "Default")
+    (tabspaces-remove-to-default t)
+    (tabspaces-include-buffers '("*scratch*"))
+    (tabspaces-initialize-project-with-todo nil)
+    ;; sessions
+    (tabspaces-session t)
+    (tabspaces-session-auto-restore nil)
+    (tab-bar-new-tab-choice "*scratch*")
+    )
 
-    ;; Filter Buffers for Consult-Buffer
-    (with-eval-after-load 'consult
-      ;; hide full buffer list (still available with "b" prefix)
-      (consult-customize consult--source-buffer :hidden t :default nil)
-      ;; set consult-workspace buffer list
-      (defvar consult--source-workspace
-        (list :name     "Workspace Buffers"
-              :narrow   ?w
-              :history  'buffer-name-history
-              :category 'buffer
-              :state    #'consult--buffer-state
-              :default  t
-              :items    (lambda () (consult--buffer-query
-                                                                :predicate #'tabspaces--local-buffer-p
-                                                                :sort 'visibility
-                                                                :as #'buffer-name)))
+  ;; Filter Buffers for Consult-Buffer
+  (with-eval-after-load 'consult
+    ;; hide full buffer list (still available with "b" prefix)
+    (consult-customize consult--source-buffer :hidden t :default nil)
+    ;; set consult-workspace buffer list
+    (defvar consult--source-workspace
+      (list :name     "Workspace Buffers"
+            :narrow   ?w
+            :history  'buffer-name-history
+            :category 'buffer
+            :state    #'consult--buffer-state
+            :default  t
+            :items    (lambda () (consult--buffer-query
+                                  :predicate #'tabspaces--local-buffer-p
+                                  :sort 'visibility
+                                  :as #'buffer-name)))
 
-        "Set workspace buffer list for consult-buffer.")
-      (add-to-list 'consult-buffer-sources 'consult--source-workspace))
+      "Set workspace buffer list for consult-buffer.")
+    (add-to-list 'consult-buffer-sources 'consult--source-workspace))
 #+END_SRC
 ** Language Server
 *** Eglot
@@ -666,28 +663,28 @@ Use visual block to uncomment easily in Org documents (C-v).
          (message "Located venv: %s" venv-directory)
          `((:pylsp .
                    (:plugins
-                                  (:jedi_completion (:fuzzy t)
-                                                                        :jedi (:environment ,venv-directory)
-                                                                        :pydocstyle (:enabled nil)
-                                                                        :pycodestyle (:enabled nil)
-                                                                        :mccabe (:enabled nil)
-                                                                        :pyflakes (:enabled nil)
-                                                                        :flake8 (:enabled nil)
-                                                                        :black (:enabled nil))))))))
+                    (:jedi_completion (:fuzzy t)
+                                      :jedi (:environment ,venv-directory)
+                                      :pydocstyle (:enabled nil)
+                                      :pycodestyle (:enabled nil)
+                                      :mccabe (:enabled nil)
+                                      :pyflakes (:enabled nil)
+                                      :flake8 (:enabled nil)
+                                      :black (:enabled nil))))))))
     )
 #+end_src
 
 #+BEGIN_SRC emacs-lisp
-(defun restart-eglot ()
-  (interactive)
-  ;; Check if there's an active Eglot server
-  (let ((current-server (eglot-current-server)))
-    ;; If a server exists, prompt the user to continue
-    (if current-server
-        ;; Shut down the server if user confirms
-        (eglot-shutdown current-server)))
-  ;; Restart Eglot for the current buffer
-  (eglot-ensure))
+  (defun restart-eglot ()
+    (interactive)
+    ;; Check if there's an active Eglot server
+    (let ((current-server (eglot-current-server)))
+      ;; If a server exists, prompt the user to continue
+      (if current-server
+          ;; Shut down the server if user confirms
+          (eglot-shutdown current-server)))
+    ;; Restart Eglot for the current buffer
+    (eglot-ensure))
 #+END_SRC
 ** TODO Reformatting
 Would be nice to have ruff --fix and ruff-format, isort etc all available.
@@ -735,10 +732,10 @@ Enable the excellent pytest package, and setup an extra hook for [[https://githu
   (use-package python-pytest
     :config
     (transient-append-suffix 'python-pytest-dispatch
-        '(-2)
-        ["Remote data"
-         ("--rd" "Remote data" "--remote-data=any")]
-        )
+      '(-2)
+      ["Remote data"
+       ("--rd" "Remote data" "--remote-data=any")]
+      )
     )
 #+end_src
 
@@ -761,130 +758,128 @@ Finally, setup the flymake-ruff package, currently my own fork of it where I am 
 :END:
 Custom written functions for Python related stuff
 #+begin_src emacs-lisp
-    ;; Add to __all__
-    (defsubst python-in-string/comment ()
-      "Return non-nil if point is in a Python literal (a comment or string)."
-      ;; We don't need to save the match data.
-      (nth 8 (syntax-ppss)))
+  ;; Add to __all__
+  (defsubst python-in-string/comment ()
+    "Return non-nil if point is in a Python literal (a comment or string)."
+    ;; We don't need to save the match data.
+    (nth 8 (syntax-ppss)))
 
-    (defun python-add-to-all ()
-      "Take the symbol under the point and add it to the __all__ list, if it's not already there."
-      (interactive)
-      (save-excursion
-        (let ((thing (thing-at-point 'symbol)))
-          (if (progn (goto-char (point-min))
-                     (let (found)
-                       (while (and (not found)
-                                   (re-search-forward (rx symbol-start "__all__" symbol-end
-                                                          (0+ space) "=" (0+ space)
-                                                          (syntax open-parenthesis))
-                                                      nil t))
-                         (setq found (not (python-in-string/comment))))
-                       found))
-              (when (not (looking-at (rx-to-string
-                                      `(and (0+ (not (syntax close-parenthesis)))
-                                            (syntax string-quote) ,thing (syntax string-quote)))))
-                (insert (format "\'%s\', " thing)))
-            (beginning-of-buffer)
-            ;; Put before any import lines, or if none, the first class or
-            ;; function.
-            (when (re-search-forward (rx bol (or "import" "from") symbol-end) nil t)
-              (re-search-forward (rx symbol-start (or "def" "class") symbol-end) nil t))
-            (forward-line -1)
-            (insert (format "\n__all__ = [\'%s\']\n\n" thing))))))
+  (defun python-add-to-all ()
+    "Take the symbol under the point and add it to the __all__ list, if it's not already there."
+    (interactive)
+    (save-excursion
+      (let ((thing (thing-at-point 'symbol)))
+        (if (progn (goto-char (point-min))
+                   (let (found)
+                     (while (and (not found)
+                                 (re-search-forward (rx symbol-start "__all__" symbol-end
+                                                        (0+ space) "=" (0+ space)
+                                                        (syntax open-parenthesis))
+                                                    nil t))
+                       (setq found (not (python-in-string/comment))))
+                     found))
+            (when (not (looking-at (rx-to-string
+                                    `(and (0+ (not (syntax close-parenthesis)))
+                                          (syntax string-quote) ,thing (syntax string-quote)))))
+              (insert (format "\'%s\', " thing)))
+          (beginning-of-buffer)
+          ;; Put before any import lines, or if none, the first class or
+          ;; function.
+          (when (re-search-forward (rx bol (or "import" "from") symbol-end) nil t)
+            (re-search-forward (rx symbol-start (or "def" "class") symbol-end) nil t))
+          (forward-line -1)
+          (insert (format "\n__all__ = [\'%s\']\n\n" thing))))))
 
-    (defun +python-executable-find (exe)
-      "Resolve the path to the EXE executable.
-        Tries to be aware of your active conda/pipenv/virtualenv environment, before
-        falling back on searching your PATH."
-      (if (file-name-absolute-p exe)
-          (and (file-executable-p exe)
-               exe)
-        (let ((exe-root (format "bin/%s" exe)))
-          (cond ((when python-shell-virtualenv-root
-                   (let ((bin (expand-file-name exe-root python-shell-virtualenv-root)))
-                     (if (file-exists-p bin) bin))))
-                ((when (require 'conda nil t)
-                   (let ((bin (expand-file-name (concat conda-env-current-name "/" exe-root)
-                                                (conda-env-default-location))))
-                     (if (file-executable-p bin) bin))))
-                ((when-let (bin (projectile-locate-dominating-file default-directory exe-root))
-                   (setq-local doom-modeline-python-executable (expand-file-name exe-root bin))))
-                ((executable-find exe))))))
+  (defun +python-executable-find (exe)
+    "Resolve the path to the EXE executable.
+      Tries to be aware of your active conda/pipenv/virtualenv environment, before
+      falling back on searching your PATH."
+    (if (file-name-absolute-p exe)
+        (and (file-executable-p exe)
+             exe)
+      (let ((exe-root (format "bin/%s" exe)))
+        (cond ((when python-shell-virtualenv-root
+                 (let ((bin (expand-file-name exe-root python-shell-virtualenv-root)))
+                   (if (file-exists-p bin) bin))))
+              ((when (require 'conda nil t)
+                 (let ((bin (expand-file-name (concat conda-env-current-name "/" exe-root)
+                                              (conda-env-default-location))))
+                   (if (file-executable-p bin) bin))))
+              ((executable-find exe))))))
 
-    (defun +python/open-repl ()
-      "Open the Python REPL."
-      (interactive)
-      (require 'python)
-      (unless python-shell-interpreter
-        (user-error "`python-shell-interpreter' isn't set"))
-      (pop-to-buffer
-       (process-buffer
-        (let ((dedicated (bound-and-true-p python-shell-dedicated)))
-          (if-let* ((pipenv (+python-executable-find "pipenv"))
-                    (pipenv-project (pipenv-project-p)))
-              (let ((default-directory pipenv-project)
-                    (python-shell-interpreter-args
-                     (format "run %s %s"
-                             python-shell-interpreter
-                             python-shell-interpreter-args))
-                    (python-shell-interpreter pipenv))
-                (run-python nil dedicated t))
-            (run-python nil dedicated t))))))
+  (defun +python/open-repl ()
+    "Open the Python REPL."
+    (interactive)
+    (require 'python)
+    (unless python-shell-interpreter
+      (user-error "`python-shell-interpreter' isn't set"))
+    (pop-to-buffer
+     (process-buffer
+      (let ((dedicated (bound-and-true-p python-shell-dedicated)))
+        (if-let* ((pipenv (+python-executable-find "pipenv"))
+                  (pipenv-project (pipenv-project-p)))
+            (let ((default-directory pipenv-project)
+                  (python-shell-interpreter-args
+                   (format "run %s %s"
+                           python-shell-interpreter
+                           python-shell-interpreter-args))
+                  (python-shell-interpreter pipenv))
+              (run-python nil dedicated t))
+          (run-python nil dedicated t))))))
 
-    (defun +python/open-ipython-repl ()
-      "Open an IPython REPL."
-      (interactive)
-      (require 'python)
-      (let ((python-shell-interpreter
-             (or (+python-executable-find (car +python-ipython-command))
-                 "ipython"))
-            (python-shell-interpreter-args
-             (string-join (cdr +python-ipython-command) " ")))
-        (+python/open-repl)))
+  (defun +python/open-ipython-repl ()
+    "Open an IPython REPL."
+    (interactive)
+    (require 'python)
+    (let ((python-shell-interpreter
+           (or (+python-executable-find (car +python-ipython-command))
+               "ipython"))
+          (python-shell-interpreter-args
+           (string-join (cdr +python-ipython-command) " ")))
+      (+python/open-repl)))
 
-    (defvar +python-ipython-command '("ipython" "-i" "--simple-prompt" "--no-color-info")
-      "Command to initialize the ipython REPL for `+python/open-ipython-repl'.")
+  (defvar +python-ipython-command '("ipython" "-i" "--simple-prompt" "--no-color-info")
+    "Command to initialize the ipython REPL for `+python/open-ipython-repl'.")
 
-    (defun cadair/run-restart-repl ()
-      "Run a new python repl in a window which does not have focus."
-      (interactive)
-      (setq initial-buffer (current-buffer))
-      (if (python-shell-get-buffer)
-          (kill-buffer (python-shell-get-buffer)))
-      (+python/open-ipython-repl)
-      (evil-normal-state)
-      (pop-to-buffer initial-buffer)
-      )
+  (defun cadair/run-restart-repl ()
+    "Run a new python repl in a window which does not have focus."
+    (interactive)
+    (setq initial-buffer (current-buffer))
+    (if (python-shell-get-buffer)
+        (kill-buffer (python-shell-get-buffer)))
+    (+python/open-ipython-repl)
+    (evil-normal-state)
+    (pop-to-buffer initial-buffer)
+    )
 
-    (defun cadair/run-in-repl (arg)
-      "Run a python buffer in a new ipython repl"
-      (interactive "P")
-      (cadair/run-restart-repl)
-      (run-at-time 0.5 nil 'python-shell-send-buffer)
-      )
+  (defun cadair/run-in-repl (arg)
+    "Run a python buffer in a new ipython repl"
+    (interactive "P")
+    (cadair/run-restart-repl)
+    (run-at-time 0.5 nil 'python-shell-send-buffer)
+    )
 
-    (defun cadair/run-in-repl-switch (arg)
-      "Run a python buffer in a new ipython repl"
-      (interactive "P")
-      (cadair/run-restart-repl)
-      (run-at-time 0.5 nil 'python-shell-send-buffer)
-      (run-at-time 1.0 nil (pop-to-buffer (python-shell-get-buffer)))
-      )
+  (defun cadair/run-in-repl-switch (arg)
+    "Run a python buffer in a new ipython repl"
+    (interactive "P")
+    (cadair/run-restart-repl)
+    (run-at-time 0.5 nil 'python-shell-send-buffer)
+    (run-at-time 1.0 nil (pop-to-buffer (python-shell-get-buffer)))
+    )
 
-    (defun cadair/python-execute-file (arg)
-      "Execute a python script in a shell."
-      (interactive "P")
-      ;; set compile command to buffer-file-name
-      ;; universal argument put compile buffer in comint mode
-      (let ((universal-argument t)
-            (compile-command (format "python %s"
-                                     (shell-quote-argument (file-name-nondirectory buffer-file-name)))))
-        (if arg
-            (call-interactively 'compile)
-          (compile compile-command t)
-          (with-current-buffer (get-buffer "*compilation*")
-            (inferior-python-mode)))))
+  (defun cadair/python-execute-file (arg)
+    "Execute a python script in a shell."
+    (interactive "P")
+    ;; set compile command to buffer-file-name
+    ;; universal argument put compile buffer in comint mode
+    (let ((universal-argument t)
+          (compile-command (format "python %s"
+                                   (shell-quote-argument (file-name-nondirectory buffer-file-name)))))
+      (if arg
+          (call-interactively 'compile)
+        (compile compile-command t)
+        (with-current-buffer (get-buffer "*compilation*")
+          (inferior-python-mode)))))
 
 #+end_src
 
@@ -922,44 +917,44 @@ Once you've used it for a bit, you'll understand why people love it. Even readin
 For example, this document is effectively the source code and descriptions bound into the one document,
 much like the literate programming ideas that Donald Knuth made famous.
 #+begin_src emacs-lisp
-    (use-package org
-      :ensure nil
-      :custom
-      (org-edit-src-content-indentation 2) ;; Set src block automatic indent to 4 instead of 2.
+  (use-package org
+    :ensure nil
+    :custom
+    (org-edit-src-content-indentation 2) ;; Set src block automatic indent to 4 instead of 2.
 
-      :hook
-      (org-mode . org-indent-mode) ;; Indent text
-      ;; The following prevents <> from auto-pairing when electric-pair-mode is on.
-      ;; Otherwise, org-tempo is broken when you try to <s TAB...
-      ;;(org-mode . (lambda ()
-      ;;              (setq-local electric-pair-inhibit-predicate
-      ;;                          `(lambda (c)
-      ;;                             (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
-      )
+    :hook
+    (org-mode . org-indent-mode) ;; Indent text
+    ;; The following prevents <> from auto-pairing when electric-pair-mode is on.
+    ;; Otherwise, org-tempo is broken when you try to <s TAB...
+    ;;(org-mode . (lambda ()
+    ;;              (setq-local electric-pair-inhibit-predicate
+    ;;                          `(lambda (c)
+    ;;                             (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
+    )
 #+end_src
 
 **** Table of Contents
 #+begin_src emacs-lisp
-    (use-package toc-org
-      :commands toc-org-enable
-      :hook (org-mode . toc-org-mode))
+  (use-package toc-org
+    :commands toc-org-enable
+    :hook (org-mode . toc-org-mode))
 #+end_src
 
 **** Org Superstar
 Prettify headings and plain lists in Org mode. Modern version of org-bullets.
 #+begin_src emacs-lisp
-    (use-package org-superstar
-      :after org
-      :hook (org-mode . org-superstar-mode))
+  (use-package org-superstar
+    :after org
+    :hook (org-mode . org-superstar-mode))
 #+end_src
 
 **** Source Code Block Tag Expansion
 Org-tempo is not a separate package but a module within org that can be enabled.
 Org-tempo allows for '<s' followed by TAB to expand to a begin_src tag.
 #+begin_src emacs-lisp
-    (use-package org-tempo
-      :ensure nil
-      :after org)
+  (use-package org-tempo
+    :ensure nil
+    :after org)
 #+end_src
 
 *** nix
@@ -987,8 +982,8 @@ Eat(Emulate A Terminal) is a terminal emulator within Emacs.
 It's more portable and less overhead for users over like vterm or eshell.
 We setup eat with eshell, if you want to use bash, zsh etc., check out their git [[https://codeberg.org/akib/emacs-eat][repository]] how to do it.
 #+begin_src emacs-lisp
-    (use-package eat
-      :hook ('eshell-load-hook #'eat-eshell-mode))
+  (use-package eat
+    :hook ('eshell-load-hook #'eat-eshell-mode))
 #+end_src
 ** TODO Combobulate
 #+begin_src emacs-lisp
@@ -1001,7 +996,7 @@ We setup eat with eshell, if you want to use bash, zsh etc., check out their git
     ;; Amend this to the directory where you keep Combobulate's source
     ;; code.
     :vc (:url "https://github.com/mickeynp/combobulate"
-         :branch "main")
+  			:branch "main")
     )
 #+end_src
 * Other Packages
@@ -1015,14 +1010,14 @@ Don't forget to use nerd-icons-install-fonts.
 We use Nerd icons because it has more, better icons and all-the-icons only supports GUI.
 While nerd-icons supports both GUI and TUI.
 #+begin_src emacs-lisp
-    (use-package nerd-icons
-      :if (display-graphic-p))
+  (use-package nerd-icons
+    :if (display-graphic-p))
 
-    (use-package nerd-icons-dired
-      :hook (dired-mode . (lambda () (nerd-icons-dired-mode t))))
+  (use-package nerd-icons-dired
+    :hook (dired-mode . (lambda () (nerd-icons-dired-mode t))))
 
-    (use-package nerd-icons-ibuffer
-      :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
+  (use-package nerd-icons-ibuffer
+    :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
 #+end_src
 
 ** Git
@@ -1033,17 +1028,17 @@ Complete text-based user interface to Git.
     :commands magit-status)
   (use-package forge
     :after magit
-  )
+    )
 #+end_src
 
 *** Diff-hl
 Highlights uncommitted changes on the left side of the window (area also known as the "gutter"), allows you to jump between and revert them selectively.
 #+begin_src emacs-lisp
-    (use-package diff-hl
-      :hook ((dired-mode         . diff-hl-dired-mode-unless-remote)
-             (magit-pre-refresh  . diff-hl-magit-pre-refresh)
-             (magit-post-refresh . diff-hl-magit-post-refresh))
-      :init (global-diff-hl-mode))
+  (use-package diff-hl
+    :hook ((dired-mode         . diff-hl-dired-mode-unless-remote)
+           (magit-pre-refresh  . diff-hl-magit-pre-refresh)
+           (magit-post-refresh . diff-hl-magit-post-refresh))
+    :init (global-diff-hl-mode))
 #+end_src
 *** git-link
 Creates URLs to forges
@@ -1051,15 +1046,15 @@ Creates URLs to forges
   (use-package git-link
     :custom
     (git-link-use-commit t)
-  )
+    )
 #+end_src
 *** git-timemachine
 #+begin_src emacs-lisp
-(use-package git-timemachine)
+  (use-package git-timemachine)
 #+end_src
 *** blamer
 #+begin_src emacs-lisp
-(use-package blamer)
+  (use-package blamer)
 #+end_src
 *** TODO igist
 https://github.com/KarimAziev/igist
@@ -1070,35 +1065,35 @@ For more configuration options check out their [[https://github.com/minad/corfu]
 Notes:
 - To enter Orderless field separator, use M-SPC.
 #+begin_src emacs-lisp
-    (use-package corfu
-      ;; Optional customizations
-      :custom
-      (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-      (corfu-auto t)                 ;; Enable auto completion
-      (corfu-auto-prefix 2)          ;; Minimum length of prefix for auto completion.
-      (corfu-popupinfo-mode t)       ;; Enable popup information
-      (corfu-popupinfo-delay 0.5)    ;; Lower popupinfo delay to 0.5 seconds from 2 seconds
-      (corfu-separator ?\s)          ;; Orderless field separator, Use M-SPC to enter separator
-      ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-      ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-      ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-      ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
-      ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-      ;; (corfu-scroll-margin 5)        ;; Use scroll margin
-      (completion-ignore-case t)
-      ;; Enable indentation+completion using the TAB key.
-      ;; `completion-at-point' is often bound to M-TAB.
-      (tab-always-indent 'complete)
-      (corfu-preview-current nil) ;; Don't insert completion without confirmation
-      ;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
-      ;; be used globally (M-/).  See also the customization variable
-      ;; `global-corfu-modes' to exclude certain modes.
-      :init
-      (global-corfu-mode))
+  (use-package corfu
+    ;; Optional customizations
+    :custom
+    (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+    (corfu-auto t)                 ;; Enable auto completion
+    (corfu-auto-prefix 2)          ;; Minimum length of prefix for auto completion.
+    (corfu-popupinfo-mode t)       ;; Enable popup information
+    (corfu-popupinfo-delay 0.5)    ;; Lower popupinfo delay to 0.5 seconds from 2 seconds
+    (corfu-separator ?\s)          ;; Orderless field separator, Use M-SPC to enter separator
+    ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+    ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+    ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+    ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
+    ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+    ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+    (completion-ignore-case t)
+    ;; Enable indentation+completion using the TAB key.
+    ;; `completion-at-point' is often bound to M-TAB.
+    (tab-always-indent 'complete)
+    (corfu-preview-current nil) ;; Don't insert completion without confirmation
+    ;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
+    ;; be used globally (M-/).  See also the customization variable
+    ;; `global-corfu-modes' to exclude certain modes.
+    :init
+    (global-corfu-mode))
 
-    (use-package nerd-icons-corfu
-      :after corfu
-      :init (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+  (use-package nerd-icons-corfu
+    :after corfu
+    :init (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 #+end_src
 
 ** Cape
@@ -1108,29 +1103,29 @@ Notes:
 - Take care when adding Capfs (Completion-at-point-functions) to the list since each of the Capfs adds a small runtime cost.
 Read the [[https://github.com/minad/cape#configuration][configuration section]] in Cape's readme for more information.
 #+begin_src emacs-lisp
-    (use-package cape
-      :after corfu
-      :init
-      ;; Add to the global default value of `completion-at-point-functions' which is
-      ;; used by `completion-at-point'.  The order of the functions matters, the
-      ;; first function returning a result wins.  Note that the list of buffer-local
-      ;; completion functions takes precedence over the global list.
-      ;; The functions that are added later will be the first in the list
+  (use-package cape
+    :after corfu
+    :init
+    ;; Add to the global default value of `completion-at-point-functions' which is
+    ;; used by `completion-at-point'.  The order of the functions matters, the
+    ;; first function returning a result wins.  Note that the list of buffer-local
+    ;; completion functions takes precedence over the global list.
+    ;; The functions that are added later will be the first in the list
 
-      (add-to-list 'completion-at-point-functions #'cape-dabbrev) ;; Complete word from current buffers
-      (add-to-list 'completion-at-point-functions #'cape-dict) ;; Dictionary completion
-      (add-to-list 'completion-at-point-functions #'cape-file) ;; Path completion
-      (add-to-list 'completion-at-point-functions #'cape-elisp-block) ;; Complete elisp in Org or Markdown mode
-      (add-to-list 'completion-at-point-functions #'cape-keyword) ;; Keyword/Snipet completion
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev) ;; Complete word from current buffers
+    (add-to-list 'completion-at-point-functions #'cape-dict) ;; Dictionary completion
+    (add-to-list 'completion-at-point-functions #'cape-file) ;; Path completion
+    (add-to-list 'completion-at-point-functions #'cape-elisp-block) ;; Complete elisp in Org or Markdown mode
+    (add-to-list 'completion-at-point-functions #'cape-keyword) ;; Keyword/Snipet completion
 
-      ;;(add-to-list 'completion-at-point-functions #'cape-abbrev) ;; Complete abbreviation
-      ;;(add-to-list 'completion-at-point-functions #'cape-history) ;; Complete from Eshell, Comint or minibuffer history
-      ;;(add-to-list 'completion-at-point-functions #'cape-line) ;; Complete entire line from current buffer
-      ;;(add-to-list 'completion-at-point-functions #'cape-elisp-symbol) ;; Complete Elisp symbol
-      ;;(add-to-list 'completion-at-point-functions #'cape-tex) ;; Complete Unicode char from TeX command, e.g. \hbar
-      ;;(add-to-list 'completion-at-point-functions #'cape-sgml) ;; Complete Unicode char from SGML entity, e.g., &alpha
-      ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345) ;; Complete Unicode char using RFC 1345 mnemonics
-      )
+    ;;(add-to-list 'completion-at-point-functions #'cape-abbrev) ;; Complete abbreviation
+    ;;(add-to-list 'completion-at-point-functions #'cape-history) ;; Complete from Eshell, Comint or minibuffer history
+    ;;(add-to-list 'completion-at-point-functions #'cape-line) ;; Complete entire line from current buffer
+    ;;(add-to-list 'completion-at-point-functions #'cape-elisp-symbol) ;; Complete Elisp symbol
+    ;;(add-to-list 'completion-at-point-functions #'cape-tex) ;; Complete Unicode char from TeX command, e.g. \hbar
+    ;;(add-to-list 'completion-at-point-functions #'cape-sgml) ;; Complete Unicode char from SGML entity, e.g., &alpha
+    ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345) ;; Complete Unicode char using RFC 1345 mnemonics
+    )
 #+end_src
 *** TODO See about setting some capf's only in certain modes
 ** TODO Orderless
@@ -1139,10 +1134,10 @@ Learn to use more fancy parts of orderless: https://github.com/oantolin/orderles
 Completion style that divides the pattern into space-separated components, and matches candidates that match all of the components in any order.
 Recomended for packages like vertico, corfu.
 #+begin_src emacs-lisp
-    (use-package orderless
-      :custom
-      (completion-styles '(orderless basic))
-      (completion-category-overrides '((file (styles basic partial-completion)))))
+  (use-package orderless
+    :custom
+    (completion-styles '(orderless basic))
+    (completion-category-overrides '((file (styles basic partial-completion)))))
 #+end_src
 
 ** Vertico and Marginalia
@@ -1156,20 +1151,23 @@ One alternative is ivy and counsel, check out the [[https://github.com/MiniApoll
 #+begin_src emacs-lisp
   (use-package vertico
     :init
-    (vertico-mode))
+    (vertico-mode)
+    :custom
+    (vertico-count 20)
+  )
 
   (use-package vertico-posframe
     :init
     (setq vertico-posframe-parameters   '((left-fringe  . 12)    ;; Fringes
-                                                                                (right-fringe . 12)
-                                                                                (undecorated  . nil))) ;; Rounded frame
+                                          (right-fringe . 12)
+                                          (undecorated  . nil))) ;; Rounded frame
     :config
     (vertico-posframe-mode 1)
     (setq vertico-posframe-width        120                      ;; Narrow frame
-                vertico-posframe-height       25                       ;; Default height
-                ;; Don't create posframe for these commands
-                vertico-multiform-commands    '((consult-line    (:not posframe))
-                                                                                (consult-ripgrep (:not posframe))))
+          vertico-posframe-height       vertico-count            ;; Default height
+          ;; Don't create posframe for these commands
+          vertico-multiform-commands    '((consult-line    (:not posframe))
+                                          (consult-ripgrep (:not posframe))))
     )
 
   (savehist-mode) ;; Enables save history mode
@@ -1416,6 +1414,10 @@ This auto-detect is taken from here: https://www.emacswiki.org/emacs/FlySpell#h5
       (flyspell-on-for-buffer-type)))
 
   (add-hook 'find-file-hook 'flyspell-on-for-buffer-type)
+#+end_src
+** Evil-nerd-commenter
+#+begin_src emacs-lisp
+(use-package evil-nerd-commenter)
 #+end_src
 * Config Split into Other Files
 ** Adding the lisp directory to load-path
