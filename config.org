@@ -32,6 +32,8 @@ This literate config is was started from the excellent [[https://github.com/Mini
   - [[#transparency][Transparency]]
   - [[#fonts][Fonts]]
   - [[#modeline][Modeline]]
+- [[#helper-functions][Helper functions]]
+  - [[#file-management][File management]]
 - [[#development][Development]]
   - [[#projects][Projects]]
   - [[#language-server][Language Server]]
@@ -40,10 +42,6 @@ This literate config is was started from the excellent [[https://github.com/Mini
   - [[#language-modes][Language modes]]
   - [[#terminal][Terminal]]
   - [[#combobulate][Combobulate]]
-- [[#multi-file-example][Multi File Example]]
-  - [[#adding-the-lisp-directory-to-load-path][Adding the lisp directory to load-path]]
-  - [[#sourcing-the-files][Sourcing the files]]
-  - [[#using-the-file][Using the file]]
 - [[#other-packages][Other Packages]]
   - [[#nerd-icons][Nerd Icons]]
   - [[#git][Git]]
@@ -60,6 +58,9 @@ This literate config is was started from the excellent [[https://github.com/Mini
   - [[#dashboard][Dashboard]]
   - [[#browse-kill-ring][Browse Kill-Ring]]
   - [[#flyspell][Flyspell]]
+- [[#config-split-into-other-files][Config Split into Other Files]]
+  - [[#adding-the-lisp-directory-to-load-path][Adding the lisp directory to load-path]]
+  - [[#org-mode][Org Mode]]
 - [[#runtime-performance][Runtime Performance]]
 
 * Important to load first
@@ -181,10 +182,10 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
       :prefix ","
       )
 
-    ;; Add some eglot related things to , because my muscle memory demands it 
+    ;; Add some eglot related things to , because my muscle memory demands it
     (my-local-leader
       :states '(normal visual)
-  	;; If I only enable this in eglot-mode-map then setting major-mode specific binds override this one
+      ;; If I only enable this in eglot-mode-map then setting major-mode specific binds override this one
       ;;:keymaps 'eglot-mode-map
       "g" '(:ignore t :wk "Eglot goto")
       "g d" '(xref-find-definitions :wk "Goto Definition")
@@ -192,7 +193,7 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
       "g r" '(xref-find-references :wk "Find references")
       "d" '('eldoc-doc-buffer :wk "Documentation")
       )
-    
+
     ;; Set up 'SPC' as primary leader key
     (general-create-definer start/leader-keys
       :states '(normal insert visual motion emacs)
@@ -215,19 +216,35 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
     (start/leader-keys
       "b" '(:ignore t :wk "Buffer Bookmarks")
       "b b" '(consult-buffer :wk "Switch buffer")
+      "b c" '(clone-indirect-buffer :wk "Clone buffer")
+      "b C" '(clone-indirect-buffer-other-window :wk "Clone buffer other window")
       "b d" '(kill-current-buffer :wk "Kill buffer")
       "b i" '(ibuffer :wk "Ibuffer")
+      "b j" '(consult-bookmark :wk "Bookmark jump")
+      "b l" '(evil-switch-to-windows-last-buffer :wk "Switch to last buffer")
+      "b m" '(bookmark-set :wk "Set bookmark")
+      "b M" '(bookmark-delete :wk "Delete bookmark")
       "b n" '(next-buffer :wk "Next buffer")
+      "b N" '(evil-buffer-new :wk "New empty buffer")
       "b p" '(previous-buffer :wk "Previous buffer")
       "b r" '(revert-buffer :wk "Reload buffer")
-      "b j" '(consult-bookmark :wk "Bookmark jump")
-      "b s" '(scratch-buffer :wk "Scratch Buffer")
-  	"b s" '(view-echo-area-messages :wk "Messages Buffer")
+      "b R" '(rename-buffer :wk "Rename buffer")
+      "b s" '(basic-save-buffer :wk "Save buffer")
+      "b S" '(scratch-buffer :wk "Scratch Buffer")
+      "b -" '(view-echo-area-messages :wk "Messages Buffer")
       )
 
     (start/leader-keys
       "c" '(:ignore t :wk "Code")
-      "c l" '(comment-or-uncomment-region :wk "Toggle Comments")
+      "c a"   '(eglot-code-actions :wk "Code actions")
+      "c b"   '(eval-buffer :wk "Evaluate elisp in buffer")
+      "c d"   '(eldoc-doc-buffer :wk "Documentation")
+      "c e"   '(eglot-reconnect :wk "Eglot Reconnect")
+      "c f"   '(eglot-format :wk "Eglot Format")
+      "c g d" '(xref-find-definitions :wk "Goto Definition")
+      "c g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
+      "c g r" '(xref-find-references :wk "Find references")
+      "c l"   '(comment-or-uncomment-region :wk "Toggle Comments")
       )
 
     (start/leader-keys
@@ -237,44 +254,84 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
       )
 
     (start/leader-keys
-      "e" '(:ignore t :wk "Eglot Evaluate")
-      "e e" '(eglot-reconnect :wk "Eglot Reconnect")
-      "e f" '(eglot-format :wk "Eglot Format")
+      "e"   '(:ignore t :wk "Evals and Errors")
       "e l" '(consult-flymake :wk "Consult Flymake")
-      "e b" '(eval-buffer :wk "Evaluate elisp in buffer")
       "e r" '(eval-region :wk "Evaluate elisp in region")
-  	"e g d" '(xref-find-definitions :wk "Goto Definition")
-  	"e g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
-  	"e g r" '(xref-find-references :wk "Find references")
-  	"e d" '('eldoc-doc-buffer :wk "Documentation")
       )
 
     (start/leader-keys
-      "f" '(:ignore t :wk "Find")
+      "f" '(:ignore t :wk "Find / Files")
       "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
-      "f r" '(consult-recent-file :wk "Recent files")
-      "f f" '(consult-fd :wk "Fd search for files")
+  	"f C" '(doom/copy-this-file :wk "Copy this file")
+      "f f" '(find-file :wk "Find file")
       "f g" '(consult-ripgrep :wk "Ripgrep search in files")
-      "f l" '(consult-line :wk "Find line")
       "f i" '(consult-imenu :wk "Imenu buffer locations")
+      "f l" '(consult-line :wk "Find line")
+  	"f L" '(locate :wk "Locate file")
+      "f r" '(consult-recent-file :wk "Recent files")
+  	"f R" '(doom/move-this-file :wk "Rename/Move file")
       "f s" '(save-buffer :wk "Save Buffer")
+      "f S" '(write-file :wk "Save file as...")
       )
 
     (start/leader-keys
       "g" '(:ignore t :wk "Git")
-      "g s" '(magit-status :wk "Magit status")
-  	"g b" '(magit-blame :wk "Git blame")
-  	"g l" '(git-link :wk "Link to selection")
+  	"g s"   '(magit                              :wk "Magit")
+  	"g R"   '(vc-revert                          :wk "Revert file")
+  	"g y"   '(git-link-homepage                  :wk "Copy link to remote")
+  	"g t"   '(git-timemachine-toggle             :wk "Git time machine")
+  	"g /"   '(magit-dispatch                     :wk "Magit dispatch")
+  	"g ."   '(magit-file-dispatch                :wk "Magit file dispatch")
+  	"g '"   '(forge-dispatch                     :wk "Forge dispatch")
+  	"g -"   '(blamer-mode                        :wk "Toggle blamer")
+  	"g b"   '(magit-branch-checkout              :wk "Magit switch branch")
+  	"g b"   '(magit-blame-addition               :wk "Magit blame")
+  	"g g"   '(magit-status                       :wk "Magit status")
+  	"g G"   '(magit-status-here                  :wk "Magit status here")
+  	"g D"   '(magit-file-delete                  :wk "Magit file delete")
+  	"g C"   '(magit-clone                        :wk "Magit clone")
+  	"g F"   '(magit-fetch                        :wk "Magit fetch")
+  	"g L"   '(git-link                           :wk "Link to selection")
+  	"g S"   '(magit-stage-buffer-file            :wk "Git stage this file")
+  	"g U"   '(magit-unstage-buffer-file          :wk "Git unstage this file")
+  	"g f"   '(:ignore t :wk "find")
+  	"g f f" '(magit-find-file                    :wk "Find file")
+  	"g f g" '(magit-find-git-config-file         :wk "Find gitconfig file")
+  	"g f c" '(magit-show-commit                  :wk "Find commit")
+  	"g f i" '(forge-visit-issue                  :wk "Find issue")
+  	"g f p" '(forge-visit-pullreq                :wk "Find pull request")
+  	"g o"   '(:ignore t :wk "open in browser")
+  	"g o r" '(forge-browse-remote                :wk "Browse remote")
+  	"g o c" '(forge-browse-commit                :wk "Browse commit")
+  	"g o i" '(forge-browse-issue                 :wk "Browse an issue")
+  	"g o p" '(forge-browse-pullreq               :wk "Browse a pull request")
+  	"g o I" '(forge-browse-issues                :wk "Browse issues")
+  	"g o P" '(forge-browse-pullreqs              :wk "Browse pull requests")
+  	"g l"   '(:ignore t :wk "list")
+  	;;"g l g" '(+gist:list                         :wk "List gists")
+  	"g l r" '(magit-list-repositories            :wk "List repositories")
+  	"g l s" '(magit-list-submodules              :wk "List submodules")
+  	"g l i" '(forge-list-issues                  :wk "List issues")
+  	"g l p" '(forge-list-pullreqs                :wk "List pull requests")
+  	"g l n" '(forge-list-notifications           :wk "List notifications")
+  	"g c"   '(:ignore t :wk "create")
+  	"g c r" '(magit-init                         :wk "Initialize repo")
+  	"g c R" '(magit-clone                        :wk "Clone repo")
+  	"g c c" '(magit-commit-create                :wk "Commit")
+  	"g c f" '(magit-commit-fixup                 :wk "Fixup")
+  	"g c b" '(magit-branch-and-checkout          :wk "Branch")
+  	"g c i" '(forge-create-issue                 :wk "Issue")
+      "g c p" '(forge-create-pullreq               :wk "Pull request")
       )
 
     ;; TODO: It would be nice if I could just rebind C-h to SPC h
     (start/leader-keys
       "h" '(:ignore t :wk "Help") ;; To get more help use C-h commands (describe variable, function, etc.)
-    	"h k" '(describe-key :wk "Describe Key")
-    	"h s" '(describe-symbol :wk "Describe Symbol")
-    	"h v" '(describe-variable :wk "Describe Variable")
-    	"h f" '(describe-function :wk "Describe Function")
-    	"h b" '(describe-bindings :wk "Describe Bindings")
+      "h k" '(describe-key :wk "Describe Key")
+      "h s" '(describe-symbol :wk "Describe Symbol")
+      "h v" '(describe-variable :wk "Describe Variable")
+      "h f" '(describe-function :wk "Describe Function")
+      "h b" '(describe-bindings :wk "Describe Bindings")
       )
 
     (start/leader-keys
@@ -291,9 +348,9 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
       ;; General Tab Control
       "l TAB" '(tab-previous :wk "Previous Tab")
       "l L" '(tab-move :wk "Move Tab Right")
-      "l H" '((lambda () 
+      "l H" '((lambda ()
                 (tab-move -1))
-          	:wk "Move Tab Left")
+              :wk "Move Tab Left")
       )
 
     (start/leader-keys
@@ -320,22 +377,22 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
       "p x" '(project-execute-extended-command :wk "Execute extended command")
       "p o" '(project-any-command :wk "Execute any command")
       )
-    
+
     (start/leader-keys
       "q" '(:ignore t :wk "Quit / Session")
       "q q" '(save-buffers-kill-emacs :wk "Quit Emacs and Daemon")
       "q r" '((lambda () (interactive)
                 (load-file "~/SyncBox/new.emacs.d/init.el"))
-          	:wk "Reload Emacs config")
-  	)
+              :wk "Reload Emacs config")
+      )
 
     (start/leader-keys
       "s" '(:ignore t :wk "Show / Spell")
       "s e" '(eat :wk "Eat terminal")
-  	"s k" '(browse-kill-ring :wk "Show kill-ring")
+      "s k" '(browse-kill-ring :wk "Show kill-ring")
       "s c" '(flyspell-correct-word-before-point :wk "Correct word at point")
       "s s" '(flyspell-toggle :wk "Toggle flyspell")
-  	"s n" '(evil-next-flyspell-error :wk "Next spelling error")
+      "s n" '(evil-next-flyspell-error :wk "Next spelling error")
       )
 
     (start/leader-keys
@@ -451,14 +508,73 @@ You can use the bindings C-+ C-- for zooming in/out. You can also use CTRL plus 
 ** Modeline
 Replace the default modeline with a prettier more useful.
 #+begin_src emacs-lisp
-(use-package doom-modeline
-  :init (doom-modeline-mode 1)
-  :custom
-  (doom-modeline-height 25)     ;; Sets modeline height
-  (doom-modeline-bar-width 5)   ;; Sets right bar width
-  )
-      #+end_src
+  (use-package doom-modeline
+    :init (doom-modeline-mode 1)
+    :custom
+    (doom-modeline-height 25)     ;; Sets modeline height
+    (doom-modeline-bar-width 5)   ;; Sets right bar width
+    )
+#+end_src
+* Helper functions
+Many of these are lifted from doom.
+** File management
+#+begin_src emacs-lisp
+  (defun doom-files--update-refs (&rest files)
+    "Ensure FILES are updated in `recentf', `magit' and `save-place'."
+    (let (toplevels)
+  	(dolist (file files)
+        (when (featurep 'vc)
+  		(vc-file-clearprops file)
+  		(when-let (buffer (get-file-buffer file))
+            (with-current-buffer buffer
+  			(vc-refresh-state))))
+        (when (featurep 'magit)
+  		(when-let (default-directory (magit-toplevel (file-name-directory file)))
+            (cl-pushnew default-directory toplevels)))
+        (unless (file-readable-p file)
+  		(when (bound-and-true-p recentf-mode)
+            (recentf-remove-if-non-kept file))))
+      (dolist (default-directory toplevels)
+        (magit-refresh))
+  	(when (bound-and-true-p save-place-mode)
+        (save-place-forget-unreadable-files))))
 
+  (defun doom/copy-this-file (new-path &optional force-p)
+    "Copy current buffer's file to NEW-PATH then open NEW-PATH.
+
+  If FORCE-P, overwrite the destination file if it exists, without confirmation."
+    (interactive
+     (list (read-file-name "Copy file to: ")
+           current-prefix-arg))
+    (unless (and buffer-file-name (file-exists-p buffer-file-name))
+      (user-error "Buffer is not visiting any file"))
+    (let ((old-path (buffer-file-name (buffer-base-buffer)))
+          (new-path (expand-file-name new-path)))
+      (make-directory (file-name-directory new-path) 't)
+      (copy-file old-path new-path (or force-p 1))
+      (find-file new-path)
+      (doom-files--update-refs old-path new-path)
+      (message "File copied to %S" (abbreviate-file-name new-path))))
+
+  (defun doom/move-this-file (new-path &optional force-p)
+    "Move current buffer's file to NEW-PATH.
+
+  If FORCE-P, overwrite the destination file if it exists, without confirmation."
+    (interactive
+     (list (read-file-name "Move file to: ")
+           current-prefix-arg))
+    (unless (and buffer-file-name (file-exists-p buffer-file-name))
+      (user-error "Buffer is not visiting any file"))
+    (let ((old-path (buffer-file-name (buffer-base-buffer)))
+          (new-path (expand-file-name new-path)))
+      (when (directory-name-p new-path)
+        (setq new-path (concat new-path (file-name-nondirectory old-path))))
+      (make-directory (file-name-directory new-path) 't)
+      (rename-file old-path new-path (or force-p 1))
+      (set-visited-file-name new-path t t)
+      (doom-files--update-refs old-path new-path)
+      (message "File moved to %S" (abbreviate-file-name new-path))))
+#+end_src
 * Development
 ** Projects
 We are going to try and use tabspaces / project.el
@@ -500,18 +616,18 @@ Then tabspaces
       (consult-customize consult--source-buffer :hidden t :default nil)
       ;; set consult-workspace buffer list
       (defvar consult--source-workspace
-    	(list :name     "Workspace Buffers"
+        (list :name     "Workspace Buffers"
               :narrow   ?w
               :history  'buffer-name-history
               :category 'buffer
               :state    #'consult--buffer-state
               :default  t
               :items    (lambda () (consult--buffer-query
-    								:predicate #'tabspaces--local-buffer-p
-    								:sort 'visibility
-    								:as #'buffer-name)))
+                                                                :predicate #'tabspaces--local-buffer-p
+                                                                :sort 'visibility
+                                                                :as #'buffer-name)))
 
-    	"Set workspace buffer list for consult-buffer.")
+        "Set workspace buffer list for consult-buffer.")
       (add-to-list 'consult-buffer-sources 'consult--source-workspace))
 #+END_SRC
 ** Language Server
@@ -542,7 +658,7 @@ Use visual block to uncomment easily in Org documents (C-v).
     (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
     (eglot-autoshutdown t);; Shutdown unused servers.
     (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
-    
+
     ;; Dynamically load the workspace configuration so that we set jedi to use the active workspace
     (eglot-workspace-configuration
      (lambda (&rest args)
@@ -550,14 +666,14 @@ Use visual block to uncomment easily in Org documents (C-v).
          (message "Located venv: %s" venv-directory)
          `((:pylsp .
                    (:plugins
-  				  (:jedi_completion (:fuzzy t)
-  									:jedi (:environment ,venv-directory)
-  									:pydocstyle (:enabled nil)
-  									:pycodestyle (:enabled nil)
-  									:mccabe (:enabled nil)
-  									:pyflakes (:enabled nil)
-  									:flake8 (:enabled nil)
-  									:black (:enabled nil))))))))
+                                  (:jedi_completion (:fuzzy t)
+                                                                        :jedi (:environment ,venv-directory)
+                                                                        :pydocstyle (:enabled nil)
+                                                                        :pycodestyle (:enabled nil)
+                                                                        :mccabe (:enabled nil)
+                                                                        :pyflakes (:enabled nil)
+                                                                        :flake8 (:enabled nil)
+                                                                        :black (:enabled nil))))))))
     )
 #+end_src
 
@@ -619,10 +735,10 @@ Enable the excellent pytest package, and setup an extra hook for [[https://githu
   (use-package python-pytest
     :config
     (transient-append-suffix 'python-pytest-dispatch
-  	'(-2)
-  	["Remote data"
-  	 ("--rd" "Remote data" "--remote-data=any")]
-  	)
+        '(-2)
+        ["Remote data"
+         ("--rd" "Remote data" "--remote-data=any")]
+        )
     )
 #+end_src
 
@@ -846,7 +962,7 @@ Org-tempo allows for '<s' followed by TAB to expand to a begin_src tag.
       :after org)
 #+end_src
 
-*** TODO nix
+*** nix
 #+begin_src emacs-lisp
   (use-package nix-mode)
 #+end_src
@@ -887,31 +1003,7 @@ We setup eat with eshell, if you want to use bash, zsh etc., check out their git
     :vc (:url "https://github.com/mickeynp/combobulate"
          :branch "main")
     )
-     #+end_src
-* Multi File Example
-** Adding the lisp directory to load-path
-Adds the lisp directory to emacs's load path to search for elisp files.
-This is necessary, because emacs does not search the entire user-emacs-directory.
-The directory name can be anything, just add it to the load-path.
-#+begin_src emacs-lisp
-    ;; (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 #+end_src
-
-** Sourcing the files
-To use the elisp files we need to load it.
-Notes:
-- Don't forget the file and the provide name needs to be the same.
-- When naming elisp files, functions, it is recommended to use a group name (e.g init-, start- or any custom name), so it does not get mixed up with other names, functions.
-#+begin_src emacs-lisp
-    ;; (require 'start-multiFileExample)
-#+end_src
-
-** Using the file
-And now we can use everything from that file.
-#+begin_src emacs-lisp
-    ;; (start/hello)
-#+end_src
-
 * Other Packages
 All the package setups that don't need much tweaking.
 ** Nerd Icons
@@ -965,6 +1057,12 @@ Creates URLs to forges
 #+begin_src emacs-lisp
 (use-package git-timemachine)
 #+end_src
+*** blamer
+#+begin_src emacs-lisp
+(use-package blamer)
+#+end_src
+*** TODO igist
+https://github.com/KarimAziev/igist
 ** Corfu
 Enhances in-buffer completion with a small completion popup.
 Corfu is a small package, which relies on the Emacs completion facilities and concentrates on providing a polished completion.
@@ -1063,15 +1161,15 @@ One alternative is ivy and counsel, check out the [[https://github.com/MiniApoll
   (use-package vertico-posframe
     :init
     (setq vertico-posframe-parameters   '((left-fringe  . 12)    ;; Fringes
-  										(right-fringe . 12)
-  										(undecorated  . nil))) ;; Rounded frame
+                                                                                (right-fringe . 12)
+                                                                                (undecorated  . nil))) ;; Rounded frame
     :config
     (vertico-posframe-mode 1)
     (setq vertico-posframe-width        120                      ;; Narrow frame
-  		vertico-posframe-height       25                       ;; Default height
-  		;; Don't create posframe for these commands
-  		vertico-multiform-commands    '((consult-line    (:not posframe))
-  										(consult-ripgrep (:not posframe))))
+                vertico-posframe-height       25                       ;; Default height
+                ;; Don't create posframe for these commands
+                vertico-multiform-commands    '((consult-line    (:not posframe))
+                                                                                (consult-ripgrep (:not posframe))))
     )
 
   (savehist-mode) ;; Enables save history mode
@@ -1275,9 +1373,9 @@ Which-key is a helper utility for keychords (which key to press).
     (dashboard-vertically-center-content t)
     (dashboard-items '(
                        (projects  . 5)
-  					 (recents   . 5)
+                                         (recents   . 5)
                        (agenda    . 5)
-  					 ))
+                                         ))
     )
 
 #+end_src
@@ -1295,30 +1393,43 @@ This auto-detect is taken from here: https://www.emacswiki.org/emacs/FlySpell#h5
     "Enable Flyspell appropriately for the major mode of the current buffer.  Uses `flyspell-prog-mode' for modes derived from `prog-mode', so only strings and comments get checked.  All other buffers get `flyspell-mode' to check all text.  If flyspell is already enabled, does nothing."
     (interactive)
     (if (not (symbol-value flyspell-mode)) ; if not already on
-  	  (progn
-  		(if (derived-mode-p 'prog-mode)
-  			(progn
-  			  (message "Flyspell on (code)")
-  			  (flyspell-prog-mode))
-  		  ;; else
-  		  (progn
-  			(message "Flyspell on (text)")
-  			(flyspell-mode 1)))
-  		;; I tried putting (flyspell-buffer) here but it didn't seem to work
-  		)))
+          (progn
+                (if (derived-mode-p 'prog-mode)
+                        (progn
+                          (message "Flyspell on (code)")
+                          (flyspell-prog-mode))
+                  ;; else
+                  (progn
+                        (message "Flyspell on (text)")
+                        (flyspell-mode 1)))
+                ;; I tried putting (flyspell-buffer) here but it didn't seem to work
+                )))
 
   (defun flyspell-toggle ()
     "Turn Flyspell on if it is off, or off if it is on.  When turning on, it uses `flyspell-on-for-buffer-type' so code-vs-text is handled appropriately."
     (interactive)
     (if (symbol-value flyspell-mode)
-  	  (progn ; flyspell is on, turn it off
-  		(message "Flyspell off")
-  		(flyspell-mode -1))
-  										; else - flyspell is off, turn it on
+          (progn ; flyspell is on, turn it off
+                (message "Flyspell off")
+                (flyspell-mode -1))
+                                                                                ; else - flyspell is off, turn it on
       (flyspell-on-for-buffer-type)))
 
   (add-hook 'find-file-hook 'flyspell-on-for-buffer-type)
 #+end_src
+* Config Split into Other Files
+** Adding the lisp directory to load-path
+Add the ~lisp~ directory to the path.
+#+begin_src emacs-lisp
+  (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+#+end_src
+
+** Org Mode
+
+#+begin_src emacs-lisp
+;;  (require 'cadair-org-mode)
+#+end_src
+
 * Runtime Performance
 Dial the GC threshold back down so that garbage collection happens more frequently but in less time.
 We also increase Read Process Output Max so emacs can read more data.
