@@ -846,7 +846,7 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   (vertico-mode)
   :custom
   (vertico-count 20)
-)
+  )
 
 (use-package vertico-posframe
   :init
@@ -855,26 +855,30 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
                                         (undecorated  . nil))) ;; Rounded frame
   :config
   (vertico-posframe-mode 1)
-  (setq vertico-posframe-width        120                      ;; Narrow frame
-        vertico-posframe-height       vertico-count            ;; Default height
-        ;; Don't create posframe for these commands
-        vertico-multiform-commands    '((consult-line    (:not posframe))
-                                        (consult-ripgrep (:not posframe))))
+  :custom
+  (vertico-posframe-width        120)                      ;; Narrow frame
+  (vertico-posframe-height       vertico-count)            ;; Default height
+  ;; Don't create posframe for these commands
+  ;; TODO: this isn't working
+  (vertico-multiform-commands    '((consult-line    (:not posframe))
+                                   (consult-ripgrep (:not posframe))
+                                   (consult-imenu   (:not posframe)))
+								 )
   )
 
-(savehist-mode) ;; Enables save history mode
+  (savehist-mode) ;; Enables save history mode
 
-(use-package marginalia
-  :after vertico
-  :init
-  (marginalia-mode))
+  (use-package marginalia
+	:after vertico
+	:init
+	(marginalia-mode))
 
-(use-package nerd-icons-completion
-  :after marginalia
-  :config
-  (nerd-icons-completion-mode)
-  :hook
-  ('marginalia-mode-hook . 'nerd-icons-completion-marginalia-setup))
+  (use-package nerd-icons-completion
+	:after marginalia
+	:config
+	(nerd-icons-completion-mode)
+	:hook
+	('marginalia-mode-hook . 'nerd-icons-completion-marginalia-setup))
 
 (cl-defun +vertico-file-search (&key query in all-files (recursive t) prompt args)
   "Conduct a file search using ripgrep.
