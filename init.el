@@ -21,33 +21,35 @@
 ;;(use-package quelpa)
 ;;(use-package quelpa-use-package)
 
-;;    (defvar bootstrap-version)
-;;    (let ((bootstrap-file
-;;           (expand-file-name
-;;            "straight/repos/straight.el/bootstrap.el"
-;;            (or (bound-and-true-p straight-base-dir)
-;;                user-emacs-directory)))
-;;          (bootstrap-version 7))
-;;      (unless (file-exists-p bootstrap-file)
-;;        (with-current-buffer
-;;            (url-retrieve-synchronously
-;;             "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-;;             'silent 'inhibit-cookies)
-;;          (goto-char (point-max))
-;;          (eval-print-last-sexp)))
-;;      (load bootstrap-file nil 'nomessage))
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir)
+            user-emacs-directory)))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
 (use-package evil
   :init ;; Execute code Before a package is loaded
   (evil-mode)
   :config ;; Execute code After a package is loaded
   (evil-set-initial-state 'eat-mode 'insert) ;; Set initial state in eat terminal to insert mode
+  (evil-set-initial-state 'org-agenda-mode 'normal)  ;; Use normal mode (not emacs) in agenda
   :custom ;; Customization of package custom variables
   (evil-want-keybinding nil)    ;; Disable evil bindings in other modes (It's not consistent and not good)
   (evil-want-C-u-scroll t)      ;; Set C-u to scroll up
   (evil-want-C-i-jump nil)      ;; Disables C-i jump
   (evil-undo-system 'undo-redo) ;; C-r to redo
   (org-return-follows-link t)   ;; Sets RETURN key in org-mode to follow links
+  
   ;; Unmap keys in 'evil-maps. If not done, org-return-follows-link will not work
   :bind (:map evil-motion-state-map
               ("SPC" . nil)
@@ -56,10 +58,11 @@
 
 (use-package evil-collection
   :after evil
+  :custom
+  (evil-collection-mode-list '(dired ibuffer magit forge corfu vertico consult dashboard org))
   :config
-  ;; Setting where to use evil-collection
-  (setq evil-collection-mode-list '(dired ibuffer magit forge corfu vertico consult dashboard))
-  (evil-collection-init))
+  (evil-collection-init)
+  )
 
 (use-package general
   :config
@@ -82,7 +85,7 @@
     ;; If I only enable this in eglot-mode-map then setting major-mode specific binds override this one
     ;;:keymaps 'eglot-mode-map
     "g" '(:ignore t :wk "Eglot goto")
-    "g d" '(xref-find-definitions :wk "Goto Definition")
+    "g g" '(xref-find-definitions :wk "Goto Definition")
     "g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
     "g r" '(xref-find-references :wk "Find references")
     "d" '('eldoc-doc-buffer :wk "Documentation")
@@ -99,7 +102,7 @@
     "SPC" '(execute-extended-command :wk "M-x")
     "." '(find-file :wk "Find file")
     "TAB" '(evil-switch-to-windows-last-buffer :wk "Last buffer")
-    "/" '(+vertico/project-search :wk "Search Project")
+    "/" '(consult-ripgrep :wk "Search Project")
     )
 
   (start/leader-keys
@@ -123,8 +126,7 @@
     "b p" '(previous-buffer :wk "Previous buffer")
     "b r" '(revert-buffer :wk "Reload buffer")
     "b R" '(rename-buffer :wk "Rename buffer")
-    "b s" '(basic-save-buffer :wk "Save buffer")
-    "b S" '(scratch-buffer :wk "Scratch Buffer")
+    "b s" '(scratch-buffer :wk "Scratch Buffer")
     "b -" '(view-echo-area-messages :wk "Messages Buffer")
     )
 
@@ -248,6 +250,16 @@
               (tab-move -1))
             :wk "Move Tab Left")
     )
+  
+  (start/leader-keys
+    "o" '(:ignore t :wk "Org Mode")
+    "o a" '(org-agenda :wk "Agenda")
+	"o c" '(org-capture :wk "Capture")
+	"o f" '(consult-org-agenda :wk "Find Agenda Item")
+	"o h" '(org-insert-todo-heading :wk "Insert TODO heading")
+	"o s" '(org-insert-todo-subheading :wk "Insert TODO subheading")
+	"o t" '(lambda() (interactive)(find-file "~/Notebooks/ToDo.org") :wk "Open ToDo.org")
+    )
 
   (start/leader-keys
     "p" '(:ignore t :wk "Projects")
@@ -311,21 +323,23 @@
 
 (use-package emacs
   :custom
-  (menu-bar-mode nil)         ;; Disable the menu bar
-  (scroll-bar-mode nil)       ;; Disable the scroll bar
-  (tool-bar-mode nil)         ;; Disable the tool bar
-  (inhibit-startup-screen t)  ;; Disable welcome screen
+  (menu-bar-mode nil)                   ;; Disable the menu bar
+  (scroll-bar-mode nil)                 ;; Disable the scroll bar
+  (tool-bar-mode nil)                   ;; Disable the tool bar
+  (inhibit-startup-screen t)            ;; Disable welcome screen
 
-  (delete-selection-mode t)   ;; Select text and delete it by typing.
-  (electric-indent-mode t)    ;; Turn off the weird indenting that Emacs does by default.
-  (electric-pair-mode nil)    ;; Turns off automatic parens pairing
-  (blink-cursor-mode nil)     ;; Don't blink cursor
-  (global-auto-revert-mode t) ;; Automatically reload file and show changes if the file has changed
+  (delete-selection-mode t)             ;; Select text and delete it by typing.
+  (electric-indent-mode t)              ;; Turn off the weird indenting that Emacs does by default.
+  (electric-pair-mode nil)              ;; Turns off automatic parens pairing
+  (blink-cursor-mode nil)               ;; Don't blink cursor
+  (global-auto-revert-mode t)           ;; Automatically reload file and show changes if the file has changed
   (global-display-line-numbers-mode t)  ;; Display line numbers
   
-  (mouse-wheel-progressive-speed nil) ;; Disable progressive speed when scrolling
-  (scroll-conservatively 10) ;; Smooth scrolling
+  (mouse-wheel-progressive-speed nil)   ;; Disable progressive speed when scrolling
+  (scroll-conservatively 10)            ;; Smooth scrolling
   ;;(scroll-margin 8)
+
+  (confirm-kill-emacs 'y-or-n-p)
 
   (tab-width 4)
 
@@ -349,22 +363,36 @@
           nil nil t)
   )
 
-(use-package gruvbox-theme
-  :config
-  (load-theme 'gruvbox-dark-medium t)) ;; We need to add t to trust this package
+;;  (use-package gruvbox-theme
+;;    :config
+;;    (load-theme 'gruvbox-dark-medium t)) ;; We need to add t to trust this package
 
 (add-to-list 'default-frame-alist '(alpha-background . 90)) ;; For all new frames henceforth
 
-(set-face-attribute 'default nil
-                    :font "JetBrains Mono"
-                    :height 120
-                    :weight 'medium)
-;; This sets the default font on all graphical frames created after restarting Emacs.
-;; Does the same thing as 'set-face-attribute default' above, but emacsclient fonts
-;; are not right unless I also add this method of setting the default font.
+;;(set-face-attribute 'default nil
+;;                    :font "JetBrains Mono"
+;;                    :height 120
+;;                    :weight 'medium)
+;;;; This sets the default font on all graphical frames created after restarting Emacs.
+;;;; Does the same thing as 'set-face-attribute default' above, but emacsclient fonts
+;;;; are not right unless I also add this method of setting the default font.
 
-(add-to-list 'default-frame-alist '(font . "JetBrains Mono")) ;; Set your favorite font
+;;(add-to-list 'default-frame-alist '(font . "JetBrains Mono")) ;; Set your favorite font
 (setq-default line-spacing 0.01)
+
+(use-package mixed-pitch
+  :defer t
+  :hook ((org-mode   . mixed-pitch-mode)
+         (LaTeX-mode . mixed-pitch-mode)))
+
+(use-package nerd-icons
+  :if (display-graphic-p))
+
+(use-package nerd-icons-dired
+  :hook (dired-mode . (lambda () (nerd-icons-dired-mode t))))
+
+(use-package nerd-icons-ibuffer
+  :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
 
 (use-package emacs
   :bind
@@ -435,6 +463,30 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
     (set-visited-file-name new-path t t)
     (doom-files--update-refs old-path new-path)
     (message "File moved to %S" (abbreviate-file-name new-path))))
+
+(use-package hl-todo
+  :config
+  (global-hl-todo-mode)
+  )
+
+(use-package flymake :ensure nil
+  :init
+  (add-hook 'flymake-diagnostic-functions #'flymake-hl-todo nil 'local)
+  :config ; (Optional) For fix bad icon display (Only for left margin)
+  (advice-add #'flymake--indicator-overlay-spec
+              :filter-return
+              (lambda (indicator)
+				(concat indicator
+						(propertize " "
+									'face 'default
+									'display `((margin left-margin)
+                                               (space :width 5))))))
+  :custom
+  (flymake-indicator-type 'margins)
+  (flymake-margin-indicators-string
+   `((error ,(nerd-icons-faicon "nf-fa-remove_sign") compilation-error)
+     (warning ,(nerd-icons-faicon "nf-fa-warning") compilation-warning)
+     (note ,(nerd-icons-faicon "nf-fa-circle_info") compilation-info))))
 
 (use-package project
   :custom
@@ -752,14 +804,8 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 			:branch "main")
   )
 
-(use-package nerd-icons
-  :if (display-graphic-p))
-
-(use-package nerd-icons-dired
-  :hook (dired-mode . (lambda () (nerd-icons-dired-mode t))))
-
-(use-package nerd-icons-ibuffer
-  :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
+(use-package treesit-fold
+  :straight (treesit-fold :type git :host github :repo "emacs-tree-sitter/treesit-fold"))
 
 (use-package magit
   :commands magit-status)
@@ -844,6 +890,7 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 (use-package vertico
   :init
   (vertico-mode)
+  (vertico-multiform-mode 1)
   :custom
   (vertico-count 20)
   )
@@ -859,84 +906,25 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   (vertico-posframe-width        120)                      ;; Narrow frame
   (vertico-posframe-height       vertico-count)            ;; Default height
   ;; Don't create posframe for these commands
-  ;; TODO: this isn't working
   (vertico-multiform-commands    '((consult-line    (:not posframe))
                                    (consult-ripgrep (:not posframe))
                                    (consult-imenu   (:not posframe)))
 								 )
   )
 
-  (savehist-mode) ;; Enables save history mode
+(savehist-mode) ;; Enables save history mode
 
-  (use-package marginalia
-	:after vertico
-	:init
-	(marginalia-mode))
+(use-package marginalia
+  :after vertico
+  :init
+  (marginalia-mode))
 
-  (use-package nerd-icons-completion
-	:after marginalia
-	:config
-	(nerd-icons-completion-mode)
-	:hook
-	('marginalia-mode-hook . 'nerd-icons-completion-marginalia-setup))
-
-(cl-defun +vertico-file-search (&key query in all-files (recursive t) prompt args)
-  "Conduct a file search using ripgrep.
-
-:query STRING
-  Determines the initial input to search for.
-:in PATH
-  Sets what directory to base the search out of. Defaults to the current project's root.
-:recursive BOOL
-  Whether or not to search files recursively from the base directory.
-:args LIST
-  Arguments to be appended to `consult-ripgrep-args'."
-  (declare (indent defun))
-  (unless (executable-find "rg")
-    (user-error "Couldn't find ripgrep in your PATH"))
-  (require 'consult)
-  (setq deactivate-mark t)
-  (let* ((project-root (or default-directory))
-         (directory (or in project-root))
-         (consult-ripgrep-args
-          (concat "rg "
-                  (if all-files "-uu ")
-                  (unless recursive "--maxdepth 1 ")
-                  "--null --line-buffered --color=never --max-columns=1000 "
-                  "--path-separator /   --smart-case --no-heading "
-                  "--with-filename --line-number --search-zip "
-                  "--hidden -g !.git -g !.svn -g !.hg "
-                  (mapconcat #'identity args " ")))
-         (prompt (if (stringp prompt) (string-trim prompt) "Search"))
-         (query)
-         (consult-async-split-style consult-async-split-style)
-         (consult-async-split-styles-alist consult-async-split-styles-alist))
-    ;; Change the split style if the initial query contains the separator.
-    (when query
-      (cl-destructuring-bind (&key type separator initial _function)
-          (consult--async-split-style)
-        (pcase type
-          (`separator
-           (replace-regexp-in-string (regexp-quote (char-to-string separator))
-                                     (concat "\\" (char-to-string separator))
-                                     query t t))
-          (`perl
-           (when (string-match-p initial query)
-             (setf (alist-get 'perlalt consult-async-split-styles-alist)
-                   `(:initial ,(or (cl-loop for char in (list "%" "@" "!" "&" "/" ";")
-                                            unless (string-match-p char query)
-                                            return char)
-                                   "%")
-                     :type perl)
-                   consult-async-split-style 'perlalt))))))
-    (consult--grep prompt #'consult--ripgrep-make-builder directory query)))
-
-(defun +vertico/project-search (&optional arg initial-query directory)
-  "Performs a live project search from the project root using ripgrep.
-If ARG (universal argument), include all files, even hidden or compressed ones,
-in the search."
-  (interactive "P")
-  (+vertico-file-search :query initial-query :in directory :all-files arg))
+(use-package nerd-icons-completion
+  :after marginalia
+  :config
+  (nerd-icons-completion-mode)
+  :hook
+  ('marginalia-mode-hook . 'nerd-icons-completion-marginalia-setup))
 
 (use-package consult
   ;; Enable automatic preview at point in the *Completions* buffer. This is
@@ -977,7 +965,7 @@ in the search."
   ;; By default `consult-project-function' uses `project-root' from project.el.
   ;; Optionally configure a different project root function.
    ;;;; 1. project.el (the default)
-   ;; (setq consult-project-function #'consult--default-project--function)
+  ;; (setq consult-project-function #'consult--default-project--function)
    ;;;; 2. vc.el (vc-root-dir)
   ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
    ;;;; 3. locate-dominating-file
@@ -1036,9 +1024,10 @@ in the search."
   (dashboard-vertically-center-content t)
   (dashboard-items '(
                      (projects  . 5)
-                                       (recents   . 5)
+                     (recents   . 5)
                      (agenda    . 5)
-                                       ))
+                     ))
+  ;; TODO: Customise font faces for no underline
   )
 
 (use-package browse-kill-ring)
@@ -1047,31 +1036,448 @@ in the search."
   "Enable Flyspell appropriately for the major mode of the current buffer.  Uses `flyspell-prog-mode' for modes derived from `prog-mode', so only strings and comments get checked.  All other buffers get `flyspell-mode' to check all text.  If flyspell is already enabled, does nothing."
   (interactive)
   (if (not (symbol-value flyspell-mode)) ; if not already on
-        (progn
-              (if (derived-mode-p 'prog-mode)
-                      (progn
-                        (message "Flyspell on (code)")
-                        (flyspell-prog-mode))
-                ;; else
-                (progn
-                      (message "Flyspell on (text)")
-                      (flyspell-mode 1)))
-              ;; I tried putting (flyspell-buffer) here but it didn't seem to work
-              )))
+      (progn
+        (if (derived-mode-p 'prog-mode)
+            (progn
+              (message "Flyspell on (code)")
+              (flyspell-prog-mode))
+          ;; else
+          (progn
+            (message "Flyspell on (text)")
+            (flyspell-mode 1)))
+        ;; I tried putting (flyspell-buffer) here but it didn't seem to work
+        )))
 
 (defun flyspell-toggle ()
   "Turn Flyspell on if it is off, or off if it is on.  When turning on, it uses `flyspell-on-for-buffer-type' so code-vs-text is handled appropriately."
   (interactive)
   (if (symbol-value flyspell-mode)
-        (progn ; flyspell is on, turn it off
-              (message "Flyspell off")
-              (flyspell-mode -1))
-                                                                              ; else - flyspell is off, turn it on
+      (progn ; flyspell is on, turn it off
+        (message "Flyspell off")
+        (flyspell-mode -1))
+										; else - flyspell is off, turn it on
     (flyspell-on-for-buffer-type)))
 
 (add-hook 'find-file-hook 'flyspell-on-for-buffer-type)
 
 (use-package evil-nerd-commenter)
+
+(use-package org
+  :defer t
+
+:config
+(setq org-adapt-indentation t
+      org-hide-leading-stars t
+      org-pretty-entities t
+      org-ellipsis "  ·")
+
+(setq org-src-fontify-natively t
+      org-src-tab-acts-natively t
+      org-edit-src-content-indentation 0)
+
+(setq org-log-done                       t
+      org-auto-align-tags                t
+      org-tags-column                    -80
+      org-fold-catch-invisible-edits     'show-and-error
+      org-special-ctrl-a/e               t
+      org-insert-heading-respect-content t)
+
+)
+
+(setq org-fontify-done-headline t)
+(custom-set-faces
+ '(org-done ((t (:weight normal
+						 :strike-through t))))
+ '(org-headline-done
+   ((((class color) (min-colors 16))
+     (:strike-through t)))))
+
+(add-hook 'org-mode-hook 'variable-pitch-mode)
+
+(my-local-leader
+  :states 'normal
+  :keymaps 'org-mode
+  "#" 'org-update-statistics-cookies
+  "'" 'org-edit-special
+  "*" 'org-ctrl-c-star
+  "+" 'org-ctrl-c-minus
+  "," 'org-switchb
+  "." 'org-goto
+  "@" 'org-cite-insert
+  "." 'consult-org-heading
+  "/" 'consult-org-agenda
+  "A" 'org-archive-subtree-default
+  "e" 'org-export-dispatch
+  "f" 'org-footnote-action
+  "h" 'org-toggle-heading
+  "i" 'org-toggle-item
+  "I" 'org-id-get-create
+  "k" 'org-babel-remove-result
+  ;; "K" #'+org/remove-result-blocks
+  "n" 'org-store-link
+  "o" 'org-set-property
+  "q" 'org-set-tags-command
+  "t" 'org-todo
+  "T" 'org-todo-list
+  "x" 'org-toggle-checkbox
+  "a" '(:ignore t :wk "Attachments")
+  "a a" 'org-attach
+  "a d" 'org-attach-delete-one
+  "a D" 'org-attach-delete-all
+  ;; "a f" #'+org/find-file-in-attachments
+  ;; "a l" #'+org/attach-file-and-insert-link
+  "a n" 'org-attach-new
+  "a o" 'org-attach-open
+  "a O" 'org-attach-open-in-emacs
+  "a r" 'org-attach-reveal
+  "a R" 'org-attach-reveal-in-emacs
+  "a u" 'org-attach-url
+  "a s" 'org-attach-set-directory
+  "a S" 'org-attach-sync
+  "b" '(:ignore t :wk "Tables")
+  "b -" 'org-table-insert-hline
+  "b a" 'org-table-align
+  "b b" 'org-table-blank-field
+  "b c" 'org-table-create-or-convert-from-region
+  "b e" 'org-table-edit-field
+  "b f" 'org-table-edit-formulas
+  "b h" 'org-table-field-info
+  "b s" 'org-table-sort-lines
+  "b r" 'org-table-recalculate
+  "b R" 'org-table-recalculate-buffer-tables
+  "s" '(:ignore t :wk "delete")
+  "s c" 'org-table-delete-column
+  "s r" 'org-table-kill-row
+  "i" '(:ignore t :wk "insert")
+  "i c" 'org-table-insert-column
+  "i h" 'org-table-insert-hline
+  "i r" 'org-table-insert-row
+  "i H" 'org-table-hline-and-move
+  "t" '(:ignore t :wk "toggle")
+  "t f" 'org-table-toggle-formula-debugger
+  "t o" 'org-table-toggle-coordinate-overlays
+  "c" '(:ignore t :wk "clock")
+  "c c" 'org-clock-cancel
+  "c d" 'org-clock-mark-default-task
+  "c e" 'org-clock-modify-effort-estimate
+  "c E" 'org-set-effort
+  "c g" 'org-clock-goto
+  ;; "c G" (cmd! (org-clock-goto 'select))
+  ;; "c l" #'+org/toggle-last-clock
+  "c i" 'org-clock-in
+  "c I" 'org-clock-in-last
+  "c o" 'org-clock-out
+  "c r" 'org-resolve-clocks
+  "c R" 'org-clock-report
+  "c t" 'org-evaluate-time-range
+  "c =" 'org-clock-timestamps-up
+  "c -" 'org-clock-timestamps-down
+  "d" '(:ignore t :wk "date/deadline")
+  "d d" 'org-deadline
+  "d s" 'org-schedule
+  "d t" 'org-time-stamp
+  "d T" 'org-time-stamp-inactive
+  "g" '(:ignore t :wk "goto")
+  "g g" 'org-goto
+  "g g" 'consult-org-heading
+  "g G" 'consult-org-agenda
+  "g c" 'org-clock-goto
+  ;; "g C" (cmd! (org-clock-goto 'select))
+  "g i" 'org-id-goto
+  "g r" 'org-refile-goto-last-stored
+  ;; "g v" #'+org/goto-visible
+  "g x" 'org-capture-goto-last-stored
+  "l" '(:ignore t :wk "links")
+  "l c" 'org-cliplink
+  ;; "l d" #'+org/remove-link
+  "l i" 'org-id-store-link
+  "l l" 'org-insert-link
+  "l L" 'org-insert-all-links
+  "l s" 'org-store-link
+  "l S" 'org-insert-last-stored-link
+  "l t" 'org-toggle-link-display
+  ;; "l y" #'+org/yank-link
+  "P" '(:ignore t :wk "Publish")
+  "P a" 'org-publish-all
+  "P f" 'org-publish-current-file
+  "P p" 'org-publish
+  "P P" 'org-publish-current-project
+  "P s" 'org-publish-sitemap
+  "r" '(:ignore t :wk "refile")
+  ;; "r ." #'+org/refile-to-current-file
+  ;; "r c" #'+org/refile-to-running-clock
+  ;; "r l" #'+org/refile-to-last-location
+  ;; "r f" #'+org/refile-to-file
+  ;; "r o" #'+org/refile-to-other-window
+  ;; "r O" #'+org/refile-to-other-buffer
+  ;; "r v" #'+org/refile-to-visible
+  "r r" 'org-refile
+  "r R" 'org-refile-reverse ; to all `org-refile-targets'
+  "s" '(:ignore t :wk "tree/subtree")
+  "s a" 'org-toggle-archive-tag
+  "s b" 'org-tree-to-indirect-buffer
+  "s c" 'org-clone-subtree-with-time-shift
+  "s d" 'org-cut-subtree
+  "s h" 'org-promote-subtree
+  "s j" 'org-move-subtree-down
+  "s k" 'org-move-subtree-up
+  "s l" 'org-demote-subtree
+  "s n" 'org-narrow-to-subtree
+  "s r" 'org-refile
+  "s s" 'org-sparse-tree
+  "s A" 'org-archive-subtree-default
+  "s N" 'widen
+  "s S" 'org-sort
+  "p" '(:ignore t :wk "priority")
+  "p d" 'org-priority-down
+  "p p" 'org-priority
+  "p u" 'org-priority-up
+)
+
+;; All my org files live in one directory
+(setq org-directory "~/Notebooks/")
+(setq cadair-default-org-files (file-expand-wildcards "~/Notebooks/*.org"))
+(setq cadair-extra-org-files '())
+
+;; Some general config
+(setq org-duration-format 'h:mm)
+(setq org-cycle-separator-lines -1)
+
+;; Always save buffers on clock changes
+(add-hook 'org-clock-in-hook #'save-buffer)
+(add-hook 'org-clock-out-hook #'save-buffer)
+
+(setq calendar-latitude 53.584)
+(setq calendar-longitude -1.778)
+(setq calendar-location-name "Holmfirth")
+
+(use-package alert
+  :custom
+  ;; TODO: This could be nicer, but at least it saves all the override
+  (alert-default-style 'notifications)
+  )
+
+(use-package secretaria
+  :hook
+  (after-init-hook . secretaria-unknown-time-always-remind-me)
+  :custom
+  (secretaria-clocked-task-save-file "~/Notebooks/secretaria-clocked-task")
+  (secretaria-notification-to-html t)
+  )
+
+(setq cadair-default-gh-repo "sunpy/sunpy")
+
+(defun cadair-gh-open (link)
+  """Complete a link to a github issue / PR"""
+  (if (string-prefix-p "#" link)
+      (setq link2 (concat cadair-default-gh-repo link))
+    (setq link2 link)
+    )
+  (setq ghlink (concat "https://github.com/" (replace-regexp-in-string "#" "/issues/" link2)))
+  ;; (message ghlink)
+  (org-open-link-from-string ghlink)
+  )
+
+;;(org-add-link-type "gh" 'cadair-gh-open)
+
+(defun cadair-jira-open (link)
+  """Complete a link to a jira ticket"""
+  (setq ghlink (concat "https://nso.atlassian.net/browse/DCS-" link))
+  ;; (message ghlink)
+  (org-open-link-from-string ghlink)
+  )
+
+;;(org-add-link-type "DCS" 'cadair-jira-open)
+
+(defadvice org-capture
+    (after make-full-window-frame activate)
+  "Advise capture to be the only window when used as a popup"
+  (if (equal "emacs-capture" (frame-parameter nil 'name))
+      (delete-other-windows)))
+
+(defadvice org-capture-finalize
+    (after delete-capture-frame activate)
+  "Advise capture-finalize to close the frame"
+  (if (equal "emacs-capture" (frame-parameter nil 'name))
+      (delete-frame)))
+
+(defvar cadair-capture-file "~/Notebooks/refile.org")
+(setq org-default-notes-file cadair-capture-file)
+
+;; This seems to work for protocol setup: http://www.mediaonfire.com/blog/2017_07_21_org_protocol_firefox.html
+;; Capture templates for: TODO tasks, Notes, appointments, phone calls, meetings, and org-protocol
+(setq org-capture-templates
+      (quote (("t" "todo" entry (file cadair-capture-file)
+               "* TODO %i%?\n" :clock-in t :clock-resume t)
+              ("x" "review" entry (file cadair-capture-file)
+               "* TODO Review %?%c\n" :clock-in t :clock-resume t)
+              ("L" "Protocol" entry (file cadair-capture-file)
+               "* TODO Review %? [[%:link][%:description]] \nCaptured On: %U")
+              ("p" "Protocol" entry (file cadair-capture-file)
+               "* TODO %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+              ("n" "note" entry (file cadair-capture-file)
+               "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)
+              ("h" "Habit" entry (file cadair-capture-file)
+               "* NEXT %?\n%U\n%a\nSCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n"))))
+
+(setq org-highest-priority ?A)
+(setq org-default-priority ?C)
+(setq org-lowest-priority ?D)
+
+;;set colours for priorities
+(setq org-priority-faces '((?A . (:foreground "#F0DFAF" :weight bold))
+                           (?B . (:foreground "LightSteelBlue"))
+                           (?C . (:foreground "OliveDrab"))))
+
+(setq org-agenda-files (append cadair-default-org-files cadair-extra-org-files))
+;; Hide some tags from the agenda to reduce noise
+(setq org-agenda-hide-tags-regexp "dkist\\|sunpy\\|reoccurring\\|aperiocontracts")
+
+;; Agenda clock report parameters
+(setq org-agenda-clockreport-parameter-plist
+      (quote (:link t :maxlevel 10 :fileskip0 t :compact t :narrow 80)))
+
+;;open agenda in current window
+(setq org-agenda-window-setup (quote current-window))
+
+;; Do not dim blocked tasks
+(setq org-agenda-dim-blocked-tasks nil)
+
+;; Compact the block agenda view
+(setq org-agenda-compact-blocks nil)
+
+;; Always show the log at the top
+(setq org-agenda-start-with-log-mode t)
+
+;; Always show the clock table
+(setq org-agenda-start-with-clockreport-mode t)
+
+;;open agenda in current window
+(setq org-agenda-window-setup (quote current-window))
+
+;;warn me of any deadlines in next 7 days
+(setq org-deadline-warning-days 7)
+
+;; Weeks start on Monday you nutters
+(setq org-agenda-start-on-weekday 1)
+(setq org-agenda-start-day (format-time-string "%Y-%m-%d"))
+
+;; Don't show tasks as scheduled if they are already shown as a deadline
+(setq org-agenda-skip-scheduled-if-deadline-is-shown t)
+
+(setq org-agenda-custom-commands
+      (quote
+       (
+        ("N" "Notes" tags "NOTE"
+         ((org-agenda-overriding-header "Notes")
+          (org-tags-match-list-sublevels t)))
+        ("B" "Billable Agenda"
+         ((agenda "" (
+                      (org-agenda-span (quote month))
+                      (org-agenda-skip-scheduled-if-deadline-is-shown nil)
+                      (org-agenda-filter-by-tag 'billable)
+                      ))
+          ))
+        ("n" "Noodling Agenda"
+         ((agenda "" (
+                      (org-agenda-span (quote day))
+                      (org-agenda-skip-scheduled-if-deadline-is-shown nil)
+                      (org-agenda-filter-by-tag 'noodling)
+                      ))
+          ))
+        ("p" "Primary Agenda"
+         ((agenda "" (
+                      (org-agenda-span (quote day))
+                      (org-agenda-skip-scheduled-if-deadline-is-shown nil)
+                      ))
+          (tags "REFILE"
+                ((org-agenda-overriding-header "Tasks to Refile")
+                 (org-tags-match-list-sublevels nil)))
+          ;; Reoccurring Tasks
+          (tags-todo "+reoccurring-HOLD-CANCELLED"
+                     ((org-agenda-overriding-header "Reoccurring Tasks")
+                      (org-tags-match-list-sublevels nil)
+                      (org-agenda-sorting-strategy
+                       '(category-keep))))
+          ;; Priority Tasks
+          (tags-todo "+PRIORITY=\"A\"|+PRIORITY=\"B\""
+                     (
+                      (org-agenda-overriding-header (concat "Priority Tasks"))
+                      ;; (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+                      ;; (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
+                      ;; (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
+                      (org-tags-match-list-sublevels 'indented)
+                      (org-agenda-sorting-strategy
+                       '(priority-down))
+                      ))
+          ;; DKIST Sprint
+          (tags-todo "dkist&activesprint&-HOLD-CANCELLED"
+                     ((org-agenda-overriding-header "This Sprint Tasks")
+                      (org-tags-match-list-sublevels 'indented)
+                      (org-agenda-sorting-strategy
+                       '(category-keep))))
+          ;; NASA Grant
+          (tags-todo "sunpy&billable&-HOLD-CANCELLED"
+                     ((org-agenda-overriding-header "SunPy NASA Tasks")
+                      (org-tags-match-list-sublevels 'indented)
+                      (org-agenda-sorting-strategy
+                       '(category-keep))))
+          ;; Active Contracts
+          (tags-todo "aperiocontracts&-HOLD-CANCELLED/!"
+                     ((org-agenda-overriding-header "Active Contracts")
+                      (org-tags-match-list-sublevels 'indented)
+                      (org-agenda-sorting-strategy
+                       '(category-keep))))
+          ;; Waiting and Postponed
+          (tags-todo "-CANCELLED+WAITING|HOLD/!"
+                     ((org-agenda-overriding-header (concat "Waiting and Postponed Tasks"
+                                                            ;; (if bh/hide-scheduled-and-waiting-next-tasks
+                                                            ;;     ""
+                                                            ;;   " (including WAITING and SCHEDULED tasks)")
+															))
+                      (org-agenda-skip-function 'bh/skip-non-tasks)
+                      (org-tags-match-list-sublevels nil)
+                      ;; (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+                      ;; (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
+					  ))
+          (tags "-REFILE/"
+                ((org-agenda-overriding-header "Tasks to Archive")
+                 ;; (org-agenda-skip-function 'bh/skip-non-archivable-tasks)
+                 (org-tags-match-list-sublevels nil))))
+         nil))))
+
+(use-package org-clock-waybar
+  :vc (:url "https://gitea.polonkai.eu/Cadair/org-clock-waybar.git" :rev "typo")
+  :config 
+  (org-clock-waybar-setup)
+  )
+
+(defun org-clock-waybar--get-tooltip ()
+  "The default tooltip to send to waybar."
+  (when (org-clocking-p)
+    (let ((clocked-time (org-clock-get-clocked-time)))
+      (format "%s: %s [%s] %s"
+              (org-clock-waybar--get-task-category)
+              (org-clock-waybar--get-task-title)
+              (org-duration-from-minutes clocked-time)
+              (format "%s" (org-clock-waybar--get-tags))))))
+
+(use-package request
+  ;;:custom
+  ;; Enable these to debug org-clock-float requests
+  ;;(request-log-level 'debug)
+  ;;(request-message-level 'debug)
+  )
+(use-package org-clock-float
+  :requires (request)
+  :vc (:url "https://github.com/Cadair/org-clock-float.git" :rev :latest)
+  ;; For local development
+  ;; :load-path "/home/stuart/Git/org-clock-float/"
+  :config
+  (org-clock-float-setup)
+  :custom
+  (org-clock-float-email "stuart@aperiosoftware.com")
+  )
 
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 
