@@ -62,6 +62,7 @@ This literate config is was started from the excellent [[https://github.com/Mini
   - [[#evil-nerd-commenter][Evil-nerd-commenter]]
 - [[#org-mode][Org Mode]]
   - [[#visuals][Visuals]]
+  - [[#other-packages-1][Other Packages]]
   - [[#keybindings-1][Keybindings]]
   - [[#task-management][Task Management]]
   - [[#secretaria---clock-notifications][Secretaria - Clock Notifications]]
@@ -199,16 +200,16 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
     )
 
   ;; Add some eglot related things to , because my muscle memory demands it
-  (my-local-leader
-    :states '(normal visual)
-    ;; If I only enable this in eglot-mode-map then setting major-mode specific binds override this one
-    ;;:keymaps 'eglot-mode-map
-    "g" '(:ignore t :wk "Eglot goto")
-    "g g" '(xref-find-definitions :wk "Goto Definition")
-    "g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
-    "g r" '(xref-find-references :wk "Find references")
-    "d" '('eldoc-doc-buffer :wk "Documentation")
-    )
+  ;;(my-local-leader
+  ;;  :states '(normal visual)
+  ;;  ;; If I only enable this in eglot-mode-map then setting major-mode specific binds override this one
+  ;;  ;;:keymaps 'eglot-mode-map
+  ;;  "g" '(:ignore t :wk "Eglot goto")
+  ;;  "g g" '(xref-find-definitions :wk "Goto Definition")
+  ;;  "g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
+  ;;  "g r" '(xref-find-references :wk "Find references")
+  ;;  "d" '('eldoc-doc-buffer :wk "Documentation")
+  ;;  )
 
   ;; Set up 'SPC' as primary leader key
   (general-create-definer start/leader-keys
@@ -970,29 +971,29 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
 
      A bunch of language specific key binds, using ~,~ as the leader key.
 
-     #+begin_src emacs-lisp
-     (my-local-leader
-       :states 'normal
-       :keymaps 'python-ts-mode-map
-       "t a" 'python-pytest
-       "t f" 'python-pytest-file-dwim
-       "t F" 'python-pytest-file
-       "t t" 'python-pytest-run-def-or-class-at-point-dwim
-       "t T" 'python-pytest-run-def-or-class-at-point
-       "t r" 'python-pytest-repeat
-       "t p" 'python-pytest-dispatch
+#+begin_src emacs-lisp
+(my-local-leader
+  :states 'normal
+  :keymaps 'python-ts-mode-map
+  "t a" 'python-pytest
+  "t f" 'python-pytest-file-dwim
+  "t F" 'python-pytest-file
+  "t t" 'python-pytest-run-def-or-class-at-point-dwim
+  "t T" 'python-pytest-run-def-or-class-at-point
+  "t r" 'python-pytest-repeat
+  "t p" 'python-pytest-dispatch
 
-       "c" 'cadair/python-execute-file
-       "r" 'cadair/run-in-repl
-       "R" 'cadair/run-in-repl-switch
-       "a" 'python-add-to-all
+  "c" 'cadair/python-execute-file
+  "r" 'cadair/run-in-repl
+  "R" 'cadair/run-in-repl-switch
+  "a" 'python-add-to-all
 
-       "m a" 'micromamba-activate
-       "m d" 'micromamba-deactivate
-       "v a" 'pyvenv-workon
-       "v d" 'pyvenv-deactivate
-       )
-     #+end_src
+  "m a" 'micromamba-activate
+  "m d" 'micromamba-deactivate
+  "v a" 'pyvenv-workon
+  "v d" 'pyvenv-deactivate
+  )
+#+end_src
 
 *** Org Mode
     Org mode is one of the things that emacs is loved for.
@@ -1014,47 +1015,23 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
       ;;                          `(lambda (c)
       ;;                             (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
       )
-    #+end_src
-
-**** Table of Contents
-     #+begin_src emacs-lisp
-     (use-package toc-org
-       :commands toc-org-enable
-       :hook (org-mode . toc-org-mode))
-     #+end_src
-
-**** Org Superstar
-     Prettify headings and plain lists in Org mode. Modern version of org-bullets.
-     #+begin_src emacs-lisp
-     (use-package org-superstar
-       :after org
-       :hook (org-mode . org-superstar-mode))
-     #+end_src
-
-**** Source Code Block Tag Expansion
-     Org-tempo is not a separate package but a module within org that can be enabled.
-     Org-tempo allows for '<s' followed by TAB to expand to a begin_src tag.
-     #+begin_src emacs-lisp
-     (use-package org-tempo
-       :ensure nil
-       :after org)
-     #+end_src
+      #+end_src
 
 *** nix
-    #+begin_src emacs-lisp
-    (use-package nix-mode)
-    #+end_src
+#+begin_src emacs-lisp
+(use-package nix-mode)
+#+end_src
 
 **** Keybindings
 
-     A bunch of language specific key binds, using ~,~ as the leader key.
+A bunch of language specific key binds, using ~,~ as the leader key.
 
-     #+begin_src emacs-lisp
-     (my-local-leader
-       :states 'normal
-       :keymaps 'nix-mode-map
-       "f" 'nix-flake
-       )
+#+begin_src emacs-lisp
+(my-local-leader
+  :states 'normal
+  :keymaps 'nix-mode-map
+  "f" 'nix-flake
+  )
      #+end_src
 *** TODO Rust
     https://github.com/emacs-rustic/rustic
@@ -1090,7 +1067,7 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
    (use-package treesit-fold
      :straight (treesit-fold :type git :host github :repo "emacs-tree-sitter/treesit-fold"))
    #+end_src
-
+   
 * Other Packages
   All the package setups that don't need much tweaking.
 
@@ -1445,6 +1422,10 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
   #+begin_src emacs-lisp
   (use-package org
     :defer t
+    :custom
+    (org-edit-src-content-indentation 2) ;; Set src block automatic indent to 4 instead of 2.
+    :hook
+    (org-mode . org-indent-mode) ;; Indent text
   #+end_src
 
 ** Visuals
@@ -1520,14 +1501,41 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
     (add-hook 'org-mode-hook 'variable-pitch-mode)
     #+end_src
 
+** Other Packages
+
+**** Table of Contents
+#+begin_src emacs-lisp
+(use-package toc-org
+  :commands toc-org-enable
+  :hook (org-mode . toc-org-mode))
+#+end_src
+
+**** Org Superstar
+Prettify headings and plain lists in Org mode. Modern version of org-bullets.
+#+begin_src emacs-lisp
+(use-package org-superstar
+  :after org
+  :hook (org-mode . org-superstar-mode))
+#+end_src
+
+**** Source Code Block Tag Expansion
+Org-tempo is not a separate package but a module within org that can be enabled.
+Org-tempo allows for '<s' followed by TAB to expand to a begin_src tag.
+#+begin_src emacs-lisp
+(use-package org-tempo
+  :ensure nil
+  :after org)
+#+end_src
+
 ** Keybindings
 
    Now let's setup a lot of org-specific keybinds, global ones are in the main keybinding section
 
-   #+begin_src emacs-lisp
+#+begin_src emacs-lisp
    (my-local-leader
-     :states 'normal
+     :states '(normal visual)
      :keymaps 'org-mode
+     
      "#" 'org-update-statistics-cookies
      "'" 'org-edit-special
      "*" 'org-ctrl-c-star
@@ -1957,7 +1965,8 @@ I use [[https://github.com/Alexays/Waybar/][Waybar]] for my sway window manager,
      :config
      (org-clock-float-setup)
      :custom
-     (org-clock-float-email "stuart@aperiosoftware.com")
+     (org-clock-float-email (plist-get (nth 0 (auth-source-search :max 1 :host "api.float.com")) :user))
+     (org-clock-float-api-token (auth-info-password (nth 0 (auth-source-search :max 1 :host "api.float.com"))))
      )
 #+end_src
 

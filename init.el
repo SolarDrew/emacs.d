@@ -80,16 +80,16 @@
     )
 
   ;; Add some eglot related things to , because my muscle memory demands it
-  (my-local-leader
-    :states '(normal visual)
-    ;; If I only enable this in eglot-mode-map then setting major-mode specific binds override this one
-    ;;:keymaps 'eglot-mode-map
-    "g" '(:ignore t :wk "Eglot goto")
-    "g g" '(xref-find-definitions :wk "Goto Definition")
-    "g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
-    "g r" '(xref-find-references :wk "Find references")
-    "d" '('eldoc-doc-buffer :wk "Documentation")
-    )
+  ;;(my-local-leader
+  ;;  :states '(normal visual)
+  ;;  ;; If I only enable this in eglot-mode-map then setting major-mode specific binds override this one
+  ;;  ;;:keymaps 'eglot-mode-map
+  ;;  "g" '(:ignore t :wk "Eglot goto")
+  ;;  "g g" '(xref-find-definitions :wk "Goto Definition")
+  ;;  "g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
+  ;;  "g r" '(xref-find-references :wk "Find references")
+  ;;  "d" '('eldoc-doc-buffer :wk "Documentation")
+  ;;  )
 
   ;; Set up 'SPC' as primary leader key
   (general-create-definer start/leader-keys
@@ -769,18 +769,6 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   ;;                             (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
   )
 
-(use-package toc-org
-  :commands toc-org-enable
-  :hook (org-mode . toc-org-mode))
-
-(use-package org-superstar
-  :after org
-  :hook (org-mode . org-superstar-mode))
-
-(use-package org-tempo
-  :ensure nil
-  :after org)
-
 (use-package nix-mode)
 
 (my-local-leader
@@ -1064,6 +1052,10 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 
 (use-package org
   :defer t
+  :custom
+  (org-edit-src-content-indentation 2) ;; Set src block automatic indent to 4 instead of 2.
+  :hook
+  (org-mode . org-indent-mode) ;; Indent text
 
 :config
 (setq org-adapt-indentation t
@@ -1094,9 +1086,22 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 
 (add-hook 'org-mode-hook 'variable-pitch-mode)
 
+(use-package toc-org
+  :commands toc-org-enable
+  :hook (org-mode . toc-org-mode))
+
+(use-package org-superstar
+  :after org
+  :hook (org-mode . org-superstar-mode))
+
+(use-package org-tempo
+  :ensure nil
+  :after org)
+
 (my-local-leader
-  :states 'normal
+  :states '(normal visual)
   :keymaps 'org-mode
+  
   "#" 'org-update-statistics-cookies
   "'" 'org-edit-special
   "*" 'org-ctrl-c-star
@@ -1476,7 +1481,8 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   :config
   (org-clock-float-setup)
   :custom
-  (org-clock-float-email "stuart@aperiosoftware.com")
+  (org-clock-float-email (plist-get (nth 0 (auth-source-search :max 1 :host "api.float.com")) :user))
+  (org-clock-float-api-token (auth-info-password (nth 0 (auth-source-search :max 1 :host "api.float.com"))))
   )
 
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
