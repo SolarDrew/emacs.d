@@ -80,16 +80,16 @@
     )
 
   ;; Add some eglot related things to , because my muscle memory demands it
-  ;;(my-local-leader
-  ;;  :states '(normal visual)
-  ;;  ;; If I only enable this in eglot-mode-map then setting major-mode specific binds override this one
-  ;;  ;;:keymaps 'eglot-mode-map
-  ;;  "g" '(:ignore t :wk "Eglot goto")
-  ;;  "g g" '(xref-find-definitions :wk "Goto Definition")
-  ;;  "g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
-  ;;  "g r" '(xref-find-references :wk "Find references")
-  ;;  "d" '('eldoc-doc-buffer :wk "Documentation")
-  ;;  )
+  (my-local-leader
+   :states '(normal visual)
+   ;; If I only enable this in eglot-mode-map then setting major-mode specific binds override this one
+   ;;:keymaps 'eglot-mode-map
+   "g" '(:ignore t :wk "Eglot goto")
+   "g g" '(xref-find-definitions :wk "Goto Definition")
+   "g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
+   "g r" '(xref-find-references :wk "Find references")
+   "d" '('eldoc-doc-buffer :wk "Documentation")
+   )
 
   ;; Set up 'SPC' as primary leader key
   (general-create-definer start/leader-keys
@@ -1100,8 +1100,8 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 
 (my-local-leader
   :states '(normal visual)
-  :keymaps 'org-mode
-  
+  :keymaps 'org-mode-map
+
   "#" 'org-update-statistics-cookies
   "'" 'org-edit-special
   "*" 'org-ctrl-c-star
@@ -1150,17 +1150,18 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   "b s" 'org-table-sort-lines
   "b r" 'org-table-recalculate
   "b R" 'org-table-recalculate-buffer-tables
-  "s" '(:ignore t :wk "delete")
-  "s c" 'org-table-delete-column
-  "s r" 'org-table-kill-row
-  "i" '(:ignore t :wk "insert")
-  "i c" 'org-table-insert-column
-  "i h" 'org-table-insert-hline
-  "i r" 'org-table-insert-row
-  "i H" 'org-table-hline-and-move
-  "t" '(:ignore t :wk "toggle")
-  "t f" 'org-table-toggle-formula-debugger
-  "t o" 'org-table-toggle-coordinate-overlays
+  ;; TODO: Figure these sub leader bindings out
+  ;; "b s" '(:ignore t :wk "delete")
+  ;; "b s c" 'org-table-delete-column
+  ;; "b s r" 'org-table-kill-row
+  ;; "b i" '(:ignore t :wk "insert")
+  ;; "b i c" 'org-table-insert-column
+  ;; "b i h" 'org-table-insert-hline
+  ;; "b i r" 'org-table-insert-row
+  ;; "b i H" 'org-table-hline-and-move
+  ;; "b t" '(:ignore t :wk "toggle")
+  ;; "b t f" 'org-table-toggle-formula-debugger
+  ;; "b t o" 'org-table-toggle-coordinate-overlays
   "c" '(:ignore t :wk "clock")
   "c c" 'org-clock-cancel
   "c d" 'org-clock-mark-default-task
@@ -1237,7 +1238,30 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   "p d" 'org-priority-down
   "p p" 'org-priority
   "p u" 'org-priority-up
-)
+  )
+
+(my-local-leader
+  :states '(normal visual)
+  :keymaps 'org-agenda-mode-map
+
+  "d" '(:ignore t :wk "date/deadline")
+  "d d" 'org-agenda-deadline
+  "d s" 'org-agenda-schedule
+  "c" '(:ignore t :wk "clock")
+  "c c" 'org-agenda-clock-cancel
+  "c g" 'org-agenda-clock-goto
+  "c i" 'org-agenda-clock-in
+  "c o" 'org-agenda-clock-out
+  "c r" 'org-agenda-clockreport-mode
+  "c s" 'org-agenda-show-clocking-issues
+  "p" '(:ignore t :wk "priority")
+  "p d" 'org-agenda-priority-down
+  "p p" 'org-agenda-priority
+  "p u" 'org-agenda-priority-up
+  "q" 'org-agenda-set-tags
+  "r" 'org-agenda-refile
+  "t" 'org-agenda-todo
+  )
 
 ;; All my org files live in one directory
 (setq org-directory "~/Notebooks/")

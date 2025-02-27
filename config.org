@@ -200,16 +200,16 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
     )
 
   ;; Add some eglot related things to , because my muscle memory demands it
-  ;;(my-local-leader
-  ;;  :states '(normal visual)
-  ;;  ;; If I only enable this in eglot-mode-map then setting major-mode specific binds override this one
-  ;;  ;;:keymaps 'eglot-mode-map
-  ;;  "g" '(:ignore t :wk "Eglot goto")
-  ;;  "g g" '(xref-find-definitions :wk "Goto Definition")
-  ;;  "g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
-  ;;  "g r" '(xref-find-references :wk "Find references")
-  ;;  "d" '('eldoc-doc-buffer :wk "Documentation")
-  ;;  )
+  (my-local-leader
+   :states '(normal visual)
+   ;; If I only enable this in eglot-mode-map then setting major-mode specific binds override this one
+   ;;:keymaps 'eglot-mode-map
+   "g" '(:ignore t :wk "Eglot goto")
+   "g g" '(xref-find-definitions :wk "Goto Definition")
+   "g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
+   "g r" '(xref-find-references :wk "Find references")
+   "d" '('eldoc-doc-buffer :wk "Documentation")
+   )
 
   ;; Set up 'SPC' as primary leader key
   (general-create-definer start/leader-keys
@@ -1528,150 +1528,181 @@ Org-tempo allows for '<s' followed by TAB to expand to a begin_src tag.
 #+end_src
 
 ** Keybindings
+:LOGBOOK:
+CLOCK: [2025-02-27 Thu 20:45]--[2025-02-27 Thu 20:47] =>  0:02
+:END:
 
-   Now let's setup a lot of org-specific keybinds, global ones are in the main keybinding section
+Now let's setup a lot of org-specific keybinds, global ones are in the main keybinding section
 
 #+begin_src emacs-lisp
-   (my-local-leader
-     :states '(normal visual)
-     :keymaps 'org-mode
-     
-     "#" 'org-update-statistics-cookies
-     "'" 'org-edit-special
-     "*" 'org-ctrl-c-star
-     "+" 'org-ctrl-c-minus
-     "," 'org-switchb
-     "." 'org-goto
-     "@" 'org-cite-insert
-     "." 'consult-org-heading
-     "/" 'consult-org-agenda
-     "A" 'org-archive-subtree-default
-     "e" 'org-export-dispatch
-     "f" 'org-footnote-action
-     "h" 'org-toggle-heading
-     "i" 'org-toggle-item
-     "I" 'org-id-get-create
-     "k" 'org-babel-remove-result
-     ;; "K" #'+org/remove-result-blocks
-     "n" 'org-store-link
-     "o" 'org-set-property
-     "q" 'org-set-tags-command
-     "t" 'org-todo
-     "T" 'org-todo-list
-     "x" 'org-toggle-checkbox
-     "a" '(:ignore t :wk "Attachments")
-     "a a" 'org-attach
-     "a d" 'org-attach-delete-one
-     "a D" 'org-attach-delete-all
-     ;; "a f" #'+org/find-file-in-attachments
-     ;; "a l" #'+org/attach-file-and-insert-link
-     "a n" 'org-attach-new
-     "a o" 'org-attach-open
-     "a O" 'org-attach-open-in-emacs
-     "a r" 'org-attach-reveal
-     "a R" 'org-attach-reveal-in-emacs
-     "a u" 'org-attach-url
-     "a s" 'org-attach-set-directory
-     "a S" 'org-attach-sync
-     "b" '(:ignore t :wk "Tables")
-     "b -" 'org-table-insert-hline
-     "b a" 'org-table-align
-     "b b" 'org-table-blank-field
-     "b c" 'org-table-create-or-convert-from-region
-     "b e" 'org-table-edit-field
-     "b f" 'org-table-edit-formulas
-     "b h" 'org-table-field-info
-     "b s" 'org-table-sort-lines
-     "b r" 'org-table-recalculate
-     "b R" 'org-table-recalculate-buffer-tables
-     "s" '(:ignore t :wk "delete")
-     "s c" 'org-table-delete-column
-     "s r" 'org-table-kill-row
-     "i" '(:ignore t :wk "insert")
-     "i c" 'org-table-insert-column
-     "i h" 'org-table-insert-hline
-     "i r" 'org-table-insert-row
-     "i H" 'org-table-hline-and-move
-     "t" '(:ignore t :wk "toggle")
-     "t f" 'org-table-toggle-formula-debugger
-     "t o" 'org-table-toggle-coordinate-overlays
-     "c" '(:ignore t :wk "clock")
-     "c c" 'org-clock-cancel
-     "c d" 'org-clock-mark-default-task
-     "c e" 'org-clock-modify-effort-estimate
-     "c E" 'org-set-effort
-     "c g" 'org-clock-goto
-     ;; "c G" (cmd! (org-clock-goto 'select))
-     ;; "c l" #'+org/toggle-last-clock
-     "c i" 'org-clock-in
-     "c I" 'org-clock-in-last
-     "c o" 'org-clock-out
-     "c r" 'org-resolve-clocks
-     "c R" 'org-clock-report
-     "c t" 'org-evaluate-time-range
-     "c =" 'org-clock-timestamps-up
-     "c -" 'org-clock-timestamps-down
-     "d" '(:ignore t :wk "date/deadline")
-     "d d" 'org-deadline
-     "d s" 'org-schedule
-     "d t" 'org-time-stamp
-     "d T" 'org-time-stamp-inactive
-     "g" '(:ignore t :wk "goto")
-     "g g" 'org-goto
-     "g g" 'consult-org-heading
-     "g G" 'consult-org-agenda
-     "g c" 'org-clock-goto
-     ;; "g C" (cmd! (org-clock-goto 'select))
-     "g i" 'org-id-goto
-     "g r" 'org-refile-goto-last-stored
-     ;; "g v" #'+org/goto-visible
-     "g x" 'org-capture-goto-last-stored
-     "l" '(:ignore t :wk "links")
-     "l c" 'org-cliplink
-     ;; "l d" #'+org/remove-link
-     "l i" 'org-id-store-link
-     "l l" 'org-insert-link
-     "l L" 'org-insert-all-links
-     "l s" 'org-store-link
-     "l S" 'org-insert-last-stored-link
-     "l t" 'org-toggle-link-display
-     ;; "l y" #'+org/yank-link
-     "P" '(:ignore t :wk "Publish")
-     "P a" 'org-publish-all
-     "P f" 'org-publish-current-file
-     "P p" 'org-publish
-     "P P" 'org-publish-current-project
-     "P s" 'org-publish-sitemap
-     "r" '(:ignore t :wk "refile")
-     ;; "r ." #'+org/refile-to-current-file
-     ;; "r c" #'+org/refile-to-running-clock
-     ;; "r l" #'+org/refile-to-last-location
-     ;; "r f" #'+org/refile-to-file
-     ;; "r o" #'+org/refile-to-other-window
-     ;; "r O" #'+org/refile-to-other-buffer
-     ;; "r v" #'+org/refile-to-visible
-     "r r" 'org-refile
-     "r R" 'org-refile-reverse ; to all `org-refile-targets'
-     "s" '(:ignore t :wk "tree/subtree")
-     "s a" 'org-toggle-archive-tag
-     "s b" 'org-tree-to-indirect-buffer
-     "s c" 'org-clone-subtree-with-time-shift
-     "s d" 'org-cut-subtree
-     "s h" 'org-promote-subtree
-     "s j" 'org-move-subtree-down
-     "s k" 'org-move-subtree-up
-     "s l" 'org-demote-subtree
-     "s n" 'org-narrow-to-subtree
-     "s r" 'org-refile
-     "s s" 'org-sparse-tree
-     "s A" 'org-archive-subtree-default
-     "s N" 'widen
-     "s S" 'org-sort
-     "p" '(:ignore t :wk "priority")
-     "p d" 'org-priority-down
-     "p p" 'org-priority
-     "p u" 'org-priority-up
-   )
+(my-local-leader
+  :states '(normal visual)
+  :keymaps 'org-mode-map
+
+  "#" 'org-update-statistics-cookies
+  "'" 'org-edit-special
+  "*" 'org-ctrl-c-star
+  "+" 'org-ctrl-c-minus
+  "," 'org-switchb
+  "." 'org-goto
+  "@" 'org-cite-insert
+  "." 'consult-org-heading
+  "/" 'consult-org-agenda
+  "A" 'org-archive-subtree-default
+  "e" 'org-export-dispatch
+  "f" 'org-footnote-action
+  "h" 'org-toggle-heading
+  "i" 'org-toggle-item
+  "I" 'org-id-get-create
+  "k" 'org-babel-remove-result
+  ;; "K" #'+org/remove-result-blocks
+  "n" 'org-store-link
+  "o" 'org-set-property
+  "q" 'org-set-tags-command
+  "t" 'org-todo
+  "T" 'org-todo-list
+  "x" 'org-toggle-checkbox
+  "a" '(:ignore t :wk "Attachments")
+  "a a" 'org-attach
+  "a d" 'org-attach-delete-one
+  "a D" 'org-attach-delete-all
+  ;; "a f" #'+org/find-file-in-attachments
+  ;; "a l" #'+org/attach-file-and-insert-link
+  "a n" 'org-attach-new
+  "a o" 'org-attach-open
+  "a O" 'org-attach-open-in-emacs
+  "a r" 'org-attach-reveal
+  "a R" 'org-attach-reveal-in-emacs
+  "a u" 'org-attach-url
+  "a s" 'org-attach-set-directory
+  "a S" 'org-attach-sync
+  "b" '(:ignore t :wk "Tables")
+  "b -" 'org-table-insert-hline
+  "b a" 'org-table-align
+  "b b" 'org-table-blank-field
+  "b c" 'org-table-create-or-convert-from-region
+  "b e" 'org-table-edit-field
+  "b f" 'org-table-edit-formulas
+  "b h" 'org-table-field-info
+  "b s" 'org-table-sort-lines
+  "b r" 'org-table-recalculate
+  "b R" 'org-table-recalculate-buffer-tables
+  ;; TODO: Figure these sub leader bindings out
+  ;; "b s" '(:ignore t :wk "delete")
+  ;; "b s c" 'org-table-delete-column
+  ;; "b s r" 'org-table-kill-row
+  ;; "b i" '(:ignore t :wk "insert")
+  ;; "b i c" 'org-table-insert-column
+  ;; "b i h" 'org-table-insert-hline
+  ;; "b i r" 'org-table-insert-row
+  ;; "b i H" 'org-table-hline-and-move
+  ;; "b t" '(:ignore t :wk "toggle")
+  ;; "b t f" 'org-table-toggle-formula-debugger
+  ;; "b t o" 'org-table-toggle-coordinate-overlays
+  "c" '(:ignore t :wk "clock")
+  "c c" 'org-clock-cancel
+  "c d" 'org-clock-mark-default-task
+  "c e" 'org-clock-modify-effort-estimate
+  "c E" 'org-set-effort
+  "c g" 'org-clock-goto
+  ;; "c G" (cmd! (org-clock-goto 'select))
+  ;; "c l" #'+org/toggle-last-clock
+  "c i" 'org-clock-in
+  "c I" 'org-clock-in-last
+  "c o" 'org-clock-out
+  "c r" 'org-resolve-clocks
+  "c R" 'org-clock-report
+  "c t" 'org-evaluate-time-range
+  "c =" 'org-clock-timestamps-up
+  "c -" 'org-clock-timestamps-down
+  "d" '(:ignore t :wk "date/deadline")
+  "d d" 'org-deadline
+  "d s" 'org-schedule
+  "d t" 'org-time-stamp
+  "d T" 'org-time-stamp-inactive
+  "g" '(:ignore t :wk "goto")
+  "g g" 'org-goto
+  "g g" 'consult-org-heading
+  "g G" 'consult-org-agenda
+  "g c" 'org-clock-goto
+  ;; "g C" (cmd! (org-clock-goto 'select))
+  "g i" 'org-id-goto
+  "g r" 'org-refile-goto-last-stored
+  ;; "g v" #'+org/goto-visible
+  "g x" 'org-capture-goto-last-stored
+  "l" '(:ignore t :wk "links")
+  "l c" 'org-cliplink
+  ;; "l d" #'+org/remove-link
+  "l i" 'org-id-store-link
+  "l l" 'org-insert-link
+  "l L" 'org-insert-all-links
+  "l s" 'org-store-link
+  "l S" 'org-insert-last-stored-link
+  "l t" 'org-toggle-link-display
+  ;; "l y" #'+org/yank-link
+  "P" '(:ignore t :wk "Publish")
+  "P a" 'org-publish-all
+  "P f" 'org-publish-current-file
+  "P p" 'org-publish
+  "P P" 'org-publish-current-project
+  "P s" 'org-publish-sitemap
+  "r" '(:ignore t :wk "refile")
+  ;; "r ." #'+org/refile-to-current-file
+  ;; "r c" #'+org/refile-to-running-clock
+  ;; "r l" #'+org/refile-to-last-location
+  ;; "r f" #'+org/refile-to-file
+  ;; "r o" #'+org/refile-to-other-window
+  ;; "r O" #'+org/refile-to-other-buffer
+  ;; "r v" #'+org/refile-to-visible
+  "r r" 'org-refile
+  "r R" 'org-refile-reverse ; to all `org-refile-targets'
+  "s" '(:ignore t :wk "tree/subtree")
+  "s a" 'org-toggle-archive-tag
+  "s b" 'org-tree-to-indirect-buffer
+  "s c" 'org-clone-subtree-with-time-shift
+  "s d" 'org-cut-subtree
+  "s h" 'org-promote-subtree
+  "s j" 'org-move-subtree-down
+  "s k" 'org-move-subtree-up
+  "s l" 'org-demote-subtree
+  "s n" 'org-narrow-to-subtree
+  "s r" 'org-refile
+  "s s" 'org-sparse-tree
+  "s A" 'org-archive-subtree-default
+  "s N" 'widen
+  "s S" 'org-sort
+  "p" '(:ignore t :wk "priority")
+  "p d" 'org-priority-down
+  "p p" 'org-priority
+  "p u" 'org-priority-up
+  )
+  #+end_src
+
+Org-Agenda
+
+#+begin_src emacs-lisp
+(my-local-leader
+  :states '(normal visual)
+  :keymaps 'org-agenda-mode-map
+
+  "d" '(:ignore t :wk "date/deadline")
+  "d d" 'org-agenda-deadline
+  "d s" 'org-agenda-schedule
+  "c" '(:ignore t :wk "clock")
+  "c c" 'org-agenda-clock-cancel
+  "c g" 'org-agenda-clock-goto
+  "c i" 'org-agenda-clock-in
+  "c o" 'org-agenda-clock-out
+  "c r" 'org-agenda-clockreport-mode
+  "c s" 'org-agenda-show-clocking-issues
+  "p" '(:ignore t :wk "priority")
+  "p d" 'org-agenda-priority-down
+  "p p" 'org-agenda-priority
+  "p u" 'org-agenda-priority-up
+  "q" 'org-agenda-set-tags
+  "r" 'org-agenda-refile
+  "t" 'org-agenda-todo
+  )
 #+end_src
 
 ** Task Management
