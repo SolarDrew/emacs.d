@@ -32,12 +32,14 @@ This literate config is was started from the excellent [[https://github.com/Mini
   - [[#transparency][Transparency]]
   - [[#fonts][Fonts]]
   - [[#modeline][Modeline]]
+  - [[#emacs-presentation-mode][emacs-presentation-mode]]
 - [[#helper-functions][Helper functions]]
   - [[#file-management][File management]]
 - [[#development][Development]]
   - [[#flymake][Flymake]]
   - [[#projects][Projects]]
   - [[#language-server][Language Server]]
+  - [[#dape][dape]]
   - [[#reformatting][Reformatting]]
   - [[#yasnippet][Yasnippet]]
   - [[#language-modes][Language modes]]
@@ -59,6 +61,7 @@ This literate config is was started from the excellent [[https://github.com/Mini
   - [[#dashboard][Dashboard]]
   - [[#browse-kill-ring][Browse Kill-Ring]]
   - [[#flyspell][Flyspell]]
+  - [[#jinx---better-spell-check][jinx - better spell check?]]
   - [[#evil-nerd-commenter][Evil-nerd-commenter]]
 - [[#org-mode][Org Mode]]
   - [[#visuals][Visuals]]
@@ -72,9 +75,6 @@ This literate config is was started from the excellent [[https://github.com/Mini
   - [[#agenda][Agenda]]
   - [[#waybar][Waybar]]
   - [[#org-clock-float][Org Clock Float]]
-- [[#config-split-into-other-files][Config Split into Other Files]]
-  - [[#adding-the-lisp-directory-to-load-path][Adding the lisp directory to load-path]]
-  - [[#org-mode-1][Org Mode]]
 - [[#runtime-performance][Runtime Performance]]
 
 * Important to load first
@@ -566,9 +566,13 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
      )
    #+end_src
 
+** TODO emacs-presentation-mode
+   https://github.com/zonuexe/emacs-presentation-mode?tab=readme-ov-file
+
 * Helper functions
   Many of these are lifted from doom.
 ** File management
+
    #+begin_src emacs-lisp
    (defun doom-files--update-refs (&rest files)
      "Ensure FILES are updated in `recentf', `magit' and `save-place'."
@@ -711,6 +715,7 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
        "Set workspace buffer list for consult-buffer.")
      (add-to-list 'consult-buffer-sources 'consult--source-workspace))
    #+END_SRC
+
 ** Language Server
 *** Eglot
     Language Server Protocol Support for Emacs. The built-in is now Eglot (with emacs 29).
@@ -770,9 +775,49 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
       ;; Restart Eglot for the current buffer
       (eglot-ensure))
     #+END_SRC
+
+** TODO dape
+   https://github.com/svaante/dape
+
+   #+begin_src emacs-lisp
+   (use-package dape
+     :preface
+     ;; By default dape shares the same keybinding prefix as `gud'
+     ;; If you do not want to use any prefix, set it to nil.
+     (setq dape-key-prefix nil)
+
+     :config
+     ;; Turn on global bindings for setting breakpoints with mouse
+     (dape-breakpoint-global-mode)
+
+     ;; Info buffers to the right
+     (setq dape-buffer-window-arrangement 'right)
+
+     ;; Info buffers like gud (gdb-mi)
+     ;; (setq dape-buffer-window-arrangement 'gud)
+     ;; (setq dape-info-hide-mode-line nil)
+
+     ;; Pulse source line (performance hit)
+     ;; (add-hook 'dape-display-source-hook 'pulse-momentary-highlight-one-line)
+
+     ;; Showing inlay hints
+     ;; (setq dape-inlay-hints t)
+
+     ;; Save buffers on startup, useful for interpreted languages
+     (add-hook 'dape-start-hook (lambda () (save-some-buffers t t)))
+
+     ;; Kill compile buffer on build success
+     ;; (add-hook 'dape-compile-hook 'kill-buffer)
+
+     ;; Projectile users
+     ;; (setq dape-cwd-function 'projectile-project-root)
+     )
+   #+end_src
+
 ** TODO Reformatting
    Would be nice to have ruff --fix and ruff-format, isort etc all available.
    https://melpa.org/#/reformatter
+
 ** Yasnippet
    A template system for Emacs. And yasnippet-snippets is a snippet collection package.
    To use it write out the full keyword (or use autocompletion) and press Tab.
@@ -1045,6 +1090,7 @@ A bunch of language specific key binds, using ~,~ as the leader key.
     (use-package eat
       :hook ('eshell-load-hook #'eat-eshell-mode))
     #+end_src
+
 ** TODO Combobulate
    #+begin_src emacs-lisp
    (use-package combobulate
@@ -1059,6 +1105,7 @@ A bunch of language specific key binds, using ~,~ as the leader key.
    			:branch "main")
      )
    #+end_src
+
 ** treesit-fold
    Treesitter aware code folding
 
@@ -1109,6 +1156,7 @@ A bunch of language specific key binds, using ~,~ as the leader key.
     #+end_src
 *** TODO igist
     https://github.com/KarimAziev/igist
+
 ** Corfu
    Enhances in-buffer completion with a small completion popup.
    Corfu is a small package, which relies on the Emacs completion facilities and concentrates on providing a polished completion.
@@ -1179,6 +1227,7 @@ A bunch of language specific key binds, using ~,~ as the leader key.
      )
    #+end_src
 *** TODO See about setting some capf's only in certain modes
+
 ** TODO Orderless
    Learn to use more fancy parts of orderless: https://github.com/oantolin/orderless?tab=readme-ov-file#component-matching-styles
 
@@ -1296,6 +1345,7 @@ A bunch of language specific key binds, using ~,~ as the leader key.
      )
    #+end_src
 *** TODO Learn this!
+
 ** Diminish
    This package implements hiding or abbreviation of the modeline displays (lighters) of minor-modes.
    With this package installed, you can add ‘:diminish’ to any use-package block to hide that particular mode in the modeline.
@@ -1344,6 +1394,7 @@ A bunch of language specific key binds, using ~,~ as the leader key.
      :ensure t
      )
    #+end_src
+
 ** Ranger
 
    #+begin_src emacs-lisp
@@ -1409,6 +1460,11 @@ A bunch of language specific key binds, using ~,~ as the leader key.
 
    (add-hook 'find-file-hook 'flyspell-on-for-buffer-type)
    #+end_src
+
+** TODO jinx - better spell check?
+   
+https://github.com/minad/jinx
+
 ** Evil-nerd-commenter
    #+begin_src emacs-lisp
    (use-package evil-nerd-commenter)
@@ -1471,7 +1527,7 @@ A bunch of language specific key binds, using ~,~ as the leader key.
     #+begin_src emacs-lisp
     )
     #+end_src
-
+    
 *** Fonts and Faces
     #+begin_src emacs-lisp
     (setq org-fontify-done-headline t)
@@ -1513,9 +1569,9 @@ A bunch of language specific key binds, using ~,~ as the leader key.
 **** Org Superstar
 Prettify headings and plain lists in Org mode. Modern version of org-bullets.
 #+begin_src emacs-lisp
-(use-package org-superstar
-  :after org
-  :hook (org-mode . org-superstar-mode))
+;; (use-package org-superstar
+;;   :after org
+;;   :hook (org-mode . org-superstar-mode))
 #+end_src
 
 **** Source Code Block Tag Expansion
@@ -1526,6 +1582,19 @@ Org-tempo allows for '<s' followed by TAB to expand to a begin_src tag.
   :ensure nil
   :after org)
 #+end_src
+
+**** org-modern
+
+https://github.com/minad/org-modern
+
+#+begin_src emacs-lisp
+(use-package org-modern
+  :hook
+  (org-mode-hook . org-modern-mode)
+  )
+#+end_src
+
+**** TODO More things from here:  https://github.com/jakebox/jake-emacs?tab=readme-ov-file#org-mode
 
 ** Keybindings
 :LOGBOOK:
@@ -1999,19 +2068,6 @@ I use [[https://github.com/Alexays/Waybar/][Waybar]] for my sway window manager,
      (org-clock-float-email (plist-get (nth 0 (auth-source-search :max 1 :host "api.float.com")) :user))
      (org-clock-float-api-token (auth-info-password (nth 0 (auth-source-search :max 1 :host "api.float.com"))))
      )
-#+end_src
-
-* Config Split into Other Files
-** Adding the lisp directory to load-path
-Add the ~lisp~ directory to the path.
-#+begin_src emacs-lisp
-  (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
-#+end_src
-
-** Org Mode
-
-#+begin_src emacs-lisp
-;;  (require 'cadair-org-mode)
 #+end_src
 
 * Runtime Performance
