@@ -467,70 +467,12 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 (use-package hl-todo
   :config
   (global-hl-todo-mode)
-  :config
-  (add-hook 'flymake-diagnostic-functions #'hl-todo-flymake)
-
-  (let ((_error   (face-attribute 'error :foreground))
-		(_warning (face-attribute 'warning :foreground))
-		(_info    (face-attribute 'success :foreground))
-		(_misc    (face-attribute 'nerd-icons-blue :foreground)))
-
-	(dolist (keyword '("BUG" "ISSUE" "FIX" "FIXME" "FAIL"))
-      (add-to-list 'hl-todo-keyword-faces `(,keyword . ,_error)))
-	(dolist (keyword '("WARNING"))
-      (add-to-list 'hl-todo-keyword-faces `(,keyword . ,_warning)))
-	(dolist (keyword '("NOTE" "HACK"))
-      (add-to-list 'hl-todo-keyword-faces `(,keyword . ,_info)))
-	(dolist (keyword '("DEBUG" "STUB" "TODO"))
-      (add-to-list 'hl-todo-keyword-faces `(,keyword . ,_misc))))
-
-  (put 'hl-todo-flymake 'flymake-type-name " TODO")
-  (advice-add 'hl-todo-make-flymake-diagnostic :override #'my/hl-todo-types-icons)
-  :preface
-  (defun my/hl-todo-types-icons (locus beg end text _keyword)
-	(let ((keyword (string-remove-suffix
-					":" (substring-no-properties _keyword)))
-          type)
-      (pcase keyword
-		("TODO" (setq type (intern-soft (concat "hl-todo-flymake-" keyword))))
-		("BUG" (setq type (intern-soft (concat "hl-todo-flymake-" keyword))))
-		("WARNING" (setq type (intern-soft (concat "hl-todo-flymake-" keyword))))
-		("FIXME" (setq type (intern-soft (concat "hl-todo-flymake-" keyword))))
-		(_ (setq type 'hl-todo-flymake)))
-      (flymake-make-diagnostic locus beg end type text))) 
-)
+  )
 
 (use-package flymake :ensure nil
-  ;; :init
-  ;; (add-hook 'flymake-diagnostic-functions #'flymake-hl-todo nil 'local)
-  ;; :config ; (Optional) For fix bad icon display (Only for left margin)
-  ;; (advice-add #'flymake--indicator-overlay-spec
-  ;;             :filter-return
-  ;;             (lambda (indicator)
-  ;; 				(concat indicator
-  ;; 						(propertize " "
-  ;; 									'face 'default
-  ;; 									'display `((margin left-margin)
-  ;;                                              (space :width 5))))))
-  :custom
-  (flymake-indicator-type 'margins)
-  (flymake-margin-indicators-string
-   `((error ,(nerd-icons-faicon "nf-fa-remove_sign") compilation-error)
-	 (warning ,(nerd-icons-faicon "nf-fa-warning") compilation-warning)
-	 (note ,(nerd-icons-faicon "nf-fa-circle_info") compilation-info)
-	 (hl-todo-flymake ,(nerd-icons-mdicon "nf-md-content_paste") hl-todo-flymake-type)
-	 (hl-todo-flymake-TODO ,(nerd-icons-sucicon "nf-seti-todo") nerd-icons-blue)
-	 (hl-todo-flymake-BUG ,(nerd-icons-faicon "nf-fa-bug") compilation-error)
-	 (hl-todo-flymake-FIXME ,(nerd-icons-faicon "nf-fa-wrench") compilation-error)
-	 (hl-todo-flymake-WARNING ,(nerd-icons-faicon "nf-fa-flag") compilation-warning)))
-  ;; (flymake-show-diagnostics-at-end-of-line 'short) ; Slow
-  :config
-  (keymap-set-after (default-value 'flymake-menu) "<list-project-problems>"
-	'(menu-item "List all Project Problems" flymake-show-project-diagnostics)
-	'List\ all\ problems)
-  ;; More Spaces for the Error List Row
-  (setf (cadr (aref flymake--diagnostics-base-tabulated-list-format 2)) 10)
-  ;; Fix margin indicators when whitespace is enabled
+  :init
+  (add-hook 'flymake-diagnostic-functions #'flymake-hl-todo nil 'local)
+  :config ; (Optional) For fix bad icon display (Only for left margin)
   (advice-add #'flymake--indicator-overlay-spec
               :filter-return
               (lambda (indicator)
@@ -539,34 +481,12 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 									'face 'default
 									'display `((margin left-margin)
                                                (space :width 5))))))
-
-  (put 'hl-todo-flymake-TODO 'flymake-type-name " TODO")
-  (put 'hl-todo-flymake-TODO 'flymake-margin-string
-       (alist-get 'hl-todo-flymake-TODO flymake-margin-indicators-string))
-  (put 'hl-todo-flymake-TODO 'flymake-category 'flymake-note)
-  (put 'hl-todo-flymake-TODO 'face nil)
-  (put 'hl-todo-flymake-TODO 'mode-line-face 'nerd-icons-blue)
-
-  (put 'hl-todo-flymake-BUG 'flymake-type-name " BUG")
-  (put 'hl-todo-flymake-BUG 'flymake-margin-string
-       (alist-get 'hl-todo-flymake-BUG flymake-margin-indicators-string))
-  (put 'hl-todo-flymake-BUG 'flymake-category 'flymake-note)
-  (put 'hl-todo-flymake-BUG 'face nil)
-  (put 'hl-todo-flymake-BUG 'mode-line-face 'compilation-error)
-
-  (put 'hl-todo-flymake-WARNING 'flymake-type-name " WARNING")
-  (put 'hl-todo-flymake-WARNING 'flymake-margin-string
-       (alist-get 'hl-todo-flymake-WARNING flymake-margin-indicators-string))
-  (put 'hl-todo-flymake-WARNING 'flymake-category 'flymake-note)
-  (put 'hl-todo-flymake-WARNING 'face nil)
-  (put 'hl-todo-flymake-WARNING 'mode-line-face 'compilation-warning)
-
-  (put 'hl-todo-flymake-FIXME 'flymake-type-name " FIXME")
-  (put 'hl-todo-flymake-FIXME 'flymake-margin-string
-       (alist-get 'hl-todo-flymake-FIXME flymake-margin-indicators-string))
-  (put 'hl-todo-flymake-FIXME 'flymake-category 'flymake-note)
-  (put 'hl-todo-flymake-FIXME 'face nil)
-  (put 'hl-todo-flymake-FIXME 'mode-line-face 'compilation-error))
+  :custom
+  (flymake-indicator-type 'margins)
+  (flymake-margin-indicators-string
+   `((error ,(nerd-icons-faicon "nf-fa-remove_sign") compilation-error)
+     (warning ,(nerd-icons-faicon "nf-fa-warning") compilation-warning)
+     (note ,(nerd-icons-faicon "nf-fa-circle_info") compilation-info))))
 
 (use-package project
   :custom

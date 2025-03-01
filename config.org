@@ -8,10 +8,10 @@
 
 * About
 
-This is my Emacs config, I use it primarily for Python development and also Org mode (although not implemented yet).
+This is my Emacs config, I use it primarily for Python development and also Org mode.
 
 I use evil mode, and like the spacemacs style of a ~SPC~ leader key.
-The keybinds I have are a combination of ones I learned in spacemace, doom and various other editors I have used over the years!
+The keybinds I have are a combination of ones I learned in spacemacs, doom and various other editors I have used over the years, they make almost no sense!
 
 This literate config is was started from the excellent [[https://github.com/MiniApollo/kickstart.emacs/][kickstart.emacs]].
 
@@ -84,6 +84,7 @@ Make startup faster by reducing the frequency of garbage collection. This will b
 ;; The default is 800 kilobytes. Measured in bytes.
 (setq gc-cons-threshold (* 50 1000 1000))
 #+end_src
+
 ** Auto-tangle Configuration file
 Auto-Tangle Org configuration file for better startup times.
 
@@ -104,6 +105,7 @@ automatically exports the configuration here to the associated output files.
 
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'start/org-babel-tangle-config)))
 #+end_src
+
 ** Use Package
 We use the default package manager package.el with use-package. Alternative package managers (straight.el, elpaca, etc.) are useful if you want to
 install packages from git repositories, if you want a specific, not very popular package that is not available on elpa or melpa,
@@ -129,6 +131,7 @@ With Emacs 29 use-package is now built-in.
 ;;(use-package quelpa)
 ;;(use-package quelpa-use-package)
 #+end_src
+
 *** Straight
 #+begin_src emacs-lisp
 (defvar bootstrap-version)
@@ -147,11 +150,12 @@ With Emacs 29 use-package is now built-in.
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 #+end_src
+
 ** Evil Mode
 An extensible vi/vim layer for Emacs. Because…let’s face it. The Vim keybindings are just plain better.
 Notes:
 - You can toggle evil mode with C-z.
-- To paste without copy (yank) select the text and use P (shift-p).
+ To paste without copy (yank) select the text and use P (shift-p).
   #+begin_src emacs-lisp
   (use-package evil
     :init ;; Execute code Before a package is loaded
