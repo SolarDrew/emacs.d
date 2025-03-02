@@ -16,7 +16,6 @@ in {
       fira-code
       fira-code-nerdfont
       fira-code-symbols
-      jetbrains-mono
       git
       ripgrep
       fd
@@ -40,6 +39,8 @@ in {
       extraPackages = epkgs: [ epkgs.tree-sitter epkgs.tree-sitter-langs epkgs.treesit-grammars.with-all-grammars epkgs.nerd-icons ];
     };
 
+    # consider having init.el built from config.org automatically here
+    # with pkgs.runCommand
     home.file.emacs-init = {
       source = ../init.el;
       target = ".emacs.d/init.el";
