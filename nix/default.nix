@@ -74,8 +74,8 @@ in {
         Environment = ["SSH_AUTH_SOCK=%t/keyring/ssh"];
         EnvironmentFile = "${config.home.homeDirectory}/${config.home.file.session_env.target}";
         Type = "forking";
-        ExecStart = "${cfg.emacs-package.out}/bin/emacs --daemon";
-        ExecStop = "${cfg.emacs-package.out}/bin/emacsclient --eval (kill-emacs)";
+        ExecStart = "${programs.emacs.finalPackage.out}/bin/emacs --daemon";
+        ExecStop = "${programs.emacs.finalPackage.out}/bin/emacsclient --eval (kill-emacs)";
         Restart = "always";
       };
 
