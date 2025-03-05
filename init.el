@@ -1314,6 +1314,26 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 (add-hook 'org-clock-in-hook #'save-buffer)
 (add-hook 'org-clock-out-hook #'save-buffer)
 
+;; Task States
+;;;;;;;;;;;;;;
+
+(setq org-todo-keywords
+      (quote ((sequence "TODO(t)" "NEXT(n)" "WIP(i)" "|" "DONE(d)")
+              (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)"))
+      )
+)
+
+;; (setq org-todo-keyword-faces
+;;       (quote (("TODO" :foreground "red" :weight bold)
+;;               ("NEXT" :foreground "yellow" :weight bold)
+;;               ("DONE" :foreground "forest green" :weight bold)
+;;               ("WAITING" :foreground "orange" :weight bold)
+;;               ("HOLD" :foreground "magenta" :weight bold)
+;;               ("CANCELLED" :foreground "forest green" :weight bold)
+;;               )))
+
+(setq org-use-fast-todo-selection t)
+
 (setq calendar-latitude 53.584)
 (setq calendar-longitude -1.778)
 (setq calendar-location-name "Holmfirth")
