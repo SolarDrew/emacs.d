@@ -363,13 +363,11 @@
           nil nil t)
   )
 
-(use-package ediff
-  :ensure nil
-  :custom
-    ediff-diff-options "-w" ; turn off whitespace checking
-    ediff-split-window-function 'split-window-horizontally
-    ediff-window-setup-function 'ediff-setup-windows-plain
-	)
+(setq
+ ediff-diff-options "-w" ; turn off whitespace checking
+ ediff-split-window-function #'split-window-horizontally
+ ediff-window-setup-function #'ediff-setup-windows-plain
+ )
 
 ;;  (use-package gruvbox-theme
 ;;    :config
