@@ -52,6 +52,13 @@ in {
       recursive = true;
     };
 
+    home.file.emacs-snippets = {
+      source = ../snippets;
+      # Copy these snippets to a different dir so the default is still writeable
+      target = ".emacs.d/hm-snippets/";
+      recursive = true;
+    };
+
     home.file.emacs-capture = {
       target = ".config/bin/emacs-capture";
       executable = true;

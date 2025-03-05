@@ -846,8 +846,15 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
    To use it write out the full keyword (or use autocompletion) and press Tab.
    #+begin_src emacs-lisp
    (use-package yasnippet-snippets
-     :hook (prog-mode . yas-minor-mode))
-   #+end_src
+     :hook (prog-mode . yas-minor-mode)
+     :config
+     (yas-snippet-dirs
+      '("~/.emacs.d/snippets"                 ;; writeable snippets dir
+   	 "~/.emacs.d/hm-snippets"              ;; snippets managed by home-manager
+        )
+      )
+     )
+         #+end_src
 
 ** Language modes
    I am using tree-sitter, with the Language grammars installed by nixos.

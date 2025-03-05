@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: myst-obj-ref
+# key: o`
+# --
+{obj}\`$0\`

@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: Python Cell
+# key: pc
+# --
+
+\`\`\`{code-cell} python
+$0
+\`\`\`

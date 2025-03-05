@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: Code Block
+# key: cb
+# --
+
+\`\`\`{code-block} $1
+$0
+\`\`\`

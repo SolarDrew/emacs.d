@@ -617,7 +617,14 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   )
 
 (use-package yasnippet-snippets
-  :hook (prog-mode . yas-minor-mode))
+  :hook (prog-mode . yas-minor-mode)
+  :config
+  (yas-snippet-dirs
+   '("~/.emacs.d/snippets"                 ;; writeable snippets dir
+	 "~/.emacs.d/hm-snippets"              ;; snippets managed by home-manager
+     )
+   )
+  )
 
 (setq major-mode-remap-alist
       '((python-mode . python-ts-mode)))
