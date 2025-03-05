@@ -1402,7 +1402,7 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
       (quote (("t" "todo" entry (file cadair-capture-file)
                "* TODO %i%?\n" :clock-in t :clock-resume t)
               ("x" "note" entry (file cadair-capture-file)
-               "* TODO %?%c\n" :clock-in f)
+               "* TODO %i%?\n" :clock-in f)
               ("L" "Protocol" entry (file cadair-capture-file)
                "* TODO Review %? [[%:link][%:description]] \nCaptured On: %U")
               ("p" "Protocol" entry (file cadair-capture-file)
