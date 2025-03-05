@@ -1783,6 +1783,11 @@ Org-Agenda
   ;; Just regular evil key extras
   (evil-define-key 'normal org-agenda-mode-map
     "r" 'org-agenda-redo
+    "b" 'org-agenda-earlier
+    "f" 'org-agenda-later
+    "s" 'org-save-all-org-buffers
+	"w" 'org-agenda-week-view
+	"d" 'org-agenda-day-view
 	)
 #+end_src
 
