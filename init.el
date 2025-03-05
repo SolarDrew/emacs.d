@@ -1399,10 +1399,10 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 ;; This seems to work for protocol setup: http://www.mediaonfire.com/blog/2017_07_21_org_protocol_firefox.html
 ;; Capture templates for: TODO tasks, Notes, appointments, phone calls, meetings, and org-protocol
 (setq org-capture-templates
-      (quote (("t" "todo" entry (file cadair-capture-file)
+      (quote (("t" "todo (clock)" entry (file cadair-capture-file)
                "* TODO %i%?\n" :clock-in t :clock-resume t)
               ("x" "note" entry (file cadair-capture-file)
-               "* TODO %i%?\n" :clock-in f)
+               "* TODO %i%?\n" :clock-in nil)
               ("L" "Protocol" entry (file cadair-capture-file)
                "* TODO Review %? [[%:link][%:description]] \nCaptured On: %U")
               ("p" "Protocol" entry (file cadair-capture-file)
