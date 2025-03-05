@@ -1323,14 +1323,14 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
       )
 )
 
-;; (setq org-todo-keyword-faces
-;;       (quote (("TODO" :foreground "red" :weight bold)
-;;               ("NEXT" :foreground "yellow" :weight bold)
-;;               ("DONE" :foreground "forest green" :weight bold)
-;;               ("WAITING" :foreground "orange" :weight bold)
-;;               ("HOLD" :foreground "magenta" :weight bold)
-;;               ("CANCELLED" :foreground "forest green" :weight bold)
-;;               )))
+(setq org-todo-keyword-faces
+      (quote (("TODO" :foreground "red" :weight bold)
+              ("NEXT" :foreground "yellow" :weight bold)
+              ("DONE" :foreground "forest green" :weight bold)
+              ("WAITING" :foreground "orange" :weight bold)
+              ("HOLD" :foreground "magenta" :weight bold)
+              ("CANCELLED" :foreground "forest green" :weight bold)
+              )))
 
 (setq org-use-fast-todo-selection t)
 
