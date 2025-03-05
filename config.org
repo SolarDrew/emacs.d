@@ -274,6 +274,8 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
 	"c i"   '(indent-region :wk "Indent Region")
     "c l"   '(evilnc-comment-or-uncomment-lines :wk "Toggle Comments")
     "c L"   '(evilnc-toggle-comment-empty-lines :wk "Toggle commenting empty lines")
+	"c o"   '(symbols-outline-show :wk "Show symbols outline")
+	"c s"   '(consult-eglot-symbols :wk "Find Symbols in Workspace")
     )
 
   (start/leader-keys
@@ -421,7 +423,7 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
     "q" '(:ignore t :wk "Quit / Session")
     "q q" '(save-buffers-kill-terminal :wk "Quit Emacs")
     "q r" '((lambda () (interactive)
-              (load-file "~/SyncBox/new.emacs.d/init.el"))
+              (load-file user-init-file))
             :wk "Reload Emacs config")
     )
 
@@ -1366,7 +1368,21 @@ A bunch of language specific key binds, using ~,~ as the leader key.
      ;; (setq consult-project-function nil)
      )
    #+end_src
-*** TODO Learn this!
+
+*** Eglot symbols
+    Things for interacting with workspace/symbols in lsp land, but as pylsp dosen't support this it's all a little moot.  - https://github.com/python-lsp/python-lsp-server/issues/237
+    
+    https://github.com/mohkale/consult-eglot
+
+            #+begin_src emacs-lisp
+        (use-package consult-eglot)
+    #+end_src
+
+https://github.com/emacsmirror/symbols-outline
+
+    #+begin_src emacs-lisp
+(use-package symbols-outline)
+#+end_src
 
 ** Diminish
    This package implements hiding or abbreviation of the modeline displays (lighters) of minor-modes.

@@ -143,6 +143,8 @@
 	"c i"   '(indent-region :wk "Indent Region")
     "c l"   '(evilnc-comment-or-uncomment-lines :wk "Toggle Comments")
     "c L"   '(evilnc-toggle-comment-empty-lines :wk "Toggle commenting empty lines")
+	"c o"   '(symbols-outline-show :wk "Show symbols outline")
+	"c s"   '(consult-eglot-symbols :wk "Find Symbols in Workspace")
     )
 
   (start/leader-keys
@@ -290,7 +292,7 @@
     "q" '(:ignore t :wk "Quit / Session")
     "q q" '(save-buffers-kill-terminal :wk "Quit Emacs")
     "q r" '((lambda () (interactive)
-              (load-file "~/SyncBox/new.emacs.d/init.el"))
+              (load-file user-init-file))
             :wk "Reload Emacs config")
     )
 
@@ -1003,6 +1005,10 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
    ;;;; 5. No project support
   ;; (setq consult-project-function nil)
   )
+
+(use-package consult-eglot)
+
+(use-package symbols-outline)
 
 (use-package diminish)
 
