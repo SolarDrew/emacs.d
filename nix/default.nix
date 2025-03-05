@@ -64,7 +64,6 @@ in {
 
     # Write a custom emacsd
     systemd.user.services.emacsd = {
-      path = with pkgs; [ git ispell ];
       Unit = {
         Description = "Emacs: the extensible, self-documenting text editor";
         After = ["graphical-session.target"];
@@ -72,7 +71,7 @@ in {
       };
 
       Service = {
-        Environment = ["SSH_AUTH_SOCK=%t/keyring/ssh"];
+        Environment = ["SSH_AUTH_SOCK=%t/keyring/ssh" "PATH=${config.home.homeDirectory}/.nix-profile/bin/" ];
         EnvironmentFile = "${config.home.homeDirectory}/${config.home.file.session_env.target}";
         Type = "forking";
         ExecStart = "${config.programs.emacs.finalPackage.out}/bin/emacs --daemon";
