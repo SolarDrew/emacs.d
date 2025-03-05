@@ -1452,6 +1452,12 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 ;; Don't show tasks as scheduled if they are already shown as a deadline
 (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
 
+;; Disable line numbers in agenda
+(defun no-display-numbers-hook ()
+  (display-line-numbers-mode 0)
+  )
+(add-hook 'org-agenda-mode-hook 'no-display-numbers-hook)
+
 (setq org-agenda-custom-commands
       (quote
        (
