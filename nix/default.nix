@@ -71,7 +71,7 @@ in {
       };
 
       Service = {
-        Environment = ["SSH_AUTH_SOCK=%t/keyring/ssh" "PATH=${config.home.homeDirectory}/.nix-profile/bin/" ];
+        Environment = ["SSH_AUTH_SOCK=%t/keyring/ssh" "PATH=/run/current-system/sw/bin/:${config.home.homeDirectory}/.nix-profile/bin/" ];
         EnvironmentFile = "${config.home.homeDirectory}/${config.home.file.session_env.target}";
         Type = "forking";
         ExecStart = "${config.programs.emacs.finalPackage.out}/bin/emacs --daemon";
@@ -94,7 +94,7 @@ in {
       Service = {
         Type = "simple";
         ExecStartPre = "${pkgs.coreutils.out}/bin/sleep 10";
-        ExecStart = ''${cfg.emacs-package.out}/bin/emacsclient -c -F "((title . \"emacs-todo\") (name . \"emacs-todo\") (height . 65) (width . 260))" --eval '(org-agenda)' '';
+        ExecStart = ''${cfg.emacs-package.out}/bin/emacsclient -c -F "((title . \"emacs-todo\") (name . \"emacs-todo\") (height . 60) (width . 180))" --eval '(org-agenda)' '';
         Restart = "on-failure";
       };
 
