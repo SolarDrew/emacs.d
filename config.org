@@ -1503,7 +1503,9 @@ https://github.com/minad/jinx
     (setq org-adapt-indentation t
           org-hide-leading-stars t
           org-pretty-entities t
-          org-ellipsis "  ·")
+          org-ellipsis "  ·"
+    	  org-startup-folded "content"
+    	  )
     #+end_src
 
     For source code blocks specifically, I want Org to display the contents using
@@ -1799,6 +1801,8 @@ This is where we increase our line count.
 ;; Always save buffers on clock changes
 (add-hook 'org-clock-in-hook #'save-buffer)
 (add-hook 'org-clock-out-hook #'save-buffer)
+(add-hook 'org-clock-in-hook #'org-agenda-redo)
+(add-hook 'org-clock-out-hook #'org-agenda-redo)
 #+end_src
 
 #+begin_src emacs-lisp
@@ -2092,9 +2096,10 @@ I use [[https://github.com/Alexays/Waybar/][Waybar]] for my sway window manager,
    (use-package request
      ;;:custom
      ;; Enable these to debug org-clock-float requests
-     ;;(request-log-level 'debug)
-     ;;(request-message-level 'debug)
+     ;; (request-log-level 'debug)
+     ;; (request-message-level 'debug)
      )
+   
    (use-package org-clock-float
      :requires (request)
      :vc (:url "https://github.com/Cadair/org-clock-float.git" :rev :latest)

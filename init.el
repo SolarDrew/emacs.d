@@ -1094,7 +1094,9 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 (setq org-adapt-indentation t
       org-hide-leading-stars t
       org-pretty-entities t
-      org-ellipsis "  ·")
+      org-ellipsis "  ·"
+	  org-startup-folded "content"
+	  )
 
 (setq org-src-fontify-natively t
       org-src-tab-acts-natively t
@@ -1318,6 +1320,8 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 ;; Always save buffers on clock changes
 (add-hook 'org-clock-in-hook #'save-buffer)
 (add-hook 'org-clock-out-hook #'save-buffer)
+(add-hook 'org-clock-in-hook #'org-agenda-redo)
+(add-hook 'org-clock-out-hook #'org-agenda-redo)
 
 ;; Task States
 ;;;;;;;;;;;;;;
@@ -1563,9 +1567,10 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 (use-package request
   ;;:custom
   ;; Enable these to debug org-clock-float requests
-  ;;(request-log-level 'debug)
-  ;;(request-message-level 'debug)
+  ;; (request-log-level 'debug)
+  ;; (request-message-level 'debug)
   )
+
 (use-package org-clock-float
   :requires (request)
   :vc (:url "https://github.com/Cadair/org-clock-float.git" :rev :latest)

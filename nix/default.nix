@@ -64,6 +64,7 @@ in {
 
     # Write a custom emacsd
     systemd.user.services.emacsd = {
+      path = with pkgs; [ git ispell ];
       Unit = {
         Description = "Emacs: the extensible, self-documenting text editor";
         After = ["graphical-session.target"];
