@@ -98,7 +98,7 @@ automatically exports the configuration here to the associated output files.
 (defun start/org-babel-tangle-config ()
   "Automatically tangle our Emacs.org config file when we save it. Credit to Emacs From Scratch for this one!"
   (when (string-equal (file-name-directory (buffer-file-name))
-                      (expand-file-name user-emacs-directory))
+                      (expand-file-name "~/Git/new.emacs.d/"))
     ;; Dynamic scoping to the rescue
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
@@ -1084,6 +1084,7 @@ A bunch of language specific key binds, using ~,~ as the leader key.
      #+end_src
 *** TODO Rust
     https://github.com/emacs-rustic/rustic
+*** TODO openscad (openscad-lsp)
 
 ** Terminal
 *** Eat
@@ -1232,7 +1233,7 @@ A bunch of language specific key binds, using ~,~ as the leader key.
    #+end_src
 *** TODO See about setting some capf's only in certain modes
 
-** TODO Orderless
+** Orderless
    Learn to use more fancy parts of orderless: https://github.com/oantolin/orderless?tab=readme-ov-file#component-matching-styles
 
    Completion style that divides the pattern into space-separated components, and matches candidates that match all of the components in any order.
