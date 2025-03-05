@@ -27,6 +27,7 @@ This literate config is was started from the excellent [[https://github.com/Mini
   - [[#evil-mode][Evil Mode]]
 - [[#keybindings][Keybindings]]
 - [[#good-defaults][Good Defaults]]
+  - [[#ediff][EDiff]]
 - [[#appearance][Appearance]]
   - [[#set-theme][Set Theme]]
   - [[#transparency][Transparency]]
@@ -179,7 +180,7 @@ Notes:
   (use-package evil-collection
     :after evil
     :custom
-    (evil-collection-mode-list '(dired ibuffer magit forge corfu vertico consult dashboard org))
+    (evil-collection-mode-list '(dired ibuffer magit forge corfu vertico consult dashboard org ediff))
     :config
     (evil-collection-init)
     )
@@ -490,6 +491,18 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
             nil nil t)
     )
   #+end_src
+
+** EDiff
+
+#+begin_src emacs-lisp
+(use-package ediff
+  :ensure nil
+  :custom
+    ediff-diff-options "-w" ; turn off whitespace checking
+    ediff-split-window-function 'split-window-horizontally
+    ediff-window-setup-function 'ediff-setup-windows-plain
+	)
+#+end_src
 
 * Appearance
 ** Set Theme

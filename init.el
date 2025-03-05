@@ -59,7 +59,7 @@
 (use-package evil-collection
   :after evil
   :custom
-  (evil-collection-mode-list '(dired ibuffer magit forge corfu vertico consult dashboard org))
+  (evil-collection-mode-list '(dired ibuffer magit forge corfu vertico consult dashboard org ediff))
   :config
   (evil-collection-init)
   )
@@ -362,6 +362,14 @@
                 (evil-normalize-keymaps))))
           nil nil t)
   )
+
+(use-package ediff
+  :ensure nil
+  :custom
+    ediff-diff-options "-w" ; turn off whitespace checking
+    ediff-split-window-function 'split-window-horizontally
+    ediff-window-setup-function 'ediff-setup-windows-plain
+	)
 
 ;;  (use-package gruvbox-theme
 ;;    :config
@@ -1306,6 +1314,11 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   ;; Just regular evil key extras
   (evil-define-key 'normal org-agenda-mode-map
     "r" 'org-agenda-redo
+    "b" 'org-agenda-earlier
+    "f" 'org-agenda-later
+    "s" 'org-save-all-org-buffers
+	"w" 'org-agenda-week-view
+	"d" 'org-agenda-day-view
 	)
 
 ;; All my org files live in one directory
