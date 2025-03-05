@@ -15,11 +15,17 @@ The keybinds I have are a combination of ones I learned in spacemacs, doom and v
 
 This literate config is was started from the excellent [[https://github.com/MiniApollo/kickstart.emacs/][kickstart.emacs]].
 
+** Nix
+
+Included in this repo is a [[https://github.com/nix-community/home-manager][home-manager]] module which adds this config and sets up an emacsd with systemd and my emacs agenda window and capture popups.
+The repo is also a flake, so if you are mad enough to want to use this you can include it in your flake based config as well.
+
 * Table Of Contents :toc:
 :PROPERTIES:
 :VISIBILITY: all
 :END:
 - [[#about][About]]
+  - [[#nix][Nix]]
 - [[#important-to-load-first][Important to load first]]
   - [[#startup-performance][Startup Performance]]
   - [[#auto-tangle-configuration-file][Auto-tangle Configuration file]]
