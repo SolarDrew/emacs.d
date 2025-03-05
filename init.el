@@ -1301,6 +1301,11 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   "t" 'org-agenda-todo
   )
 
+  ;; Just regular evil key extras
+  (evil-define-key 'normal org-agenda-mode-map
+    "r" 'org-agenda-redo
+	)
+
 ;; All my org files live in one directory
 (setq org-directory "~/Notebooks/")
 (setq cadair-default-org-files (file-expand-wildcards "~/Notebooks/*.org"))
@@ -1396,8 +1401,8 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 (setq org-capture-templates
       (quote (("t" "todo" entry (file cadair-capture-file)
                "* TODO %i%?\n" :clock-in t :clock-resume t)
-              ("x" "review" entry (file cadair-capture-file)
-               "* TODO Review %?%c\n" :clock-in t :clock-resume t)
+              ("x" "note" entry (file cadair-capture-file)
+               "* TODO %?%c\n" :clock-in f)
               ("L" "Protocol" entry (file cadair-capture-file)
                "* TODO Review %? [[%:link][%:description]] \nCaptured On: %U")
               ("p" "Protocol" entry (file cadair-capture-file)

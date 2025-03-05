@@ -1777,6 +1777,11 @@ Org-Agenda
   "r" 'org-agenda-refile
   "t" 'org-agenda-todo
   )
+
+  ;; Just regular evil key extras
+  (evil-define-key 'normal org-agenda-mode-map
+    "r" 'org-agenda-redo
+	)
 #+end_src
 
 ** Task Management
@@ -1897,8 +1902,8 @@ Calendar Setup
    (setq org-capture-templates
          (quote (("t" "todo" entry (file cadair-capture-file)
                   "* TODO %i%?\n" :clock-in t :clock-resume t)
-                 ("x" "review" entry (file cadair-capture-file)
-                  "* TODO Review %?%c\n" :clock-in t :clock-resume t)
+                 ("x" "note" entry (file cadair-capture-file)
+                  "* TODO %?%c\n" :clock-in f)
                  ("L" "Protocol" entry (file cadair-capture-file)
                   "* TODO Review %? [[%:link][%:description]] \nCaptured On: %U")
                  ("p" "Protocol" entry (file cadair-capture-file)
