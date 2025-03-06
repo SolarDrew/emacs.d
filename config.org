@@ -684,6 +684,7 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
         (warning ,(nerd-icons-faicon "nf-fa-warning") compilation-warning)
         (note ,(nerd-icons-faicon "nf-fa-circle_info") compilation-info))))
    #+end_src
+
 ** Projects
    We are going to try and use tabspaces / project.el
 
@@ -847,7 +848,7 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
    #+begin_src emacs-lisp
    (use-package yasnippet-snippets
      :hook (prog-mode . yas-minor-mode)
-     :config
+     :custom
      (yas-snippet-dirs
       '("~/.emacs.d/snippets"                 ;; writeable snippets dir
    	 "~/.emacs.d/hm-snippets"              ;; snippets managed by home-manager

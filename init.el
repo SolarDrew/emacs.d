@@ -618,7 +618,7 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 
 (use-package yasnippet-snippets
   :hook (prog-mode . yas-minor-mode)
-  :config
+  :custom
   (yas-snippet-dirs
    '("~/.emacs.d/snippets"                 ;; writeable snippets dir
 	 "~/.emacs.d/hm-snippets"              ;; snippets managed by home-manager
