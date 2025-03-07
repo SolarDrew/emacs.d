@@ -551,6 +551,7 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   :hook ((python-mode python-ts-mode nix-mode) . eglot-ensure)
   :custom
   (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
+  (add-to-list 'eglot-server-programs '(scad-mode . ("openscad-lsp")))
   (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
   (eglot-autoshutdown t);; Shutdown unused servers.
   (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
@@ -833,6 +834,21 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   :keymaps 'nix-mode-map
   "f" 'nix-flake
   )
+
+(use-package rust-mode
+  :ensure t
+  :init
+  (setq rust-mode-treesitter-derive t))
+
+(use-package rustic
+  :ensure t
+  :after (rust-mode)
+  :custom
+  (rustic-format-on-save nil)
+  (rustic-lsp-client 'eglot)
+  (rustic-cargo-use-last-stored-arguments t))
+
+(use-package scad-mode)
 
 (use-package eat
   :hook ('eshell-load-hook #'eat-eshell-mode))

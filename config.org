@@ -764,6 +764,7 @@ Use visual block to uncomment easily in Org documents (C-v).
   :hook ((python-mode python-ts-mode nix-mode) . eglot-ensure)
   :custom
   (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
+  (add-to-list 'eglot-server-programs '(scad-mode . ("openscad-lsp")))
   (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
   (eglot-autoshutdown t);; Shutdown unused servers.
   (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
@@ -1117,9 +1118,37 @@ A bunch of language specific key binds, using ~,~ as the leader key.
   "f" 'nix-flake
   )
 #+end_src
-*** TODO Rust
+*** Rust
 https://github.com/emacs-rustic/rustic
-*** TODO openscad (openscad-lsp)
+
+#+begin_src emacs-lisp
+(use-package rust-mode
+  :ensure t
+  :init
+  (setq rust-mode-treesitter-derive t))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package rustic
+  :ensure t
+  :after (rust-mode)
+  :custom
+  (rustic-format-on-save nil)
+  (rustic-lsp-client 'eglot)
+  (rustic-cargo-use-last-stored-arguments t))
+#+end_src
+
+*** openscad
+                #+begin_src emacs-lisp
+                (use-package scad-mode)
+                #+end_src
+
+**** TODO lsp
+
+     eglot configuration isn't working and even when starting manually it dosen't work
+     
+**** TODO treesitter
+     https://github.com/openscad/tree-sitter-openscad
 
 ** Terminal
 *** Eat
