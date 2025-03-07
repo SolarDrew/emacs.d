@@ -81,15 +81,15 @@
 
   ;; Add some eglot related things to , because my muscle memory demands it
   (my-local-leader
-   :states '(normal visual)
-   ;; If I only enable this in eglot-mode-map then setting major-mode specific binds override this one
-   ;;:keymaps 'eglot-mode-map
-   "g" '(:ignore t :wk "Eglot goto")
-   "g g" '(xref-find-definitions :wk "Goto Definition")
-   "g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
-   "g r" '(xref-find-references :wk "Find references")
-   "d" '('eldoc-doc-buffer :wk "Documentation")
-   )
+	:states '(normal visual)
+	;; If I only enable this in eglot-mode-map then setting major-mode specific binds override this one
+	;;:keymaps 'eglot-mode-map
+	"g" '(:ignore t :wk "Eglot goto")
+	"g g" '(xref-find-definitions :wk "Goto Definition")
+	"g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
+	"g r" '(xref-find-references :wk "Find references")
+	"d" '('eldoc-doc-buffer :wk "Documentation")
+	)
 
   ;; Set up 'SPC' as primary leader key
   (general-create-definer start/leader-keys
@@ -246,7 +246,7 @@
     "l l" '(tabspaces-switch-or-create-workspace :wk "Switch or Create Workspace")
     "l t" '(tabspaces-switch-buffer-and-tab :wk "Switch Buffer and tab")
     ;; General Tab Control
-    "l TAB" '(tab-previous :wk "Previous Tab")
+    "l TAB" '(tab-last :wk "Previous Tab")
     "l L" '(tab-move :wk "Move Tab Right")
     "l H" '((lambda ()
               (tab-move -1))
@@ -945,7 +945,7 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   (vertico-multiform-commands    '((consult-line    (:not posframe))
                                    (consult-ripgrep (:not posframe))
                                    (consult-imenu   (:not posframe)))
-								 )
+                                 )
   )
 
 (savehist-mode) ;; Enables save history mode
@@ -1322,15 +1322,16 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   "t" 'org-agenda-todo
   )
 
-  ;; Just regular evil key extras
-  (evil-define-key 'normal org-agenda-mode-map
-    "r" 'org-agenda-redo
-    "b" 'org-agenda-earlier
-    "f" 'org-agenda-later
-    "s" 'org-save-all-org-buffers
-	"w" 'org-agenda-week-view
-	"d" 'org-agenda-day-view
-	)
+;; Just regular evil key extras
+(evil-define-key 'normal org-agenda-mode-map
+  "r" 'org-agenda-redo
+  "b" 'org-agenda-earlier
+  "f" 'org-agenda-later
+  "s" 'org-save-all-org-buffers
+  "w" 'org-agenda-week-view
+  "d" 'org-agenda-day-view
+  "." 'org-agenda-goto-today
+  )
 
 ;; All my org files live in one directory
 (setq org-directory "~/Notebooks/")
@@ -1353,8 +1354,8 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 (setq org-todo-keywords
       (quote ((sequence "TODO(t)" "NEXT(n)" "WIP(i)" "|" "DONE(d)")
               (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)"))
-      )
-)
+			 )
+	  )
 
 (setq org-todo-keyword-faces
       (quote (("TODO" :foreground "red" :weight bold)
@@ -1385,7 +1386,7 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   (secretaria-notification-to-html t)
   )
 
-(setq cadair-default-gh-repo "sunpy/sunpy")
+(setq cadair-default-gh-repo "DKISTDC/dkist")
 
 (defun cadair-gh-open (link)
   """Complete a link to a github issue / PR"""
@@ -1394,20 +1395,20 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
     (setq link2 link)
     )
   (setq ghlink (concat "https://github.com/" (replace-regexp-in-string "#" "/issues/" link2)))
-  ;; (message ghlink)
   (org-open-link-from-string ghlink)
   )
 
-;;(org-add-link-type "gh" 'cadair-gh-open)
 
 (defun cadair-jira-open (link)
   """Complete a link to a jira ticket"""
   (setq ghlink (concat "https://nso.atlassian.net/browse/DCS-" link))
-  ;; (message ghlink)
   (org-open-link-from-string ghlink)
   )
 
-;;(org-add-link-type "DCS" 'cadair-jira-open)
+(with-eval-after-load 'org
+  (org-add-link-type "gh" 'cadair-gh-open)
+  (org-add-link-type "DCS" 'cadair-jira-open)
+  )
 
 (defadvice org-capture
     (after make-full-window-frame activate)
