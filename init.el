@@ -657,6 +657,10 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   (flymake-ruff-warning-regex ".*")
   )
 
+(use-package python-isort)
+(use-package ruff-format)
+(use-package python-black)
+
 ;; Add to __all__
 (defsubst python-in-string/comment ()
   "Return non-nil if point is in a Python literal (a comment or string)."
@@ -795,6 +799,11 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   "r" 'cadair/run-in-repl
   "R" 'cadair/run-in-repl-switch
   "a" 'python-add-to-all
+
+  ;; Reformatting
+  "f i" 'python-isort-buffer
+  "f b" 'python-black-buffer
+  "f r" 'ruff-format-buffer
 
   "m a" 'micromamba-activate
   "m d" 'micromamba-deactivate

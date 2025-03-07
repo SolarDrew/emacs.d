@@ -47,7 +47,6 @@ The repo is also a flake, so if you are mad enough to want to use this you can i
   - [[#projects][Projects]]
   - [[#language-server][Language Server]]
   - [[#dape][dape]]
-  - [[#reformatting][Reformatting]]
   - [[#yasnippet][Yasnippet]]
   - [[#language-modes][Language modes]]
   - [[#terminal][Terminal]]
@@ -838,10 +837,6 @@ https://github.com/svaante/dape
   )
 #+end_src
 
-** TODO Reformatting
-Would be nice to have ruff --fix and ruff-format, isort etc all available.
-https://melpa.org/#/reformatter
-
 ** Yasnippet
 A template system for Emacs. And yasnippet-snippets is a snippet collection package.
 To use it write out the full keyword (or use autocompletion) and press Tab.
@@ -911,6 +906,14 @@ Finally, setup the flymake-ruff package, currently my own fork of it where I am 
   (flymake-ruff-warning-regex ".*")
   )
 #+end_src
+
+**** Reformatting
+
+     #+begin_src emacs-lisp
+(use-package python-isort)
+(use-package ruff-format)
+(use-package python-black)
+     #+end_src
 
 **** Custom Functions
 :PROPERTIES:
@@ -1063,6 +1066,11 @@ A bunch of language specific key binds, using ~,~ as the leader key.
   "r" 'cadair/run-in-repl
   "R" 'cadair/run-in-repl-switch
   "a" 'python-add-to-all
+
+  ;; Reformatting
+  "f i" 'python-isort-buffer
+  "f b" 'python-black-buffer
+  "f r" 'ruff-format-buffer
 
   "m a" 'micromamba-activate
   "m d" 'micromamba-deactivate
