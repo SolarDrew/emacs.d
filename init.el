@@ -246,11 +246,9 @@
     "l l" '(tabspaces-switch-or-create-workspace :wk "Switch or Create Workspace")
     "l t" '(tabspaces-switch-buffer-and-tab :wk "Switch Buffer and tab")
     ;; General Tab Control
-    "l TAB" '(tab-last :wk "Previous Tab")
+    "l TAB" '(tab-bar-switch-to-recent-tab :wk "Previous Tab")
     "l L" '(tab-move :wk "Move Tab Right")
-    "l H" '((lambda ()
-              (tab-move -1))
-            :wk "Move Tab Left")
+    "l H" '((lambda () (interactive) (tab-move -1)) :wk "Move Tab Left")
     )
   
   (start/leader-keys
