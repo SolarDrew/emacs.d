@@ -1353,8 +1353,8 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 
 (setq org-use-fast-todo-selection t)
 
-(setq calendar-latitude 53.584)
-(setq calendar-longitude -1.778)
+(setq calendar-latitude 53.57)
+(setq calendar-longitude -1.78)
 (setq calendar-location-name "Holmfirth")
 
 (use-package alert

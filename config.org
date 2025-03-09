@@ -1829,8 +1829,8 @@ Org-Agenda
 
    Calendar Setup
    #+begin_src emacs-lisp
-   (setq calendar-latitude 53.584)
-   (setq calendar-longitude -1.778)
+   (setq calendar-latitude 53.57)
+   (setq calendar-longitude -1.78)
    (setq calendar-location-name "Holmfirth")
    #+end_src
 
