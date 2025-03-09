@@ -49,9 +49,6 @@ The repo is also a flake, so if you are mad enough to want to use this you can i
   - [[#dape][dape]]
   - [[#yasnippet][Yasnippet]]
   - [[#language-modes][Language modes]]
-  - [[#terminal][Terminal]]
-  - [[#combobulate][Combobulate]]
-  - [[#treesit-fold][treesit-fold]]
 - [[#other-packages][Other Packages]]
   - [[#git][Git]]
   - [[#corfu][Corfu]]
@@ -71,12 +68,14 @@ The repo is also a flake, so if you are mad enough to want to use this you can i
   - [[#evil-nerd-commenter][Evil-nerd-commenter]]
 - [[#org-mode][Org Mode]]
   - [[#visuals][Visuals]]
+  - [[#vertico-fixes][Vertico Fixes]]
   - [[#other-packages-1][Other Packages]]
   - [[#keybindings-1][Keybindings]]
   - [[#task-management][Task Management]]
   - [[#secretaria---clock-notifications][Secretaria - Clock Notifications]]
   - [[#links][Links]]
   - [[#capture][Capture]]
+  - [[#refile][Refile]]
   - [[#priority][Priority]]
   - [[#agenda][Agenda]]
   - [[#waybar][Waybar]]
@@ -1078,110 +1077,6 @@ A bunch of language specific key binds, using ~,~ as the leader key.
   )
 #+end_src
 
-*** Org Mode
-Org mode is one of the things that emacs is loved for.
-Once you've used it for a bit, you'll understand why people love it. Even reading about it can be inspiring!
-For example, this document is effectively the source code and descriptions bound into the one document,
-much like the literate programming ideas that Donald Knuth made famous.
-#+begin_src emacs-lisp
-(use-package org
-  :ensure nil
-  :custom
-  (org-edit-src-content-indentation 2) ;; Set src block automatic indent to 4 instead of 2.
-
-  :hook
-  (org-mode . org-indent-mode) ;; Indent text
-  ;; The following prevents <> from auto-pairing when electric-pair-mode is on.
-  ;; Otherwise, org-tempo is broken when you try to <s TAB...
-  ;;(org-mode . (lambda ()
-  ;;              (setq-local electric-pair-inhibit-predicate
-  ;;                          `(lambda (c)
-  ;;                             (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
-  )
-#+end_src
-
-*** nix
-#+begin_src emacs-lisp
-(use-package nix-mode)
-#+end_src
-
-**** Keybindings
-
-A bunch of language specific key binds, using ~,~ as the leader key.
-
-#+begin_src emacs-lisp
-(my-local-leader
-  :states 'normal
-  :keymaps 'nix-mode-map
-  "f" 'nix-flake
-  )
-#+end_src
-*** Rust
-https://github.com/emacs-rustic/rustic
-
-#+begin_src emacs-lisp
-(use-package rust-mode
-  :ensure t
-  :init
-  (setq rust-mode-treesitter-derive t))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package rustic
-  :ensure t
-  :after (rust-mode)
-  :custom
-  (rustic-format-on-save nil)
-  (rustic-lsp-client 'eglot)
-  (rustic-cargo-use-last-stored-arguments t))
-#+end_src
-
-*** openscad
-                #+begin_src emacs-lisp
-                (use-package scad-mode)
-                #+end_src
-
-**** TODO lsp
-
-     eglot configuration isn't working and even when starting manually it dosen't work
-     
-**** TODO treesitter
-     https://github.com/openscad/tree-sitter-openscad
-
-** Terminal
-*** Eat
-Eat(Emulate A Terminal) is a terminal emulator within Emacs.
-It's more portable and less overhead for users over like vterm or eshell.
-We setup eat with eshell, if you want to use bash, zsh etc., check out their git [[https://codeberg.org/akib/emacs-eat][repository]] how to do it.
-#+begin_src emacs-lisp
-(use-package eat
-  :hook ('eshell-load-hook #'eat-eshell-mode))
-#+end_src
-
-** TODO Combobulate
-#+begin_src emacs-lisp
-(use-package combobulate
-  :custom
-  ;; You can customize Combobulate's key prefix here.
-  ;; Note that you may have to restart Emacs for this to take effect!
-  (combobulate-key-prefix "SPC o")
-  :hook ((prog-mode . combobulate-mode))
-  ;; Amend this to the directory where you keep Combobulate's source
-  ;; code.
-  :vc (:url "https://github.com/mickeynp/combobulate"
-			:branch "main")
-  )
-#+end_src
-
-** treesit-fold
-Treesitter aware code folding
-
-Looks like this might be merged into core in 31
-#+begin_src emacs-lisp
-;; (use-package treesit-fold
-;;   :straight (treesit-fold :type git :host github :repo "emacs-tree-sitter/treesit-fold"))
-#+end_src
-   
 * Other Packages
 All the package setups that don't need much tweaking.
 
@@ -1581,6 +1476,7 @@ write the greek letter alpha) and display ellipses in a condensed way.
       org-pretty-entities t
       org-ellipsis "  ·"
 	  org-startup-folded "content"
+	  org-cycle-separator-lines -1
 	  )
 #+end_src
 
@@ -1638,6 +1534,28 @@ for some reason, it seems the header bullet in Org mode are affected by this.
 
 #+begin_src emacs-lisp
 (add-hook 'org-mode-hook 'variable-pitch-mode)
+#+end_src
+
+** Vertico Fixes
+See https://github.com/minad/vertico?tab=readme-ov-file#problematic-completion-commands
+
+#+begin_src emacs-lisp
+;; For org-refile we use full path as that's what I am used to anyway.
+
+;; Use the other two org fixes from the vertico readme
+(advice-add #'org-make-tags-matcher :around #'vertico-enforce-basic-completion)
+(advice-add #'org-agenda-filter :around #'vertico-enforce-basic-completion)
+
+(defun vertico-enforce-basic-completion (&rest args)
+  (minibuffer-with-setup-hook
+      (:append
+       (lambda ()
+         (let ((map (make-sparse-keymap)))
+           (define-key map [tab] #'minibuffer-complete)
+           (use-local-map (make-composed-keymap (list map) (current-local-map))))
+         (setq-local completion-styles (cons 'basic completion-styles)
+                     vertico-preselect 'prompt)))
+    (apply args)))
 #+end_src
 
 ** Other Packages
@@ -1933,7 +1851,6 @@ Org-Agenda
      )
    #+end_src
 
-
 ** Links
 
    Setting up some custom link notation for things I commonly link
@@ -2000,6 +1917,23 @@ Org-Agenda
                   "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)
                  ("h" "Habit" entry (file cadair-capture-file)
                   "* NEXT %?\n%U\n%a\nSCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n"))))
+
+   #+end_src
+
+** Refile
+
+   #+begin_src emacs-lisp
+; Targets include this file and any file contributing to the agenda - up to 9 levels deep
+(setq org-refile-targets (quote ((nil :maxlevel . 9)
+                                 (org-agenda-files :maxlevel . 9))))
+
+; Use full outline paths for refile targets - we file directly with IDO
+(setq org-refile-use-outline-path t)
+
+(setq org-outline-path-complete-in-steps nil)
+
+; Allow refile to create parent tasks with confirmation
+(setq org-refile-allow-creating-parent-nodes (quote confirm))
 
    #+end_src
 

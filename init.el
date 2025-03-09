@@ -810,62 +810,6 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   "v d" 'pyvenv-deactivate
   )
 
-(use-package org
-  :ensure nil
-  :custom
-  (org-edit-src-content-indentation 2) ;; Set src block automatic indent to 4 instead of 2.
-
-  :hook
-  (org-mode . org-indent-mode) ;; Indent text
-  ;; The following prevents <> from auto-pairing when electric-pair-mode is on.
-  ;; Otherwise, org-tempo is broken when you try to <s TAB...
-  ;;(org-mode . (lambda ()
-  ;;              (setq-local electric-pair-inhibit-predicate
-  ;;                          `(lambda (c)
-  ;;                             (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
-  )
-
-(use-package nix-mode)
-
-(my-local-leader
-  :states 'normal
-  :keymaps 'nix-mode-map
-  "f" 'nix-flake
-  )
-
-(use-package rust-mode
-  :ensure t
-  :init
-  (setq rust-mode-treesitter-derive t))
-
-(use-package rustic
-  :ensure t
-  :after (rust-mode)
-  :custom
-  (rustic-format-on-save nil)
-  (rustic-lsp-client 'eglot)
-  (rustic-cargo-use-last-stored-arguments t))
-
-(use-package scad-mode)
-
-(use-package eat
-  :hook ('eshell-load-hook #'eat-eshell-mode))
-
-(use-package combobulate
-  :custom
-  ;; You can customize Combobulate's key prefix here.
-  ;; Note that you may have to restart Emacs for this to take effect!
-  (combobulate-key-prefix "SPC o")
-  :hook ((prog-mode . combobulate-mode))
-  ;; Amend this to the directory where you keep Combobulate's source
-  ;; code.
-  :vc (:url "https://github.com/mickeynp/combobulate"
-			:branch "main")
-  )
-
-;; (use-package treesit-fold
-;;   :straight (treesit-fold :type git :host github :repo "emacs-tree-sitter/treesit-fold"))
-
 (use-package magit
   :commands magit-status)
 (use-package forge
@@ -1138,6 +1082,7 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
       org-pretty-entities t
       org-ellipsis "  ·"
 	  org-startup-folded "content"
+	  org-cycle-separator-lines -1
 	  )
 
 (setq org-src-fontify-natively t
@@ -1162,6 +1107,23 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
      (:strike-through t)))))
 
 (add-hook 'org-mode-hook 'variable-pitch-mode)
+
+;; For org-refile we use full path as that's what I am used to anyway.
+
+;; Use the other two org fixes from the vertico readme
+(advice-add #'org-make-tags-matcher :around #'vertico-enforce-basic-completion)
+(advice-add #'org-agenda-filter :around #'vertico-enforce-basic-completion)
+
+(defun vertico-enforce-basic-completion (&rest args)
+  (minibuffer-with-setup-hook
+      (:append
+       (lambda ()
+         (let ((map (make-sparse-keymap)))
+           (define-key map [tab] #'minibuffer-complete)
+           (use-local-map (make-composed-keymap (list map) (current-local-map))))
+         (setq-local completion-styles (cons 'basic completion-styles)
+                     vertico-preselect 'prompt)))
+    (apply args)))
 
 (use-package toc-org
   :commands toc-org-enable
@@ -1463,6 +1425,18 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
                "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)
               ("h" "Habit" entry (file cadair-capture-file)
                "* NEXT %?\n%U\n%a\nSCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n"))))
+
+; Targets include this file and any file contributing to the agenda - up to 9 levels deep
+(setq org-refile-targets (quote ((nil :maxlevel . 9)
+                                 (org-agenda-files :maxlevel . 9))))
+
+; Use full outline paths for refile targets - we file directly with IDO
+(setq org-refile-use-outline-path t)
+
+(setq org-outline-path-complete-in-steps nil)
+
+; Allow refile to create parent tasks with confirmation
+(setq org-refile-allow-creating-parent-nodes (quote confirm))
 
 (setq org-highest-priority ?A)
 (setq org-default-priority ?C)
