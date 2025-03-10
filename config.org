@@ -942,14 +942,14 @@ Custom written functions for Python related stuff
           (when (not (looking-at (rx-to-string
                                   `(and (0+ (not (syntax close-parenthesis)))
                                         (syntax string-quote) ,thing (syntax string-quote)))))
-            (insert (format "\'%s\', " thing)))
+            (insert (format "\"%s\", " thing)))
         (beginning-of-buffer)
         ;; Put before any import lines, or if none, the first class or
         ;; function.
         (when (re-search-forward (rx bol (or "import" "from") symbol-end) nil t)
           (re-search-forward (rx symbol-start (or "def" "class") symbol-end) nil t))
         (forward-line -1)
-        (insert (format "\n__all__ = [\'%s\']\n\n" thing))))))
+        (insert (format "\n__all__ = [\"%s\"]\n\n" thing))))))
 
 (defun +python-executable-find (exe)
   "Resolve the path to the EXE executable.
