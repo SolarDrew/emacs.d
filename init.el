@@ -369,10 +369,10 @@
  ediff-window-setup-function #'ediff-setup-windows-plain
  )
 
-(setenv "PATH" (concat (getenv "PATH") ":/run/current-system/sw/bin/:/home/stuart/.nix-profile/bin/"))
 (setenv "LD_LIBRARY_PATH" (concat (getenv "LD_LIBRARY_PATH") (concat ":" (getenv "NIX_LD_LIBRARY_PATH"))))
-(setq exec-path (append exec-path '("/run/current-system/sw/bin/")))
-(setq exec-path (append exec-path '("/home/stuart/.nix-profile/bin/")))
+;;(setenv "PATH" (concat (getenv "PATH") ":/run/current-system/sw/bin/:/home/stuart/.nix-profile/bin/"))
+;;(setq exec-path (append exec-path '("/run/current-system/sw/bin/")))
+;;(setq exec-path (append exec-path '("/home/stuart/.nix-profile/bin/")))
 
 ;;  (use-package gruvbox-theme
 ;;    :config
@@ -555,9 +555,9 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   :custom
   (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
   (add-to-list 'eglot-server-programs '(scad-mode . ("openscad-lsp")))
-  (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
+  ;; (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
   (eglot-autoshutdown t);; Shutdown unused servers.
-  (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
+  ;; (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
 
   ;; Dynamically load the workspace configuration so that we set jedi to use the active workspace
   (eglot-workspace-configuration

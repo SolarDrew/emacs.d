@@ -21,15 +21,14 @@ in {
       fd
       emacs-all-the-icons-fonts
       # lsp
-      python312Packages.python-lsp-server
-      python312Packages.pyls-isort
-      python312Packages.ruff
+      python313Packages.python-lsp-server
+      python313Packages.ruff
       # spelling
       ispell
       # nix lsp
       nil
       # dap
-      python312Packages.debugpy
+      python313Packages.debugpy
     ];
 
     # emacs
