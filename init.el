@@ -319,6 +319,11 @@
     "w -" '(evil-window-split :wk "Vertical Split")
     "w d" '(evil-window-delete :wk "Close window")
     )
+
+  (start/leader-keys
+	"x" '(:ignore t :wk "Cleanup?")
+	"x d w" '(delete-trailing-whitespace :wk "Delete trailing whitespace")
+	)
   )
 
 (use-package emacs
