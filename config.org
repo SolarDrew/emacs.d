@@ -34,6 +34,7 @@ The repo is also a flake, so if you are mad enough to want to use this you can i
 - [[#keybindings][Keybindings]]
 - [[#good-defaults][Good Defaults]]
   - [[#ediff][EDiff]]
+  - [[#nix-environment-hackery][nix environment hackery]]
 - [[#appearance][Appearance]]
   - [[#set-theme][Set Theme]]
   - [[#transparency][Transparency]]
@@ -506,6 +507,13 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
  )
 #+end_src
 
+** nix environment hackery
+   #+begin_src emacs-lisp
+(setenv "PATH" (concat (getenv "PATH") ":/run/current-system/sw/bin/:/home/stuart/.nix-profile/bin/"))
+(setenv "LD_LIBRARY_PATH" (concat (getenv "LD_LIBRARY_PATH") (concat ":" (getenv "NIX_LD_LIBRARY_PATH"))))
+(setq exec-path (append exec-path '("/run/current-system/sw/bin/")))
+(setq exec-path (append exec-path '("/home/stuart/.nix-profile/bin/")))
+   #+end_src
 * Appearance
 ** Set Theme
 My themes and fonts are set in my home-manager config so that they match the whole system.

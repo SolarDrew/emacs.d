@@ -369,6 +369,11 @@
  ediff-window-setup-function #'ediff-setup-windows-plain
  )
 
+(setenv "PATH" (concat (getenv "PATH") ":/run/current-system/sw/bin/:/home/stuart/.nix-profile/bin/"))
+(setenv "LD_LIBRARY_PATH" (concat (getenv "LD_LIBRARY_PATH") (concat ":" (getenv "NIX_LD_LIBRARY_PATH"))))
+(setq exec-path (append exec-path '("/run/current-system/sw/bin/")))
+(setq exec-path (append exec-path '("/home/stuart/.nix-profile/bin/")))
+
 ;;  (use-package gruvbox-theme
 ;;    :config
 ;;    (load-theme 'gruvbox-dark-medium t)) ;; We need to add t to trust this package
