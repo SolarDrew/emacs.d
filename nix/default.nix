@@ -69,6 +69,18 @@ in {
         '';
     };
 
+    # Add a protocol handler for org-protocol which uses our capture script
+    xdg.desktopEntries = {
+      org-protocol = {
+        name = "org-protocol";
+        exec = "${config.home.homeDirectory}/.config/bin/emacs-capture %u";
+        type= "Application";
+        terminal = false;
+        categories = [ "System" ];
+        mimeType = [ "x-scheme-handler/org-protocol" ];
+      };
+    };
+
     # Write a custom emacsd
     systemd.user.services.emacsd = {
       Unit = {
