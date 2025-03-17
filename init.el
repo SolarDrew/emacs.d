@@ -652,8 +652,10 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   :config
   (transient-append-suffix 'python-pytest-dispatch
     '(-2)
-    ["Remote data"
-     ("--rd" "Remote data" "--remote-data=any")]
+    ["Extra Options"
+     ("--rd" "Remote data" "--remote-data=any")
+     ("--cov" "Coverage" "--cov --cov-report=term-missing")
+	 ]
     )
   )
 
@@ -1426,7 +1428,7 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 (defun transform-square-brackets-to-round-ones(string-to-transform)
   "Transforms [ into ( and ] into ), other chars left unchanged."
   (concat
-   (mapcar #'(lambda (c) (if (equal c ?[) ?\( (if (equal c ?]) ?\) c))) string-to-transform))
+   (mapcar #'(lambda (c) (if (equal c ?\[) ?\( (if (equal c ?\]) ?\) c))) string-to-transform))
   )
 (setq org-capture-templates
       (quote (("t" "todo (clock)" entry (file cadair-capture-file)

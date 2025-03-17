@@ -899,8 +899,10 @@ Enable the excellent pytest package, and setup an extra hook for [[https://githu
   :config
   (transient-append-suffix 'python-pytest-dispatch
     '(-2)
-    ["Remote data"
-     ("--rd" "Remote data" "--remote-data=any")]
+    ["Extra Options"
+     ("--rd" "Remote data" "--remote-data=any")
+     ("--cov" "Coverage" "--cov --cov-report=term-missing")
+	 ]
     )
   )
 #+end_src
@@ -1921,7 +1923,7 @@ Org-Agenda
    (defun transform-square-brackets-to-round-ones(string-to-transform)
      "Transforms [ into ( and ] into ), other chars left unchanged."
      (concat
-      (mapcar #'(lambda (c) (if (equal c ?[) ?\( (if (equal c ?]) ?\) c))) string-to-transform))
+      (mapcar #'(lambda (c) (if (equal c ?\[) ?\( (if (equal c ?\]) ?\) c))) string-to-transform))
      )
    (setq org-capture-templates
          (quote (("t" "todo (clock)" entry (file cadair-capture-file)
