@@ -901,7 +901,7 @@ Enable the excellent pytest package, and setup an extra hook for [[https://githu
     '(-2)
     ["Extra Options"
      ("--rd" "Remote data" "--remote-data=any")
-     ("--cov" "Coverage" "--cov --cov-report=term-missing")
+     ("-c" "Coverage" "--cov --cov-report=term-missing")
 	 ]
     )
   )

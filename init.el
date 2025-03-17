@@ -654,7 +654,7 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
     '(-2)
     ["Extra Options"
      ("--rd" "Remote data" "--remote-data=any")
-     ("--cov" "Coverage" "--cov --cov-report=term-missing")
+     ("-c" "Coverage" "--cov --cov-report=term-missing")
 	 ]
     )
   )
