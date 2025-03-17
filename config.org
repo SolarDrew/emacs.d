@@ -1918,13 +1918,18 @@ Org-Agenda
    ;; This seems to work for protocol setup: http://www.mediaonfire.com/blog/2017_07_21_org_protocol_firefox.html
    ;; Capture templates for: TODO tasks, Notes, appointments, phone calls, meetings, and org-protocol
    (require 'org-protocol)
+   (defun transform-square-brackets-to-round-ones(string-to-transform)
+     "Transforms [ into ( and ] into ), other chars left unchanged."
+     (concat
+      (mapcar #'(lambda (c) (if (equal c ?[) ?\( (if (equal c ?]) ?\) c))) string-to-transform))
+     )
    (setq org-capture-templates
          (quote (("t" "todo (clock)" entry (file cadair-capture-file)
                   "* TODO %i%?\n" :clock-in t :clock-resume t)
                  ("x" "note" entry (file cadair-capture-file)
                   "* TODO %i%?\n" :clock-in nil)
-                 ("L" "Protocol" entry (file cadair-capture-file)
-                  "* TODO Review %? [[%:link][%:description]] \nCaptured On: %U")
+                 ("L" "Protocol Link" entry (file cadair-capture-file)
+                  "* TODO %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\nCaptured On: %U")
                  ("p" "Protocol" entry (file cadair-capture-file)
                   "* TODO %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
                  ("n" "note" entry (file cadair-capture-file)

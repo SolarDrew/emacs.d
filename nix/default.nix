@@ -70,6 +70,8 @@ in {
     };
 
     # Add a protocol handler for org-protocol which uses our capture script
+    # This can be configured to use with firefox / chrome using this:
+    # https://github.com/sprig/org-capture-extension
     xdg.desktopEntries = {
       org-protocol = {
         name = "org-protocol";
