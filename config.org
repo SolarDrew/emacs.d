@@ -1190,7 +1190,9 @@ Notes:
     ;; The functions that are added later will be the first in the list
 
     (add-to-list 'completion-at-point-functions #'cape-dabbrev) ;; Complete word from current buffers
-    (add-to-list 'completion-at-point-functions #'cape-dict) ;; Dictionary completion
+    ;; TODO: Make this find the nixos wordlist
+    ;; https://github.com/NixOS/nixpkgs/issues/16545
+    ;; (add-to-list 'completion-at-point-functions #'cape-dict) ;; Dictionary completion
     (add-to-list 'completion-at-point-functions #'cape-file) ;; Path completion
     (add-to-list 'completion-at-point-functions #'cape-elisp-block) ;; Complete elisp in Org or Markdown mode
     (add-to-list 'completion-at-point-functions #'cape-keyword) ;; Keyword/Snipet completion
