@@ -144,6 +144,7 @@
     "c l"   '(evilnc-comment-or-uncomment-lines :wk "Toggle Comments")
     "c L"   '(evilnc-toggle-comment-empty-lines :wk "Toggle commenting empty lines")
 	"c o"   '(symbols-outline-show :wk "Show symbols outline")
+	"c r"   '(eglot-rename :wk "Rename symbol at point")
 	"c s"   '(consult-eglot-symbols :wk "Find Symbols in Workspace")
     )
 
