@@ -1087,6 +1087,13 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 
 (use-package evil-nerd-commenter)
 
+(use-package indent-bars
+  :ensure t
+  :hook ((emacs-lisp-mode
+          markdown-mode
+          rst-mode
+          yaml-ts-mode) . indent-bars-mode))
+
 (use-package org
   :defer t
   :custom

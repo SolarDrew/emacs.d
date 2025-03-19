@@ -67,6 +67,7 @@ The repo is also a flake, so if you are mad enough to want to use this you can i
   - [[#flyspell][Flyspell]]
   - [[#jinx---better-spell-check][jinx - better spell check?]]
   - [[#evil-nerd-commenter][Evil-nerd-commenter]]
+  - [[#indent-guides][Indent guides]]
 - [[#org-mode][Org Mode]]
   - [[#visuals][Visuals]]
   - [[#vertico-fixes][Vertico Fixes]]
@@ -1469,6 +1470,18 @@ https://github.com/minad/jinx
 #+begin_src emacs-lisp
 (use-package evil-nerd-commenter)
 #+end_src
+
+** Indent guides
+   I only really want this occasionally, i'm not a fan of it for Python normally.
+
+   #+begin_src emacs-lisp
+(use-package indent-bars
+  :ensure t
+  :hook ((emacs-lisp-mode
+          markdown-mode
+          rst-mode
+          yaml-ts-mode) . indent-bars-mode))
+   #+end_src
 
 * Org Mode
 
