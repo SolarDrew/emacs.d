@@ -823,6 +823,9 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   "v d" 'pyvenv-deactivate
   )
 
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-ts-mode))
+
 (use-package magit
   :commands magit-status)
 (use-package forge

@@ -1093,6 +1093,12 @@ A bunch of language specific key binds, using ~,~ as the leader key.
   )
 #+end_src
 
+*** Yaml
+
+#+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-ts-mode))
+#+end_src
 * Other Packages
 All the package setups that don't need much tweaking.
 
