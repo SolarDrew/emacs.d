@@ -348,6 +348,7 @@
   (confirm-kill-emacs 'y-or-n-p)
 
   (tab-width 4)
+  (setq-default 'truncate-lines t)
 
   (make-backup-files nil) ;; Stop creating ~ backup files
   (auto-save-default nil) ;; Stop creating # auto save files
