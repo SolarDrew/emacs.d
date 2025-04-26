@@ -665,12 +665,25 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   )
 
 (use-package flymake-ruff
-  :load-path "local-packages/flymake-ruff"
+  :vc (:url "https://github.com/erickgnavar/flymake-ruff"
+			:rev :newest)
   :ensure t
   :hook (eglot-managed-mode . flymake-ruff-load)
-  :custom
-  (flymake-ruff-error-regex "SyntaxError")
-  (flymake-ruff-warning-regex ".*")
+  :config
+  (setq flymake-ruff--severity-map '(
+                                    ("SyntaxError" . :error)     ; Syntax Errors
+                                    ("E"           . :error)     ; Critical style errors
+                                    ("W"           . :warning)   ; Style warnings
+                                    ("F"           . :error)     ; Logical errors (pyflakes)
+                                    ("B"           . :warning)   ; Bugbears (best practices)
+                                    ("C90"         . :warning)   ; Complexity (mccabe)
+                                    ("N"           . :note)      ; Naming conventions
+                                    ("I"           . :note)      ; Import sorting
+                                    ("UP"          . :note)      ; Python upgrades (pyupgrade)
+                                    ("SIM"         . :note)      ; Simplification
+                                    ("PERF"        . :warning)   ; Performance issues
+                                    )
+        )
   )
 
 (use-package python-isort)
