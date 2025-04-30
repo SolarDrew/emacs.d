@@ -46,11 +46,11 @@ in {
       target = ".emacs.d/init.el";
     };
 
-    home.file.emacs-local-packages = {
-      source = ../local-packages;
-      target = ".emacs.d/local-packages/";
-      recursive = true;
-    };
+    # home.file.emacs-local-packages = {
+    #   source = ../local-packages;
+    #   target = ".emacs.d/local-packages/";
+    #   recursive = true;
+    # };
 
     home.file.emacs-snippets = {
       source = ../snippets;
