@@ -658,7 +658,7 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   (transient-append-suffix 'python-pytest-dispatch
     '(-2)
     ["Extra Options"
-     ("--rd" "Remote data" "--remote-data=any")
+     ("-r" "Remote data (any)" "--remote-data=any")
      ("-c" "Coverage" "--cov --cov-report=term-missing")
 	 ]
     )
@@ -689,6 +689,13 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 (use-package python-isort)
 (use-package ruff-format)
 (use-package python-black)
+(use-package reformatter)
+
+;; Define a formatter which runs ruff check --fix
+(reformatter-define ruff-check
+  :program ruff-format-command
+  :args (list "check" "--fix" "--unsafe-fixes" "--stdin-filename" (or (buffer-file-name) input-file))
+  :lighter " RuffCheck")
 
 ;; Add to __all__
 (defsubst python-in-string/comment ()
@@ -833,6 +840,7 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   "f i" 'python-isort-buffer
   "f b" 'python-black-buffer
   "f r" 'ruff-format-buffer
+  "f c" 'ruff-check-buffer
 
   "m a" 'micromamba-activate
   "m d" 'micromamba-deactivate
