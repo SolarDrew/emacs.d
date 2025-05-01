@@ -1626,27 +1626,29 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
                  (org-tags-match-list-sublevels nil))))
          nil))))
 
-(use-package org-clock-waybar
-  :vc (:url "https://gitea.polonkai.eu/Cadair/org-clock-waybar.git" :rev "typo")
-  :config 
-  (org-clock-waybar-setup)
-  )
-
-(defun org-clock-waybar--get-tooltip ()
+(defun cadair-waybar-tooltip ()
   "The default tooltip to send to waybar."
-  (when (org-clocking-p)
+    (message "boo")
     (let ((clocked-time (org-clock-get-clocked-time)))
       (format "%s: %s [%s] %s"
               (org-clock-waybar--get-task-category)
               (org-clock-waybar--get-task-title)
               (org-duration-from-minutes clocked-time)
-              (format "%s" (org-clock-waybar--get-tags))))))
+              (format "%s" (org-clock-waybar--get-tags)))))
+
+(use-package org-clock-waybar
+  :vc (:url "https://gitea.polonkai.eu/gergely/org-clock-waybar.git" :rev "configurable-output")
+  :config
+  (org-clock-waybar-setup)
+  :custom
+  (#'org-clock-waybar-tooltip-function 'cadair-waybar-tooltip)
+  )
 
 (use-package request
-  ;;:custom
   ;; Enable these to debug org-clock-float requests
-  ;; (request-log-level 'debug)
-  ;; (request-message-level 'debug)
+  :custom
+  (request-log-level 'debug)
+  (request-message-level 'debug)
   )
 
 (use-package org-clock-float
