@@ -426,6 +426,11 @@
   (doom-modeline-bar-width 5)   ;; Sets right bar width
   )
 
+(use-package breadcrumb
+  :custom-face
+  (breadcrumb-face ((t (:inherit header-line))))
+  )
+
 (defun doom-files--update-refs (&rest files)
   "Ensure FILES are updated in `recentf', `magit' and `save-place'."
   (let (toplevels)

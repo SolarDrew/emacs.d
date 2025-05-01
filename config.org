@@ -41,6 +41,7 @@ The repo is also a flake, so if you are mad enough to want to use this you can i
   - [[#fonts][Fonts]]
   - [[#modeline][Modeline]]
   - [[#emacs-presentation-mode][emacs-presentation-mode]]
+  - [[#breadcrumbs-at-the-top][Breadcrumbs at the top]]
 - [[#helper-functions][Helper functions]]
   - [[#file-management][File management]]
 - [[#development][Development]]
@@ -603,7 +604,14 @@ Replace the default modeline with a prettier more useful.
 
 ** TODO emacs-presentation-mode
 https://github.com/zonuexe/emacs-presentation-mode?tab=readme-ov-file
-   
+
+** Breadcrumbs at the top
+#+begin_src emacs-lisp
+(use-package breadcrumb
+  :custom-face
+  (breadcrumb-face ((t (:inherit header-line))))
+  )
+#+end_src
 * Helper functions
 Many of these are lifted from doom.
 ** File management
