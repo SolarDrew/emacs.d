@@ -404,7 +404,11 @@
          (LaTeX-mode . mixed-pitch-mode)))
 
 (use-package nerd-icons
-  :if (display-graphic-p))
+  :if (display-graphic-p)
+  :demand t
+  :custom
+  (nerd-icons-font-family "Fira Code Nerd Font")
+  )
 
 (use-package nerd-icons-dired
   :hook (dired-mode . (lambda () (nerd-icons-dired-mode t))))
@@ -426,10 +430,56 @@
   (doom-modeline-bar-width 5)   ;; Sets right bar width
   )
 
+;; (use-package breadcrumb
+  ;; :custom-face
+  ;; (breadcrumb-face ((t (:inherit header-line))))
+;;   )
 (use-package breadcrumb
+  :hook
+  (prog-mode . breadcrumb-local-mode)
   :custom-face
   (breadcrumb-face ((t (:inherit header-line))))
-  )
+  :custom
+  ;; Add nerd-icons to breadcrumb
+  (breadcrumb-imenu-crumb-separator
+   (concat " "(nerd-icons-faicon "nf-fa-chevron_right") " "))
+  (breadcrumb-project-crumb-separator
+   (concat " "(nerd-icons-faicon "nf-fa-chevron_right") " "))
+  (breadcrumb-imenu-max-length 0.5)
+  (breadcrumb-project-max-length 0.5)
+  :preface
+  ;; Add icons to breadcrumb
+  (advice-add #'breadcrumb--format-project-node :around
+              (lambda (og p more &rest r)
+                "Icon For File"
+                (let ((string (apply og p more r)))
+                  (if (not more)
+                      (concat (nerd-icons-icon-for-file string)
+                              " " string)
+                    (concat (nerd-icons-faicon
+                             "nf-fa-folder_open"
+                             :face 'breadcrumb-project-crumbs-face)
+                            " "
+                            string)))))
+
+  (advice-add #'breadcrumb--format-ipath-node :around
+              (lambda (og p more &rest r)
+                "Icon for items"
+                (let ((string (apply og p more r)))
+                  (if (not more)
+                      (concat (nerd-icons-codicon
+                               "nf-cod-symbol_field"
+                               :face 'breadcrumb-imenu-leaf-face)
+                              " " string)
+                    (cond ((string= string "Packages")
+                           (concat (nerd-icons-codicon "nf-cod-package" :face 'breadcrumb-imenu-crumbs-face) " " string))
+                          ((string= string "Requires")
+                           (concat (nerd-icons-codicon "nf-cod-file_submodule" :face 'breadcrumb-imenu-crumbs-face) " " string))
+                          ((or (string= string "Variable") (string= string "Variables"))
+                           (concat (nerd-icons-codicon "nf-cod-symbol_variable" :face 'breadcrumb-imenu-crumbs-face) " " string))
+                          ((string= string "Function")
+                           (concat (nerd-icons-codicon "nf-cod-symbol_field" :face 'breadcrumb-imenu-crumbs-face) " " string))
+                          (t string)))))))
 
 (defun doom-files--update-refs (&rest files)
   "Ensure FILES are updated in `recentf', `magit' and `save-place'."
