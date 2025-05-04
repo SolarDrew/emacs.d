@@ -437,9 +437,12 @@
 (use-package breadcrumb
   :hook
   (prog-mode . breadcrumb-local-mode)
+  (org-mode . breadcrumb-local-mode)
   :custom-face
-  (breadcrumb-face ((t (:inherit header-line))))
+  (breadcrumb-face ((t (:inherit header-line :foreground "dark-gray"))))
   :custom
+  ;; This doesn't work as breadcrumb get's prepended
+  ;; (header-line-format `("" header-line-indent))
   ;; Add nerd-icons to breadcrumb
   (breadcrumb-imenu-crumb-separator
    (concat " "(nerd-icons-faicon "nf-fa-chevron_right") " "))
