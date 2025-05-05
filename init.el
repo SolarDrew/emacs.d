@@ -319,6 +319,7 @@
     "w /" '(evil-window-vsplit :wk "Vertical Split")
     "w -" '(evil-window-split :wk "Vertical Split")
     "w d" '(evil-window-delete :wk "Close window")
+    "w D" '(toggle-window-dedicated :wk "Dedicate window to buffer")
     )
 
   (start/leader-keys
@@ -380,6 +381,19 @@
 ;;(setenv "PATH" (concat (getenv "PATH") ":/run/current-system/sw/bin/:/home/stuart/.nix-profile/bin/"))
 ;;(setq exec-path (append exec-path '("/run/current-system/sw/bin/")))
 ;;(setq exec-path (append exec-path '("/home/stuart/.nix-profile/bin/")))
+
+;; Make manual buffer commands obey the rules
+(setq switch-to-buffer-obey-display-actions t)
+
+;; If you try and open a new buffer in a dediated window put it somewhere else
+(setq switch-to-buffer-in-dedicated-window "pop")
+
+;; an interactive function for setting a buffer as dediated
+(defun toggle-window-dedication ()
+  "Toggles window dedication in the selected window."
+  (interactive)
+  (set-window-dedicated-p (selected-window)
+     (not (window-dedicated-p (selected-window)))))
 
 ;;  (use-package gruvbox-theme
 ;;    :config
@@ -789,20 +803,16 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 
 (defun +python-executable-find (exe)
   "Resolve the path to the EXE executable.
-    Tries to be aware of your active conda/pipenv/virtualenv environment, before
-    falling back on searching your PATH."
+Tries to be aware of your active conda/pipenv/virtualenv environment, before
+falling back on searching your PATH."
   (if (file-name-absolute-p exe)
-      (and (file-executable-p exe)
-           exe)
+      (and (file-executable-p exe) exe)
     (let ((exe-root (format "bin/%s" exe)))
-      (cond ((when python-shell-virtualenv-root
+	  ;; micromamba sets python-shell-virtualenv-root as well
+      (or (and python-shell-virtualenv-root
                (let ((bin (expand-file-name exe-root python-shell-virtualenv-root)))
-                 (if (file-exists-p bin) bin))))
-            ((when (require 'conda nil t)
-               (let ((bin (expand-file-name (concat conda-env-current-name "/" exe-root)
-                                            (conda-env-default-location))))
-                 (if (file-executable-p bin) bin))))
-            ((executable-find exe))))))
+                 (and (file-exists-p bin) bin)))
+          (executable-find exe)))))
 
 (defun +python/open-repl ()
   "Open the Python REPL."
@@ -824,6 +834,9 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
             (run-python nil dedicated t))
         (run-python nil dedicated t))))))
 
+(defvar +python-ipython-command '("ipython" "-i" "--simple-prompt" "--no-color-info")
+  "Command to initialize the ipython REPL for `+python/open-ipython-repl'.")
+
 (defun +python/open-ipython-repl ()
   "Open an IPython REPL."
   (interactive)
@@ -835,15 +848,13 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
          (string-join (cdr +python-ipython-command) " ")))
     (+python/open-repl)))
 
-(defvar +python-ipython-command '("ipython" "-i" "--simple-prompt" "--no-color-info")
-  "Command to initialize the ipython REPL for `+python/open-ipython-repl'.")
-
 (defun cadair/run-restart-repl ()
   "Run a new python repl in a window which does not have focus."
   (interactive)
   (setq initial-buffer (current-buffer))
   (if (python-shell-get-buffer)
-      (kill-buffer (python-shell-get-buffer)))
+      (kill-process (get-buffer-process (python-shell-get-buffer))))
+  (sleep-for 0.5)
   (+python/open-ipython-repl)
   (evil-normal-state)
   (pop-to-buffer initial-buffer)
