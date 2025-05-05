@@ -438,25 +438,26 @@
   ("<C-wheel-down>" . text-scale-decrease))
 
 (use-package doom-modeline
-  :init (doom-modeline-mode 1)
+  :hook
+  (after-init . doom-modeline-mode)
+  (after-init . column-number-mode)
   :custom
   (doom-modeline-height 25)     ;; Sets modeline height
   (doom-modeline-bar-width 5)   ;; Sets right bar width
   )
 
-;; (use-package breadcrumb
-  ;; :custom-face
-  ;; (breadcrumb-face ((t (:inherit header-line))))
-;;   )
 (use-package breadcrumb
   :hook
   (prog-mode . breadcrumb-local-mode)
   (org-mode . breadcrumb-local-mode)
+  
   :custom-face
   (breadcrumb-face ((t (:inherit mode-line))))
+  
   :custom
   ;; This doesn't work as breadcrumb get's prepended
   ;; (header-line-format `("" header-line-indent))
+  
   ;; Add nerd-icons to breadcrumb
   (breadcrumb-imenu-crumb-separator
    (concat " "(nerd-icons-faicon "nf-fa-chevron_right") " "))
@@ -464,6 +465,7 @@
    (concat " "(nerd-icons-faicon "nf-fa-chevron_right") " "))
   (breadcrumb-imenu-max-length 0.5)
   (breadcrumb-project-max-length 0.5)
+  
   :preface
   ;; Add icons to breadcrumb
   (advice-add #'breadcrumb--format-project-node :around

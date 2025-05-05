@@ -41,8 +41,8 @@ The repo is also a flake, so if you are mad enough to want to use this you can i
   - [[#transparency][Transparency]]
   - [[#fonts][Fonts]]
   - [[#modeline][Modeline]]
+  - [[#headerline-breadcrumbs-at-the-top][headerline: Breadcrumbs at the top]]
   - [[#emacs-presentation-mode][emacs-presentation-mode]]
-  - [[#breadcrumbs-at-the-top][Breadcrumbs at the top]]
 - [[#helper-functions][Helper functions]]
   - [[#file-management][File management]]
 - [[#development][Development]]
@@ -626,31 +626,30 @@ You can use the bindings C-+ C-- for zooming in/out. You can also use CTRL plus 
 Replace the default modeline with a prettier more useful.
 #+begin_src emacs-lisp
 (use-package doom-modeline
-  :init (doom-modeline-mode 1)
+  :hook
+  (after-init . doom-modeline-mode)
+  (after-init . column-number-mode)
   :custom
   (doom-modeline-height 25)     ;; Sets modeline height
   (doom-modeline-bar-width 5)   ;; Sets right bar width
   )
 #+end_src
 
-** TODO emacs-presentation-mode
-https://github.com/zonuexe/emacs-presentation-mode?tab=readme-ov-file
-
-** Breadcrumbs at the top
+** headerline: Breadcrumbs at the top
+   It's nice to have some file and also code structure information at the top. It's even nicer if we copy a lot of fancy icon stuff from here: https://github.com/DevelopmentCool2449/visual-emacs?tab=readme-ov-file#fancy-configurations-i-think-ui-enchantmentel
 #+begin_src emacs-lisp
-;; (use-package breadcrumb
-  ;; :custom-face
-  ;; (breadcrumb-face ((t (:inherit header-line))))
-;;   )
 (use-package breadcrumb
   :hook
   (prog-mode . breadcrumb-local-mode)
   (org-mode . breadcrumb-local-mode)
+  
   :custom-face
   (breadcrumb-face ((t (:inherit mode-line))))
+  
   :custom
   ;; This doesn't work as breadcrumb get's prepended
   ;; (header-line-format `("" header-line-indent))
+  
   ;; Add nerd-icons to breadcrumb
   (breadcrumb-imenu-crumb-separator
    (concat " "(nerd-icons-faicon "nf-fa-chevron_right") " "))
@@ -658,6 +657,7 @@ https://github.com/zonuexe/emacs-presentation-mode?tab=readme-ov-file
    (concat " "(nerd-icons-faicon "nf-fa-chevron_right") " "))
   (breadcrumb-imenu-max-length 0.5)
   (breadcrumb-project-max-length 0.5)
+  
   :preface
   ;; Add icons to breadcrumb
   (advice-add #'breadcrumb--format-project-node :around
@@ -692,6 +692,9 @@ https://github.com/zonuexe/emacs-presentation-mode?tab=readme-ov-file
                            (concat (nerd-icons-codicon "nf-cod-symbol_field" :face 'breadcrumb-imenu-crumbs-face) " " string))
                           (t string)))))))
 #+end_src
+
+** TODO emacs-presentation-mode
+https://github.com/zonuexe/emacs-presentation-mode?tab=readme-ov-file
 
 * Helper functions
 Many of these are lifted from doom.
