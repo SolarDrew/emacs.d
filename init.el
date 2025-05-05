@@ -1559,7 +1559,7 @@ falling back on searching your PATH."
 ;; this helps vertico work properly
 (setq org-refile-use-outline-path 'file)
 
-(setq org-outline-path-complete-in-steps t)
+(setq org-outline-path-complete-in-steps nil)
 
 ; Allow refile to create parent tasks with confirmation
 (setq org-refile-allow-creating-parent-nodes (quote confirm))
