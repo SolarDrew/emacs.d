@@ -1229,8 +1229,6 @@ falling back on searching your PATH."
 
 (add-hook 'org-mode-hook 'variable-pitch-mode)
 
-;; For org-refile we use full path as that's what I am used to anyway.
-
 ;; Use the other two org fixes from the vertico readme
 (advice-add #'org-make-tags-matcher :around #'vertico-enforce-basic-completion)
 (advice-add #'org-agenda-filter :around #'vertico-enforce-basic-completion)
@@ -1557,10 +1555,11 @@ falling back on searching your PATH."
 (setq org-refile-targets (quote ((nil :maxlevel . 9)
                                  (org-agenda-files :maxlevel . 9))))
 
-; Use full outline paths for refile targets - we file directly with IDO
-(setq org-refile-use-outline-path t)
+;; Use outline path file and complete in steps
+;; this helps vertico work properly
+(setq org-refile-use-outline-path 'file)
 
-(setq org-outline-path-complete-in-steps nil)
+(setq org-outline-path-complete-in-steps t)
 
 ; Allow refile to create parent tasks with confirmation
 (setq org-refile-allow-creating-parent-nodes (quote confirm))

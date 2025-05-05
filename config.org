@@ -1692,8 +1692,6 @@ for some reason, it seems the header bullet in Org mode are affected by this.
 See https://github.com/minad/vertico?tab=readme-ov-file#problematic-completion-commands
 
 #+begin_src emacs-lisp
-;; For org-refile we use full path as that's what I am used to anyway.
-
 ;; Use the other two org fixes from the vertico readme
 (advice-add #'org-make-tags-matcher :around #'vertico-enforce-basic-completion)
 (advice-add #'org-agenda-filter :around #'vertico-enforce-basic-completion)
@@ -2081,17 +2079,18 @@ Org-Agenda
 ** Refile
 
    #+begin_src emacs-lisp
-; Targets include this file and any file contributing to the agenda - up to 9 levels deep
-(setq org-refile-targets (quote ((nil :maxlevel . 9)
-                                 (org-agenda-files :maxlevel . 9))))
+   ; Targets include this file and any file contributing to the agenda - up to 9 levels deep
+   (setq org-refile-targets (quote ((nil :maxlevel . 9)
+                                    (org-agenda-files :maxlevel . 9))))
 
-; Use full outline paths for refile targets - we file directly with IDO
-(setq org-refile-use-outline-path t)
+   ;; Use outline path file and complete in steps
+   ;; this helps vertico work properly
+   (setq org-refile-use-outline-path 'file)
 
-(setq org-outline-path-complete-in-steps nil)
+   (setq org-outline-path-complete-in-steps t)
 
-; Allow refile to create parent tasks with confirmation
-(setq org-refile-allow-creating-parent-nodes (quote confirm))
+   ; Allow refile to create parent tasks with confirmation
+   (setq org-refile-allow-creating-parent-nodes (quote confirm))
 
    #+end_src
 
