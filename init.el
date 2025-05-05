@@ -453,7 +453,7 @@
   (prog-mode . breadcrumb-local-mode)
   (org-mode . breadcrumb-local-mode)
   :custom-face
-  (breadcrumb-face ((t (:inherit header-line :foreground "dark-gray"))))
+  (breadcrumb-face ((t (:inherit mode-line))))
   :custom
   ;; This doesn't work as breadcrumb get's prepended
   ;; (header-line-format `("" header-line-indent))
