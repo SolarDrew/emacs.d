@@ -74,6 +74,16 @@
    "J" 'scroll-up-command
    )
 
+  ;; Mode Specific Keybinds
+  ;; Shell
+  (general-define-key
+   :states 'insert
+   :keymaps 'comint-mode-map
+
+   "<up>" 'comint-previous-input
+   "<down>" 'comint-next-input
+  )
+
   ;; Set up a local-leader used for language mode specific functionality
   (general-create-definer my-local-leader
     :prefix ","
