@@ -891,6 +891,11 @@ falling back on searching your PATH."
       (with-current-buffer (get-buffer "*compilation*")
         (inferior-python-mode)))))
 
+;; Always scroll to the end in a python shell
+(add-hook 'inferior-python-mode-hook
+          (lambda ()
+            (setq comint-move-point-for-output t)))
+
 (my-local-leader
   :states 'normal
   :keymaps 'python-ts-mode-map
