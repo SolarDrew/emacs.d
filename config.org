@@ -455,6 +455,10 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
 
   (start/leader-keys
     "w" '(:ignore t :wk "Windows and Workspaces")
+    "w <left>" '(evil-window-left :wk "Window left")
+    "w <right>" '(evil-window-right :wk "Window right")
+    "w <down>" '(evil-window-down :wk "Window Down")
+    "w <up>" '(evil-window-up :wk "Window Up")
     "w h" '(evil-window-left :wk "Window left")
     "w l" '(evil-window-right :wk "Window right")
     "w j" '(evil-window-down :wk "Window Down")
@@ -998,6 +1002,13 @@ I am using both micromamba and virtualenvwrapper-style virtual envs, so we enabl
   :ensure t
   :hook (micromamba-postactivate-hook . restart-eglot)
   )
+
+(use-package conda
+  :ensure t
+  :hook (conda-postactivate-hook . restart-eglot)
+  :custom
+  (conda-anaconda-home "/home/drew/mambaforge/")
+  )
 #+end_src
 
 Enable the excellent pytest package, and setup an extra hook for [[https://github.com/astropy/pytest-remotedata][pytest-remotedata]].
@@ -1215,6 +1226,8 @@ A bunch of language specific key binds, using ~,~ as the leader key.
   "f r" 'ruff-format-buffer
   "f c" 'ruff-check-buffer
 
+  "n a" 'conda-env-activate
+  "n d" 'conda-env-deactivate
   "m a" 'micromamba-activate
   "m d" 'micromamba-deactivate
   "v a" 'pyvenv-workon

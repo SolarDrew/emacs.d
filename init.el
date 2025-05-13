@@ -322,6 +322,10 @@
 
   (start/leader-keys
     "w" '(:ignore t :wk "Windows and Workspaces")
+    "w <left>" '(evil-window-left :wk "Window left")
+    "w <right>" '(evil-window-right :wk "Window right")
+    "w <down>" '(evil-window-down :wk "Window Down")
+    "w <up>" '(evil-window-up :wk "Window Up")
     "w h" '(evil-window-left :wk "Window left")
     "w l" '(evil-window-right :wk "Window right")
     "w j" '(evil-window-down :wk "Window Down")
@@ -737,6 +741,13 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   :hook (micromamba-postactivate-hook . restart-eglot)
   )
 
+(use-package conda
+  :ensure t
+  :hook (conda-postactivate-hook . restart-eglot)
+  :custom
+  (conda-anaconda-home "/home/drew/mambaforge/")
+  )
+
 (use-package python-pytest
   :config
   (transient-append-suffix 'python-pytest-dispatch
@@ -928,6 +939,8 @@ falling back on searching your PATH."
   "f r" 'ruff-format-buffer
   "f c" 'ruff-check-buffer
 
+  "n a" 'conda-env-activate
+  "n d" 'conda-env-deactivate
   "m a" 'micromamba-activate
   "m d" 'micromamba-deactivate
   "v a" 'pyvenv-workon
