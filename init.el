@@ -4,7 +4,7 @@
 (defun start/org-babel-tangle-config ()
   "Automatically tangle our Emacs.org config file when we save it. Credit to Emacs From Scratch for this one!"
   (when (string-equal (file-name-directory (buffer-file-name))
-                      (expand-file-name "~/Git/new.emacs.d/"))
+                      (expand-file-name "~/oss-projects/stumacs/"))
     ;; Dynamic scoping to the rescue
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
@@ -409,9 +409,10 @@
   (set-window-dedicated-p (selected-window)
      (not (window-dedicated-p (selected-window)))))
 
-;;  (use-package gruvbox-theme
-;;    :config
-;;    (load-theme 'gruvbox-dark-medium t)) ;; We need to add t to trust this package
+(use-package monokai-theme
+  :config
+  (load-theme 'monokai t)
+)
 
 (add-to-list 'default-frame-alist '(alpha-background . 90)) ;; For all new frames henceforth
 
