@@ -413,6 +413,8 @@
   (set-window-dedicated-p (selected-window)
      (not (window-dedicated-p (selected-window)))))
 
+(add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
+
 ;;  (use-package gruvbox-theme
 ;;    :config
 ;;    (load-theme 'gruvbox-dark-medium t)) ;; We need to add t to trust this package
@@ -832,46 +834,22 @@ falling back on searching your PATH."
                  (and (file-exists-p bin) bin)))
           (executable-find exe)))))
 
-(defun +python/open-repl ()
-  "Open the Python REPL."
-  (interactive)
-  (require 'python)
-  (unless python-shell-interpreter
-    (user-error "`python-shell-interpreter' isn't set"))
-  (pop-to-buffer
-   (process-buffer
-    (let ((dedicated (bound-and-true-p python-shell-dedicated)))
-      (if-let* ((pipenv (+python-executable-find "pipenv"))
-                (pipenv-project (pipenv-project-p)))
-          (let ((default-directory pipenv-project)
-                (python-shell-interpreter-args
-                 (format "run %s %s"
-                         python-shell-interpreter
-                         python-shell-interpreter-args))
-                (python-shell-interpreter pipenv))
-            (run-python nil dedicated t))
-        (run-python nil dedicated t))))))
-
-(defvar +python-ipython-command '("ipython" "-i" "--simple-prompt" "--no-color-info")
+(defvar +python-ipython-command '("ipython")
   "Command to initialize the ipython REPL for `+python/open-ipython-repl'.")
 
 (defun +python/open-ipython-repl ()
   "Open an IPython REPL."
   (interactive)
   (require 'python)
-  (let ((python-shell-interpreter
-         (or (+python-executable-find (car +python-ipython-command))
-             "ipython"))
-        (python-shell-interpreter-args
-         (string-join (cdr +python-ipython-command) " ")))
-    (+python/open-repl)))
+  (eat-other-window (or (+python-executable-find (car +python-ipython-command))
+                        "ipython")))
 
 (defun cadair/run-restart-repl ()
   "Run a new python repl in a window which does not have focus."
   (interactive)
   (setq initial-buffer (current-buffer))
   (if (python-shell-get-buffer)
-      (kill-process (get-buffer-process (python-shell-get-buffer))))
+	  (kill-process (get-buffer-process (python-shell-get-buffer))))
   (sleep-for 0.5)
   (+python/open-ipython-repl)
   (evil-normal-state)
@@ -903,13 +881,13 @@ falling back on searching your PATH."
                                  (shell-quote-argument (file-name-nondirectory buffer-file-name)))))
     (if arg
         (call-interactively 'compile)
-      (compile compile-command t)
-      (with-current-buffer (get-buffer "*compilation*")
+	  (compile compile-command t)
+	  (with-current-buffer (get-buffer "*compilation*")
         (inferior-python-mode)))))
 
 ;; Always scroll to the end in a python shell
 (add-hook 'inferior-python-mode-hook
-          (lambda ()
+		  (lambda ()
             (setq comint-move-point-for-output t)))
 
 (my-local-leader
