@@ -1470,8 +1470,8 @@ falling back on searching your PATH."
   )
 
 ;; All my org files live in one directory
-(setq org-directory "~/Notebooks/")
-(setq cadair-default-org-files (file-expand-wildcards "~/Notebooks/*.org"))
+(setq org-directory "~/to-do/")
+(setq cadair-default-org-files (file-expand-wildcards "~/to-do/*.org"))
 (setq cadair-extra-org-files '())
 
 ;; Some general config

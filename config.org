@@ -1989,8 +1989,8 @@ Org-Agenda
    This is where we increase our line count.
    #+begin_src emacs-lisp
    ;; All my org files live in one directory
-   (setq org-directory "~/Notebooks/")
-   (setq cadair-default-org-files (file-expand-wildcards "~/Notebooks/*.org"))
+   (setq org-directory "~/to-do/")
+   (setq cadair-default-org-files (file-expand-wildcards "~/to-do/*.org"))
    (setq cadair-extra-org-files '())
 
    ;; Some general config
