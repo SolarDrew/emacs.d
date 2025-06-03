@@ -36,6 +36,7 @@ The repo is also a flake, so if you are mad enough to want to use this you can i
   - [[#ediff][EDiff]]
   - [[#nix-environment-hackery][nix environment hackery]]
   - [[#window-management][Window management]]
+  - [[#compilation-mode][Compilation Mode]]
 - [[#appearance][Appearance]]
   - [[#set-theme][Set Theme]]
   - [[#transparency][Transparency]]
@@ -70,6 +71,7 @@ The repo is also a flake, so if you are mad enough to want to use this you can i
   - [[#jinx---better-spell-check][jinx - better spell check?]]
   - [[#evil-nerd-commenter][Evil-nerd-commenter]]
   - [[#indent-guides][Indent guides]]
+  - [[#eat---terminal][EAT - Terminal]]
 - [[#org-mode][Org Mode]]
   - [[#visuals][Visuals]]
   - [[#vertico-fixes][Vertico Fixes]]
@@ -174,7 +176,7 @@ Notes:
     (evil-set-initial-state 'org-agenda-mode 'normal)  ;; Use normal mode (not emacs) in agenda
     :custom ;; Customization of package custom variables
     (evil-want-keybinding nil)    ;; Disable evil bindings in other modes (It's not consistent and not good)
-    (evil-want-C-u-scroll t)      ;; Set C-u to scroll up
+    (evil-want-C-u-scroll nil)    ;; Do not set C-u to scroll up
     (evil-want-C-i-jump nil)      ;; Disables C-i jump
     (evil-undo-system 'undo-redo) ;; C-r to redo
     (org-return-follows-link t)   ;; Sets RETURN key in org-mode to follow links
@@ -205,6 +207,7 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
    :states '(normal visual motion emacs)
    "K" 'scroll-down-command
    "J" 'scroll-up-command
+   ;; "<escape>" 'keyboard-quit
    )
 
   ;; Mode Specific Keybinds
@@ -215,6 +218,13 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
 
    "<up>" 'comint-previous-input
    "<down>" 'comint-next-input
+  )
+  
+  (general-define-key
+   :keymaps 'compilation-mode-map
+   :states 'motion
+
+   "<escape>" 'quit-window
   )
 
   ;; Set up a local-leader used for language mode specific functionality
@@ -416,9 +426,9 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
     "p b" '(project-switch-to-buffer :wk "Switch to project buffer")
     "p s" '(project-shell :wk "Run shell in project")
     "p d" '(project-find-dir :wk "Find directory")
-    "p D" '(project-dired :wk "Dired")
-    "p v" '(project-vc-dir :wk "Run VC-Dir")
-    "p c" '(project-compile :wk "Compile Project")
+    "p D" '(project-dired :Wk "Dired")
+    "P V" '(Project-Vc-Dir :Wk "Run Vc-Dir")
+    "P C" '(project-compile :wk "Compile Project")
     "p e" '(project-eshell :wk "Run Shell")
     "p k" '(project-kill-buffers :wk "Kill all buffers")
     "p p" '(tabspaces-open-or-create-project-and-workspace :wk "Switch Tabspaces")
@@ -564,6 +574,14 @@ This is based off reading this tutorial: https://www.masteringemacs.org/article/
   (set-window-dedicated-p (selected-window)
      (not (window-dedicated-p (selected-window)))))
 #+end_src
+
+** Compilation Mode
+
+   Enable colour in compilation buffers.
+   #+begin_src emacs-lisp
+(add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
+   #+end_src
+
 * Appearance
 ** Set Theme
 My themes and fonts are set in my home-manager config so that they match the whole system.
@@ -616,8 +634,6 @@ While nerd-icons supports both GUI and TUI.
 (use-package nerd-icons
   :if (display-graphic-p)
   :demand t
-  :custom
-  (nerd-icons-font-family "Fira Code Nerd Font")
   )
 
 (use-package nerd-icons-dired
@@ -1119,46 +1135,22 @@ falling back on searching your PATH."
                  (and (file-exists-p bin) bin)))
           (executable-find exe)))))
 
-(defun +python/open-repl ()
-  "Open the Python REPL."
-  (interactive)
-  (require 'python)
-  (unless python-shell-interpreter
-    (user-error "`python-shell-interpreter' isn't set"))
-  (pop-to-buffer
-   (process-buffer
-    (let ((dedicated (bound-and-true-p python-shell-dedicated)))
-      (if-let* ((pipenv (+python-executable-find "pipenv"))
-                (pipenv-project (pipenv-project-p)))
-          (let ((default-directory pipenv-project)
-                (python-shell-interpreter-args
-                 (format "run %s %s"
-                         python-shell-interpreter
-                         python-shell-interpreter-args))
-                (python-shell-interpreter pipenv))
-            (run-python nil dedicated t))
-        (run-python nil dedicated t))))))
-
-(defvar +python-ipython-command '("ipython" "-i" "--simple-prompt" "--no-color-info")
+(defvar +python-ipython-command '("ipython")
   "Command to initialize the ipython REPL for `+python/open-ipython-repl'.")
 
 (defun +python/open-ipython-repl ()
   "Open an IPython REPL."
   (interactive)
   (require 'python)
-  (let ((python-shell-interpreter
-         (or (+python-executable-find (car +python-ipython-command))
-             "ipython"))
-        (python-shell-interpreter-args
-         (string-join (cdr +python-ipython-command) " ")))
-    (+python/open-repl)))
+  (eat-other-window (or (+python-executable-find (car +python-ipython-command))
+                        "ipython")))
 
 (defun cadair/run-restart-repl ()
   "Run a new python repl in a window which does not have focus."
   (interactive)
   (setq initial-buffer (current-buffer))
   (if (python-shell-get-buffer)
-      (kill-process (get-buffer-process (python-shell-get-buffer))))
+	  (kill-process (get-buffer-process (python-shell-get-buffer))))
   (sleep-for 0.5)
   (+python/open-ipython-repl)
   (evil-normal-state)
@@ -1190,13 +1182,13 @@ falling back on searching your PATH."
                                  (shell-quote-argument (file-name-nondirectory buffer-file-name)))))
     (if arg
         (call-interactively 'compile)
-      (compile compile-command t)
-      (with-current-buffer (get-buffer "*compilation*")
+	  (compile compile-command t)
+	  (with-current-buffer (get-buffer "*compilation*")
         (inferior-python-mode)))))
 
 ;; Always scroll to the end in a python shell
 (add-hook 'inferior-python-mode-hook
-          (lambda ()
+		  (lambda ()
             (setq comint-move-point-for-output t)))
 #+end_src
 
@@ -1243,6 +1235,27 @@ A bunch of language specific key binds, using ~,~ as the leader key.
 (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-ts-mode))
 #+end_src
 
+*** nix
+    #+begin_src emacs-lisp
+(use-package nix-ts-mode
+ :mode "\\.nix\\'")
+    #+end_src
+
+*** Quarto
+    #+begin_src emacs-lisp
+  (use-package quarto-mode)
+    #+end_src
+
+#+begin_src emacs-lisp
+(my-local-leader
+  :states 'normal
+  :keymaps 'poly-quarto-polymode-map
+  "m a" 'micromamba-activate
+  "m d" 'micromamba-deactivate
+  "v a" 'pyvenv-workon
+  "v d" 'pyvenv-deactivate
+  )
+#+end_src
 * Other Packages
 All the package setups that don't need much tweaking.
 
@@ -1626,6 +1639,14 @@ https://github.com/minad/jinx
           yaml-ts-mode) . indent-bars-mode))
    #+end_src
 
+** EAT - Terminal
+
+#+begin_src emacs-lisp
+(use-package eat
+  :custom
+  (eat-shell "/home/stuart/.nix-profile/bin/xonsh")
+  )
+#+end_src
 * Org Mode
 
 Orgy orgy org mode.

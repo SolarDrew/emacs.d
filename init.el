@@ -45,11 +45,11 @@
   (evil-set-initial-state 'org-agenda-mode 'normal)  ;; Use normal mode (not emacs) in agenda
   :custom ;; Customization of package custom variables
   (evil-want-keybinding nil)    ;; Disable evil bindings in other modes (It's not consistent and not good)
-  (evil-want-C-u-scroll t)      ;; Set C-u to scroll up
+  (evil-want-C-u-scroll nil)    ;; Do not set C-u to scroll up
   (evil-want-C-i-jump nil)      ;; Disables C-i jump
   (evil-undo-system 'undo-redo) ;; C-r to redo
   (org-return-follows-link t)   ;; Sets RETURN key in org-mode to follow links
-  
+
   ;; Unmap keys in 'evil-maps. If not done, org-return-follows-link will not work
   :bind (:map evil-motion-state-map
               ("SPC" . nil)
@@ -72,6 +72,7 @@
    :states '(normal visual motion emacs)
    "K" 'scroll-down-command
    "J" 'scroll-up-command
+   ;; "<escape>" 'keyboard-quit
    )
 
   ;; Mode Specific Keybinds
@@ -82,264 +83,271 @@
 
    "<up>" 'comint-previous-input
    "<down>" 'comint-next-input
-  )
+   )
+
+  (general-define-key
+   :keymaps 'compilation-mode-map
+   :states 'motion
+
+   "<escape>" 'quit-window
+   )
 
   ;; Set up a local-leader used for language mode specific functionality
   (general-create-definer my-local-leader
-    :prefix ","
-    )
+                          :prefix ","
+                          )
 
   ;; Add some eglot related things to , because my muscle memory demands it
   (my-local-leader
-	:states '(normal visual)
-	;; If I only enable this in eglot-mode-map then setting major-mode specific binds override this one
-	;;:keymaps 'eglot-mode-map
-	"g" '(:ignore t :wk "Eglot goto")
-	"g g" '(xref-find-definitions :wk "Goto Definition")
-	"g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
-	"g r" '(xref-find-references :wk "Find references")
-	"d" '('eldoc-doc-buffer :wk "Documentation")
-	)
+   :states '(normal visual)
+   ;; If I only enable this in eglot-mode-map then setting major-mode specific binds override this one
+   ;;:keymaps 'eglot-mode-map
+   "g" '(:ignore t :wk "Eglot goto")
+   "g g" '(xref-find-definitions :wk "Goto Definition")
+   "g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
+   "g r" '(xref-find-references :wk "Find references")
+   "d" '('eldoc-doc-buffer :wk "Documentation")
+   )
 
   ;; Set up 'SPC' as primary leader key
   (general-create-definer start/leader-keys
-    :states '(normal insert visual motion emacs)
-    :keymaps 'override
-    :prefix "SPC"           ;; Set leader key
-    :global-prefix "C-SPC") ;; Set global leader key
+                          :states '(normal insert visual motion emacs)
+                          :keymaps 'override
+                          :prefix "SPC"           ;; Set leader key
+                          :global-prefix "C-SPC") ;; Set global leader key
 
   (start/leader-keys
-    "SPC" '(execute-extended-command :wk "M-x")
-    "." '(find-file :wk "Find file")
-    "TAB" '(evil-switch-to-windows-last-buffer :wk "Last buffer")
-    "/" '(consult-ripgrep :wk "Search Project")
-    )
+   "SPC" '(execute-extended-command :wk "M-x")
+   "." '(find-file :wk "Find file")
+   "TAB" '(evil-switch-to-windows-last-buffer :wk "Last buffer")
+   "/" '(consult-ripgrep :wk "Search Project")
+   )
 
   (start/leader-keys
-    "a" '(:ignore t :wk "Applications")
-    "a r" '(ranger :wk "Ranger")
-    )
+   "a" '(:ignore t :wk "Applications")
+   "a r" '(ranger :wk "Ranger")
+   )
 
   (start/leader-keys
-    "b" '(:ignore t :wk "Buffer Bookmarks")
-    "b b" '(consult-buffer :wk "Switch buffer")
-    "b c" '(clone-indirect-buffer :wk "Clone buffer")
-    "b C" '(clone-indirect-buffer-other-window :wk "Clone buffer other window")
-    "b d" '(kill-current-buffer :wk "Kill buffer")
-    "b i" '(ibuffer :wk "Ibuffer")
-    "b j" '(consult-bookmark :wk "Bookmark jump")
-    "b l" '(evil-switch-to-windows-last-buffer :wk "Switch to last buffer")
-    "b m" '(bookmark-set :wk "Set bookmark")
-    "b M" '(bookmark-delete :wk "Delete bookmark")
-    "b n" '(next-buffer :wk "Next buffer")
-    "b N" '(evil-buffer-new :wk "New empty buffer")
-    "b p" '(previous-buffer :wk "Previous buffer")
-    "b r" '(revert-buffer :wk "Reload buffer")
-    "b R" '(rename-buffer :wk "Rename buffer")
-    "b s" '(scratch-buffer :wk "Scratch Buffer")
-    "b -" '(view-echo-area-messages :wk "Messages Buffer")
-    )
+   "b" '(:ignore t :wk "Buffer Bookmarks")
+   "b b" '(consult-buffer :wk "Switch buffer")
+   "b c" '(clone-indirect-buffer :wk "Clone buffer")
+   "b C" '(clone-indirect-buffer-other-window :wk "Clone buffer other window")
+   "b d" '(kill-current-buffer :wk "Kill buffer")
+   "b i" '(ibuffer :wk "Ibuffer")
+   "b j" '(consult-bookmark :wk "Bookmark jump")
+   "b l" '(evil-switch-to-windows-last-buffer :wk "Switch to last buffer")
+   "b m" '(bookmark-set :wk "Set bookmark")
+   "b M" '(bookmark-delete :wk "Delete bookmark")
+   "b n" '(next-buffer :wk "Next buffer")
+   "b N" '(evil-buffer-new :wk "New empty buffer")
+   "b p" '(previous-buffer :wk "Previous buffer")
+   "b r" '(revert-buffer :wk "Reload buffer")
+   "b R" '(rename-buffer :wk "Rename buffer")
+   "b s" '(scratch-buffer :wk "Scratch Buffer")
+   "b -" '(view-echo-area-messages :wk "Messages Buffer")
+   )
 
   (start/leader-keys
-    "c" '(:ignore t :wk "Code")
-    "c a"   '(eglot-code-actions :wk "Code actions")
-    "c b"   '(eval-buffer :wk "Evaluate elisp in buffer")
-    "c d"   '(eldoc-doc-buffer :wk "Documentation")
-    "c e"   '(eglot-reconnect :wk "Eglot Reconnect")
-    "c f"   '(eglot-format :wk "Eglot Format")
-    "c g d" '(xref-find-definitions :wk "Goto Definition")
-    "c g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
-    "c g r" '(xref-find-references :wk "Find references")
-	"c i"   '(indent-region :wk "Indent Region")
-    "c l"   '(evilnc-comment-or-uncomment-lines :wk "Toggle Comments")
-    "c L"   '(evilnc-toggle-comment-empty-lines :wk "Toggle commenting empty lines")
-	"c o"   '(symbols-outline-show :wk "Show symbols outline")
-	"c r"   '(eglot-rename :wk "Rename symbol at point")
-	"c s"   '(consult-eglot-symbols :wk "Find Symbols in Workspace")
-    )
+   "c" '(:ignore t :wk "Code")
+   "c a"   '(eglot-code-actions :wk "Code actions")
+   "c b"   '(eval-buffer :wk "Evaluate elisp in buffer")
+   "c d"   '(eldoc-doc-buffer :wk "Documentation")
+   "c e"   '(eglot-reconnect :wk "Eglot Reconnect")
+   "c f"   '(eglot-format :wk "Eglot Format")
+   "c g d" '(xref-find-definitions :wk "Goto Definition")
+   "c g D" '(xref-find-definitions-other-window :wk "Goto Definition (other window)")
+   "c g r" '(xref-find-references :wk "Find references")
+   "c i"   '(indent-region :wk "Indent Region")
+   "c l"   '(evilnc-comment-or-uncomment-lines :wk "Toggle Comments")
+   "c L"   '(evilnc-toggle-comment-empty-lines :wk "Toggle commenting empty lines")
+   "c o"   '(symbols-outline-show :wk "Show symbols outline")
+   "c r"   '(eglot-rename :wk "Rename symbol at point")
+   "c s"   '(consult-eglot-symbols :wk "Find Symbols in Workspace")
+   )
 
   (start/leader-keys
-    "d" '(:ignore t :wk "Dired")
-    "j v" '(dired :wk "Open dired")
-    "d j" '(dired-jump :wk "Dired jump to current")
-    )
+   "d" '(:ignore t :wk "Dired")
+   "j v" '(dired :wk "Open dired")
+   "d j" '(dired-jump :wk "Dired jump to current")
+   )
 
   (start/leader-keys
-    "e"   '(:ignore t :wk "Evals and Errors")
-    "e l" '(consult-flymake :wk "Consult Flymake")
-    "e r" '(eval-region :wk "Evaluate elisp in region")
-    )
+   "e"   '(:ignore t :wk "Evals and Errors")
+   "e l" '(consult-flymake :wk "Consult Flymake")
+   "e r" '(eval-region :wk "Evaluate elisp in region")
+   )
 
   (start/leader-keys
-    "f" '(:ignore t :wk "Find / Files")
-    "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
-  	"f C" '(doom/copy-this-file :wk "Copy this file")
-    "f f" '(find-file :wk "Find file")
-    "f g" '(consult-ripgrep :wk "Ripgrep search in files")
-    "f i" '(consult-imenu :wk "Imenu buffer locations")
-    "f l" '(consult-line :wk "Find line")
-  	"f L" '(locate :wk "Locate file")
-    "f r" '(consult-recent-file :wk "Recent files")
-  	"f R" '(doom/move-this-file :wk "Rename/Move file")
-    "f s" '(save-buffer :wk "Save Buffer")
-    "f S" '(write-file :wk "Save file as...")
-    )
+   "f" '(:ignore t :wk "Find / Files")
+   "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
+   "f C" '(doom/copy-this-file :wk "Copy this file")
+   "f f" '(find-file :wk "Find file")
+   "f g" '(consult-ripgrep :wk "Ripgrep search in files")
+   "f i" '(consult-imenu :wk "Imenu buffer locations")
+   "f l" '(consult-line :wk "Find line")
+   "f L" '(locate :wk "Locate file")
+   "f r" '(consult-recent-file :wk "Recent files")
+   "f R" '(doom/move-this-file :wk "Rename/Move file")
+   "f s" '(save-buffer :wk "Save Buffer")
+   "f S" '(write-file :wk "Save file as...")
+   )
 
   (start/leader-keys
-    "g" '(:ignore t :wk "Git")
-  	"g s"   '(magit                              :wk "Magit")
-  	"g R"   '(vc-revert                          :wk "Revert file")
-  	"g y"   '(git-link-homepage                  :wk "Copy link to remote")
-  	"g t"   '(git-timemachine-toggle             :wk "Git time machine")
-  	"g /"   '(magit-dispatch                     :wk "Magit dispatch")
-  	"g ."   '(magit-file-dispatch                :wk "Magit file dispatch")
-  	"g '"   '(forge-dispatch                     :wk "Forge dispatch")
-  	"g -"   '(blamer-mode                        :wk "Toggle blamer")
-  	"g b"   '(magit-branch-checkout              :wk "Magit switch branch")
-  	"g b"   '(magit-blame-addition               :wk "Magit blame")
-  	"g g"   '(magit-status                       :wk "Magit status")
-  	"g G"   '(magit-status-here                  :wk "Magit status here")
-  	"g D"   '(magit-file-delete                  :wk "Magit file delete")
-  	"g C"   '(magit-clone                        :wk "Magit clone")
-  	"g F"   '(magit-fetch                        :wk "Magit fetch")
-  	"g L"   '(git-link                           :wk "Link to selection")
-  	"g S"   '(magit-stage-buffer-file            :wk "Git stage this file")
-  	"g U"   '(magit-unstage-buffer-file          :wk "Git unstage this file")
-  	"g f"   '(:ignore t :wk "find")
-  	"g f f" '(magit-find-file                    :wk "Find file")
-  	"g f g" '(magit-find-git-config-file         :wk "Find gitconfig file")
-  	"g f c" '(magit-show-commit                  :wk "Find commit")
-  	"g f i" '(forge-visit-issue                  :wk "Find issue")
-  	"g f p" '(forge-visit-pullreq                :wk "Find pull request")
-  	"g o"   '(:ignore t :wk "open in browser")
-  	"g o r" '(forge-browse-remote                :wk "Browse remote")
-  	"g o c" '(forge-browse-commit                :wk "Browse commit")
-  	"g o i" '(forge-browse-issue                 :wk "Browse an issue")
-  	"g o p" '(forge-browse-pullreq               :wk "Browse a pull request")
-  	"g o I" '(forge-browse-issues                :wk "Browse issues")
-  	"g o P" '(forge-browse-pullreqs              :wk "Browse pull requests")
-  	"g l"   '(:ignore t :wk "list")
-  	;;"g l g" '(+gist:list                         :wk "List gists")
-  	"g l r" '(magit-list-repositories            :wk "List repositories")
-  	"g l s" '(magit-list-submodules              :wk "List submodules")
-  	"g l i" '(forge-list-issues                  :wk "List issues")
-  	"g l p" '(forge-list-pullreqs                :wk "List pull requests")
-  	"g l n" '(forge-list-notifications           :wk "List notifications")
-  	"g c"   '(:ignore t :wk "create")
-  	"g c r" '(magit-init                         :wk "Initialize repo")
-  	"g c R" '(magit-clone                        :wk "Clone repo")
-  	"g c c" '(magit-commit-create                :wk "Commit")
-  	"g c f" '(magit-commit-fixup                 :wk "Fixup")
-  	"g c b" '(magit-branch-and-checkout          :wk "Branch")
-  	"g c i" '(forge-create-issue                 :wk "Issue")
-    "g c p" '(forge-create-pullreq               :wk "Pull request")
-    )
+   "g" '(:ignore t :wk "Git")
+   "g s"   '(magit                              :wk "Magit")
+   "g R"   '(vc-revert                          :wk "Revert file")
+   "g y"   '(git-link-homepage                  :wk "Copy link to remote")
+   "g t"   '(git-timemachine-toggle             :wk "Git time machine")
+   "g /"   '(magit-dispatch                     :wk "Magit dispatch")
+   "g ."   '(magit-file-dispatch                :wk "Magit file dispatch")
+   "g '"   '(forge-dispatch                     :wk "Forge dispatch")
+   "g -"   '(blamer-mode                        :wk "Toggle blamer")
+   "g b"   '(magit-branch-checkout              :wk "Magit switch branch")
+   "g b"   '(magit-blame-addition               :wk "Magit blame")
+   "g g"   '(magit-status                       :wk "Magit status")
+   "g G"   '(magit-status-here                  :wk "Magit status here")
+   "g D"   '(magit-file-delete                  :wk "Magit file delete")
+   "g C"   '(magit-clone                        :wk "Magit clone")
+   "g F"   '(magit-fetch                        :wk "Magit fetch")
+   "g L"   '(git-link                           :wk "Link to selection")
+   "g S"   '(magit-stage-buffer-file            :wk "Git stage this file")
+   "g U"   '(magit-unstage-buffer-file          :wk "Git unstage this file")
+   "g f"   '(:ignore t :wk "find")
+   "g f f" '(magit-find-file                    :wk "Find file")
+   "g f g" '(magit-find-git-config-file         :wk "Find gitconfig file")
+   "g f c" '(magit-show-commit                  :wk "Find commit")
+   "g f i" '(forge-visit-issue                  :wk "Find issue")
+   "g f p" '(forge-visit-pullreq                :wk "Find pull request")
+   "g o"   '(:ignore t :wk "open in browser")
+   "g o r" '(forge-browse-remote                :wk "Browse remote")
+   "g o c" '(forge-browse-commit                :wk "Browse commit")
+   "g o i" '(forge-browse-issue                 :wk "Browse an issue")
+   "g o p" '(forge-browse-pullreq               :wk "Browse a pull request")
+   "g o I" '(forge-browse-issues                :wk "Browse issues")
+   "g o P" '(forge-browse-pullreqs              :wk "Browse pull requests")
+   "g l"   '(:ignore t :wk "list")
+   ;;"g l g" '(+gist:list                         :wk "List gists")
+   "g l r" '(magit-list-repositories            :wk "List repositories")
+   "g l s" '(magit-list-submodules              :wk "List submodules")
+   "g l i" '(forge-list-issues                  :wk "List issues")
+   "g l p" '(forge-list-pullreqs                :wk "List pull requests")
+   "g l n" '(forge-list-notifications           :wk "List notifications")
+   "g c"   '(:ignore t :wk "create")
+   "g c r" '(magit-init                         :wk "Initialize repo")
+   "g c R" '(magit-clone                        :wk "Clone repo")
+   "g c c" '(magit-commit-create                :wk "Commit")
+   "g c f" '(magit-commit-fixup                 :wk "Fixup")
+   "g c b" '(magit-branch-and-checkout          :wk "Branch")
+   "g c i" '(forge-create-issue                 :wk "Issue")
+   "g c p" '(forge-create-pullreq               :wk "Pull request")
+   )
 
   ;; TODO: It would be nice if I could just rebind C-h to SPC h
   (start/leader-keys
-    "h" '(:ignore t :wk "Help") ;; To get more help use C-h commands (describe variable, function, etc.)
-    "h k" '(describe-key :wk "Describe Key")
-    "h s" '(describe-symbol :wk "Describe Symbol")
-    "h v" '(describe-variable :wk "Describe Variable")
-    "h f" '(describe-function :wk "Describe Function")
-    "h b" '(describe-bindings :wk "Describe Bindings")
-    )
+   "h" '(:ignore t :wk "Help") ;; To get more help use C-h commands (describe variable, function, etc.)
+   "h k" '(describe-key :wk "Describe Key")
+   "h s" '(describe-symbol :wk "Describe Symbol")
+   "h v" '(describe-variable :wk "Describe Variable")
+   "h f" '(describe-function :wk "Describe Function")
+   "h b" '(describe-bindings :wk "Describe Bindings")
+   )
 
   (start/leader-keys
-    "l" '(:ignore t :wk "Tabspaces")
-    "l C" '(tabspaces-clear-buffers :wk "Clear all Buffers")
-    "l b" '(tabspaces-switch-to-buffer :wk "Switch to Buffer")
-    "l d" '(tabspaces-close-workspace :wk "Close Workspace")
-    "l k" '(tabspaces-kill-buffers-close-workspace :wk "Kill Buffers and Close Workspace")
-    "l o" '(tabspaces-open-or-create-project-and-workspace :wk "Open Project and Workspace")
-    "l r" '(tabspaces-remove-current-buffer :wk "Remove current buffer")
-    "l R" '(tabspaces-restore-session :wk "Restore previous session")
-    "l l" '(tabspaces-switch-or-create-workspace :wk "Switch or Create Workspace")
-    "l t" '(tabspaces-switch-buffer-and-tab :wk "Switch Buffer and tab")
-    ;; General Tab Control
-    "l TAB" '(tab-bar-switch-to-recent-tab :wk "Previous Tab")
-    "l L" '(tab-move :wk "Move Tab Right")
-    "l H" '((lambda () (interactive) (tab-move -1)) :wk "Move Tab Left")
-    )
-  
-  (start/leader-keys
-    "o" '(:ignore t :wk "Org Mode")
-    "o a" '(org-agenda :wk "Agenda")
-	"o c" '(org-capture :wk "Capture")
-	"o f" '(consult-org-agenda :wk "Find Agenda Item")
-	"o h" '(org-insert-todo-heading :wk "Insert TODO heading")
-	"o s" '(org-insert-todo-subheading :wk "Insert TODO subheading")
-	"o t" '(lambda() (interactive)(find-file "~/Notebooks/ToDo.org") :wk "Open ToDo.org")
-    )
+   "l" '(:ignore t :wk "Tabspaces")
+   "l C" '(tabspaces-clear-buffers :wk "Clear all Buffers")
+   "l b" '(tabspaces-switch-to-buffer :wk "Switch to Buffer")
+   "l d" '(tabspaces-close-workspace :wk "Close Workspace")
+   "l k" '(tabspaces-kill-buffers-close-workspace :wk "Kill Buffers and Close Workspace")
+   "l o" '(tabspaces-open-or-create-project-and-workspace :wk "Open Project and Workspace")
+   "l r" '(tabspaces-remove-current-buffer :wk "Remove current buffer")
+   "l R" '(tabspaces-restore-session :wk "Restore previous session")
+   "l l" '(tabspaces-switch-or-create-workspace :wk "Switch or Create Workspace")
+   "l t" '(tabspaces-switch-buffer-and-tab :wk "Switch Buffer and tab")
+   ;; General Tab Control
+   "l TAB" '(tab-bar-switch-to-recent-tab :wk "Previous Tab")
+   "l L" '(tab-move :wk "Move Tab Right")
+   "l H" '((lambda () (interactive) (tab-move -1)) :wk "Move Tab Left")
+   )
 
   (start/leader-keys
-    "p" '(:ignore t :wk "Projects")
-    "p t" '(treemacs :wk "Treemacs")
-    ;; Copied from project.el
-    "p !" '(project-shell-command :wk "Run command")
-    "p &" '(project-async-shell-command :wk "Run command (async)")
-    "p f" '(project-find-file :wk "Find file")
-    "p F" '(project-or-external-find-file :wk "Find file in project or external roots")
-    "p b" '(project-switch-to-buffer :wk "Switch to project buffer")
-    "p s" '(project-shell :wk "Run shell in project")
-    "p d" '(project-find-dir :wk "Find directory")
-    "p D" '(project-dired :wk "Dired")
-    "p v" '(project-vc-dir :wk "Run VC-Dir")
-    "p c" '(project-compile :wk "Compile Project")
-    "p e" '(project-eshell :wk "Run Shell")
-    "p k" '(project-kill-buffers :wk "Kill all buffers")
-    "p p" '(tabspaces-open-or-create-project-and-workspace :wk "Switch Tabspaces")
-    "p P" '(project-switch-project :wk "Switch Project")
-    "p g" '(project-find-regexp :wk "Find matches for regexp")
-    "p G" '(project-or-external-find-regexp :wk "Find matches for regexp in project or external")
-    "p r" '(project-query-replace-regexp :wk "Replace regexp")
-    "p x" '(project-execute-extended-command :wk "Execute extended command")
-    "p o" '(project-any-command :wk "Execute any command")
-    )
+   "o" '(:ignore t :wk "Org Mode")
+   "o a" '(org-agenda :wk "Agenda")
+   "o c" '(org-capture :wk "Capture")
+   "o f" '(consult-org-agenda :wk "Find Agenda Item")
+   "o h" '(org-insert-todo-heading :wk "Insert TODO heading")
+   "o s" '(org-insert-todo-subheading :wk "Insert TODO subheading")
+   "o t" '(lambda() (interactive)(find-file "~/Notebooks/ToDo.org") :wk "Open ToDo.org")
+   )
 
   (start/leader-keys
-    "q" '(:ignore t :wk "Quit / Session")
-    "q q" '(save-buffers-kill-terminal :wk "Quit Emacs")
-    "q r" '((lambda () (interactive)
-              (load-file user-init-file))
-            :wk "Reload Emacs config")
-    )
+   "p" '(:ignore t :wk "Projects")
+   "p t" '(treemacs :wk "Treemacs")
+   ;; Copied from project.el
+   "p !" '(project-shell-command :wk "Run command")
+   "p &" '(project-async-shell-command :wk "Run command (async)")
+   "p f" '(project-find-file :wk "Find file")
+   "p F" '(project-or-external-find-file :wk "Find file in project or external roots")
+   "p b" '(project-switch-to-buffer :wk "Switch to project buffer")
+   "p s" '(project-shell :wk "Run shell in project")
+   "p d" '(project-find-dir :wk "Find directory")
+   "p D" '(project-dired :Wk "Dired")
+   "P V" '(Project-Vc-Dir :Wk "Run Vc-Dir")
+   "P C" '(project-compile :wk "Compile Project")
+   "p e" '(project-eshell :wk "Run Shell")
+   "p k" '(project-kill-buffers :wk "Kill all buffers")
+   "p p" '(tabspaces-open-or-create-project-and-workspace :wk "Switch Tabspaces")
+   "p P" '(project-switch-project :wk "Switch Project")
+   "p g" '(project-find-regexp :wk "Find matches for regexp")
+   "p G" '(project-or-external-find-regexp :wk "Find matches for regexp in project or external")
+   "p r" '(project-query-replace-regexp :wk "Replace regexp")
+   "p x" '(project-execute-extended-command :wk "Execute extended command")
+   "p o" '(project-any-command :wk "Execute any command")
+   )
 
   (start/leader-keys
-    "s" '(:ignore t :wk "Show / Spell")
-    "s e" '(eat :wk "Eat terminal")
-    "s k" '(browse-kill-ring :wk "Show kill-ring")
-    "s c" '(flyspell-correct-word-before-point :wk "Correct word at point")
-    "s s" '(flyspell-toggle :wk "Toggle flyspell")
-    "s n" '(evil-next-flyspell-error :wk "Next spelling error")
-    )
+   "q" '(:ignore t :wk "Quit / Session")
+   "q q" '(save-buffers-kill-terminal :wk "Quit Emacs")
+   "q r" '((lambda () (interactive)
+             (load-file user-init-file))
+           :wk "Reload Emacs config")
+   )
 
   (start/leader-keys
-    "t" '(:ignore t :wk "Toggle")
-    "t t" '(visual-line-mode :wk "Toggle truncated lines (wrap)")
-    "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
-    )
+   "s" '(:ignore t :wk "Show / Spell")
+   "s e" '(eat :wk "Eat terminal")
+   "s k" '(browse-kill-ring :wk "Show kill-ring")
+   "s c" '(flyspell-correct-word-before-point :wk "Correct word at point")
+   "s s" '(flyspell-toggle :wk "Toggle flyspell")
+   "s n" '(evil-next-flyspell-error :wk "Next spelling error")
+   )
 
   (start/leader-keys
-    "w" '(:ignore t :wk "Windows and Workspaces")
-    "w <left>" '(evil-window-left :wk "Window left")
-    "w <right>" '(evil-window-right :wk "Window right")
-    "w <down>" '(evil-window-down :wk "Window Down")
-    "w <up>" '(evil-window-up :wk "Window Up")
-    "w h" '(evil-window-left :wk "Window left")
-    "w l" '(evil-window-right :wk "Window right")
-    "w j" '(evil-window-down :wk "Window Down")
-    "w k" '(evil-window-up :wk "Window Up")
-    "w /" '(evil-window-vsplit :wk "Vertical Split")
-    "w -" '(evil-window-split :wk "Vertical Split")
-    "w d" '(evil-window-delete :wk "Close window")
-    "w D" '(toggle-window-dedicated :wk "Dedicate window to buffer")
-    )
+   "t" '(:ignore t :wk "Toggle")
+   "t t" '(visual-line-mode :wk "Toggle truncated lines (wrap)")
+   "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
+   )
 
   (start/leader-keys
-	"x" '(:ignore t :wk "Cleanup?")
-	"x d w" '(delete-trailing-whitespace :wk "Delete trailing whitespace")
-	)
+   "w" '(:ignore t :wk "Windows and Workspaces")
+   "w <left>" '(evil-window-left :wk "Window left")
+   "w <right>" '(evil-window-right :wk "Window right")
+   "w <down>" '(evil-window-down :wk "Window Down")
+   "w <up>" '(evil-window-up :wk "Window Up")
+   "w h" '(evil-window-left :wk "Window left")
+   "w l" '(evil-window-right :wk "Window right")
+   "w j" '(evil-window-down :wk "Window Down")
+   "w k" '(evil-window-up :wk "Window Up")
+   "w /" '(evil-window-vsplit :wk "Vertical Split")
+   "w -" '(evil-window-split :wk "Vertical Split")
+   "w d" '(evil-window-delete :wk "Close window")
+   "w D" '(toggle-window-dedicated :wk "Dedicate window to buffer")
+   )
+
+  (start/leader-keys
+   "x" '(:ignore t :wk "Cleanup?")
+   "x d w" '(delete-trailing-whitespace :wk "Delete trailing whitespace")
+   )
   )
 
 (use-package emacs
@@ -355,7 +363,7 @@
   (blink-cursor-mode nil)               ;; Don't blink cursor
   (global-auto-revert-mode t)           ;; Automatically reload file and show changes if the file has changed
   (global-display-line-numbers-mode t)  ;; Display line numbers
-  
+
   (mouse-wheel-progressive-speed nil)   ;; Disable progressive speed when scrolling
   (scroll-conservatively 10)            ;; Smooth scrolling
   ;;(scroll-margin 8)
@@ -407,12 +415,14 @@
   "Toggles window dedication in the selected window."
   (interactive)
   (set-window-dedicated-p (selected-window)
-     (not (window-dedicated-p (selected-window)))))
+                          (not (window-dedicated-p (selected-window)))))
+
+(add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
 
 (use-package monokai-theme
   :config
   (load-theme 'monokai t)
-)
+  )
 
 (add-to-list 'default-frame-alist '(alpha-background . 90)) ;; For all new frames henceforth
 
@@ -435,8 +445,6 @@
 (use-package nerd-icons
   :if (display-graphic-p)
   :demand t
-  :custom
-  (nerd-icons-font-family "Fira Code Nerd Font")
   )
 
 (use-package nerd-icons-dired
@@ -465,14 +473,14 @@
   :hook
   (prog-mode . breadcrumb-local-mode)
   (org-mode . breadcrumb-local-mode)
-  
+
   :custom-face
   (breadcrumb-face ((t (:inherit mode-line))))
-  
+
   :custom
   ;; This doesn't work as breadcrumb get's prepended
   ;; (header-line-format `("" header-line-indent))
-  
+
   ;; Add nerd-icons to breadcrumb
   (breadcrumb-imenu-crumb-separator
    (concat " "(nerd-icons-faicon "nf-fa-chevron_right") " "))
@@ -480,7 +488,7 @@
    (concat " "(nerd-icons-faicon "nf-fa-chevron_right") " "))
   (breadcrumb-imenu-max-length 0.5)
   (breadcrumb-project-max-length 0.5)
-  
+
   :preface
   ;; Add icons to breadcrumb
   (advice-add #'breadcrumb--format-project-node :around
@@ -518,21 +526,21 @@
 (defun doom-files--update-refs (&rest files)
   "Ensure FILES are updated in `recentf', `magit' and `save-place'."
   (let (toplevels)
-	(dolist (file files)
+    (dolist (file files)
       (when (featurep 'vc)
-		(vc-file-clearprops file)
-		(when-let (buffer (get-file-buffer file))
+        (vc-file-clearprops file)
+        (when-let (buffer (get-file-buffer file))
           (with-current-buffer buffer
-			(vc-refresh-state))))
+            (vc-refresh-state))))
       (when (featurep 'magit)
-		(when-let (default-directory (magit-toplevel (file-name-directory file)))
+        (when-let (default-directory (magit-toplevel (file-name-directory file)))
           (cl-pushnew default-directory toplevels)))
       (unless (file-readable-p file)
-		(when (bound-and-true-p recentf-mode)
+        (when (bound-and-true-p recentf-mode)
           (recentf-remove-if-non-kept file))))
     (dolist (default-directory toplevels)
       (magit-refresh))
-	(when (bound-and-true-p save-place-mode)
+    (when (bound-and-true-p save-place-mode)
       (save-place-forget-unreadable-files))))
 
 (defun doom/copy-this-file (new-path &optional force-p)
@@ -583,10 +591,10 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   (advice-add #'flymake--indicator-overlay-spec
               :filter-return
               (lambda (indicator)
-				(concat indicator
-						(propertize " "
-									'face 'default
-									'display `((margin left-margin)
+                (concat indicator
+                        (propertize " "
+                                    'face 'default
+                                    'display `((margin left-margin)
                                                (space :width 5))))))
   :custom
   (flymake-indicator-type 'margins)
@@ -724,7 +732,7 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   :custom
   (yas-snippet-dirs
    '("~/.emacs.d/snippets"                 ;; writeable snippets dir
-	 "~/.emacs.d/hm-snippets"              ;; snippets managed by home-manager
+     "~/.emacs.d/hm-snippets"              ;; snippets managed by home-manager
      )
    )
   )
@@ -756,29 +764,29 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
     ["Extra Options"
      ("-r" "Remote data (any)" "--remote-data=any")
      ("-c" "Coverage" "--cov --cov-report=term-missing")
-	 ]
+     ]
     )
   )
 
 (use-package flymake-ruff
   :vc (:url "https://github.com/erickgnavar/flymake-ruff"
-			:rev :newest)
+            :rev :newest)
   :ensure t
   :hook (eglot-managed-mode . flymake-ruff-load)
   :config
   (setq flymake-ruff--severity-map '(
-                                    ("SyntaxError" . :error)     ; Syntax Errors
-                                    ("E"           . :error)     ; Critical style errors
-                                    ("W"           . :warning)   ; Style warnings
-                                    ("F"           . :error)     ; Logical errors (pyflakes)
-                                    ("B"           . :warning)   ; Bugbears (best practices)
-                                    ("C90"         . :warning)   ; Complexity (mccabe)
-                                    ("N"           . :note)      ; Naming conventions
-                                    ("I"           . :note)      ; Import sorting
-                                    ("UP"          . :note)      ; Python upgrades (pyupgrade)
-                                    ("SIM"         . :note)      ; Simplification
-                                    ("PERF"        . :warning)   ; Performance issues
-                                    )
+                                     ("SyntaxError" . :error)     ; Syntax Errors
+                                     ("E"           . :error)     ; Critical style errors
+                                     ("W"           . :warning)   ; Style warnings
+                                     ("F"           . :error)     ; Logical errors (pyflakes)
+                                     ("B"           . :warning)   ; Bugbears (best practices)
+                                     ("C90"         . :warning)   ; Complexity (mccabe)
+                                     ("N"           . :note)      ; Naming conventions
+                                     ("I"           . :note)      ; Import sorting
+                                     ("UP"          . :note)      ; Python upgrades (pyupgrade)
+                                     ("SIM"         . :note)      ; Simplification
+                                     ("PERF"        . :warning)   ; Performance issues
+                                     )
         )
   )
 
@@ -789,9 +797,9 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
 
 ;; Define a formatter which runs ruff check --fix
 (reformatter-define ruff-check
-  :program ruff-format-command
-  :args (list "check" "--fix" "--unsafe-fixes" "--stdin-filename" (or (buffer-file-name) input-file))
-  :lighter " RuffCheck")
+                    :program ruff-format-command
+                    :args (list "check" "--fix" "--unsafe-fixes" "--stdin-filename" (or (buffer-file-name) input-file))
+                    :lighter " RuffCheck")
 
 ;; Add to __all__
 (defsubst python-in-string/comment ()
@@ -832,45 +840,21 @@ falling back on searching your PATH."
   (if (file-name-absolute-p exe)
       (and (file-executable-p exe) exe)
     (let ((exe-root (format "bin/%s" exe)))
-	  ;; micromamba sets python-shell-virtualenv-root as well
+      ;; micromamba sets python-shell-virtualenv-root as well
       (or (and python-shell-virtualenv-root
                (let ((bin (expand-file-name exe-root python-shell-virtualenv-root)))
                  (and (file-exists-p bin) bin)))
           (executable-find exe)))))
 
-(defun +python/open-repl ()
-  "Open the Python REPL."
-  (interactive)
-  (require 'python)
-  (unless python-shell-interpreter
-    (user-error "`python-shell-interpreter' isn't set"))
-  (pop-to-buffer
-   (process-buffer
-    (let ((dedicated (bound-and-true-p python-shell-dedicated)))
-      (if-let* ((pipenv (+python-executable-find "pipenv"))
-                (pipenv-project (pipenv-project-p)))
-          (let ((default-directory pipenv-project)
-                (python-shell-interpreter-args
-                 (format "run %s %s"
-                         python-shell-interpreter
-                         python-shell-interpreter-args))
-                (python-shell-interpreter pipenv))
-            (run-python nil dedicated t))
-        (run-python nil dedicated t))))))
-
-(defvar +python-ipython-command '("ipython" "-i" "--simple-prompt" "--no-color-info")
+(defvar +python-ipython-command '("ipython")
   "Command to initialize the ipython REPL for `+python/open-ipython-repl'.")
 
 (defun +python/open-ipython-repl ()
   "Open an IPython REPL."
   (interactive)
   (require 'python)
-  (let ((python-shell-interpreter
-         (or (+python-executable-find (car +python-ipython-command))
-             "ipython"))
-        (python-shell-interpreter-args
-         (string-join (cdr +python-ipython-command) " ")))
-    (+python/open-repl)))
+  (eat-other-window (or (+python-executable-find (car +python-ipython-command))
+                        "ipython")))
 
 (defun cadair/run-restart-repl ()
   "Run a new python repl in a window which does not have focus."
@@ -919,37 +903,51 @@ falling back on searching your PATH."
             (setq comint-move-point-for-output t)))
 
 (my-local-leader
-  :states 'normal
-  :keymaps 'python-ts-mode-map
-  "t a" 'python-pytest
-  "t f" 'python-pytest-file-dwim
-  "t F" 'python-pytest-file
-  "t t" 'python-pytest-run-def-or-class-at-point-dwim
-  "t T" 'python-pytest-run-def-or-class-at-point
-  "t r" 'python-pytest-repeat
-  "t p" 'python-pytest-dispatch
+ :states 'normal
+ :keymaps 'python-ts-mode-map
+ "t a" 'python-pytest
+ "t f" 'python-pytest-file-dwim
+ "t F" 'python-pytest-file
+ "t t" 'python-pytest-run-def-or-class-at-point-dwim
+ "t T" 'python-pytest-run-def-or-class-at-point
+ "t r" 'python-pytest-repeat
+ "t p" 'python-pytest-dispatch
 
-  "c" 'cadair/python-execute-file
-  "r" 'cadair/run-in-repl
-  "R" 'cadair/run-in-repl-switch
-  "a" 'python-add-to-all
+ "c" 'cadair/python-execute-file
+ "r" 'cadair/run-in-repl
+ "R" 'cadair/run-in-repl-switch
+ "a" 'python-add-to-all
 
-  ;; Reformatting
-  "f i" 'python-isort-buffer
-  "f b" 'python-black-buffer
-  "f r" 'ruff-format-buffer
-  "f c" 'ruff-check-buffer
+ ;; Reformatting
+ "f i" 'python-isort-buffer
+ "f b" 'python-black-buffer
+ "f r" 'ruff-format-buffer
+ "f c" 'ruff-check-buffer
 
-  "n a" 'conda-env-activate
-  "n d" 'conda-env-deactivate
-  "m a" 'micromamba-activate
-  "m d" 'micromamba-deactivate
-  "v a" 'pyvenv-workon
-  "v d" 'pyvenv-deactivate
-  )
+ "n a" 'conda-env-activate
+ "n d" 'conda-env-deactivate
+ "m a" 'micromamba-activate
+ "m d" 'micromamba-deactivate
+ "v a" 'pyvenv-workon
+ "v d" 'pyvenv-deactivate
+ )
 
 (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-ts-mode))
+
+(use-package nix-ts-mode
+  :mode "\\.nix\\'")
+
+(use-package quarto-mode)
+
+(my-local-leader
+ :states 'normal
+ :keymaps 'poly-quarto-polymode-map
+ "m a" 'micromamba-activate
+ "m d" 'micromamba-deactivate
+ "v a" 'pyvenv-workon
+ "v d" 'pyvenv-deactivate
+ )
 
 (use-package magit
   :commands magit-status)
@@ -1205,7 +1203,7 @@ falling back on searching your PATH."
       (progn ; flyspell is on, turn it off
         (message "Flyspell off")
         (flyspell-mode -1))
-										; else - flyspell is off, turn it on
+                                        ; else - flyspell is off, turn it on
     (flyspell-on-for-buffer-type)))
 
 (add-hook 'find-file-hook 'flyspell-on-for-buffer-type)
@@ -1219,6 +1217,11 @@ falling back on searching your PATH."
           rst-mode
           yaml-ts-mode) . indent-bars-mode))
 
+(use-package eat
+  :custom
+  (eat-shell "/home/stuart/.nix-profile/bin/xonsh")
+  )
+
 (use-package org
   :defer t
   :custom
@@ -1226,32 +1229,32 @@ falling back on searching your PATH."
   :hook
   (org-mode . org-indent-mode) ;; Indent text
 
-:config
-(setq org-adapt-indentation t
-      org-hide-leading-stars t
-      org-pretty-entities t
-      org-ellipsis "  ·"
-	  org-startup-folded "content"
-	  org-cycle-separator-lines -1
-	  )
+  :config
+  (setq org-adapt-indentation t
+        org-hide-leading-stars t
+        org-pretty-entities t
+        org-ellipsis "  ·"
+        org-startup-folded "content"
+        org-cycle-separator-lines -1
+        )
 
-(setq org-src-fontify-natively t
-      org-src-tab-acts-natively t
-      org-edit-src-content-indentation 0)
+  (setq org-src-fontify-natively t
+        org-src-tab-acts-natively t
+        org-edit-src-content-indentation 0)
 
-(setq org-log-done                       t
-      org-auto-align-tags                t
-      org-tags-column                    -80
-      org-fold-catch-invisible-edits     'show-and-error
-      org-special-ctrl-a/e               t
-      org-insert-heading-respect-content t)
+  (setq org-log-done                       t
+        org-auto-align-tags                t
+        org-tags-column                    -80
+        org-fold-catch-invisible-edits     'show-and-error
+        org-special-ctrl-a/e               t
+        org-insert-heading-respect-content t)
 
-)
+  )
 
 (setq org-fontify-done-headline t)
 (custom-set-faces
  '(org-done ((t (:weight normal
-						 :strike-through t))))
+                         :strike-through t))))
  '(org-headline-done
    ((((class color) (min-colors 16))
      (:strike-through t)))))
@@ -1291,169 +1294,169 @@ falling back on searching your PATH."
   )
 
 (my-local-leader
-  :states '(normal visual)
-  :keymaps 'org-mode-map
+ :states '(normal visual)
+ :keymaps 'org-mode-map
 
-  "#" 'org-update-statistics-cookies
-  "'" 'org-edit-special
-  "*" 'org-ctrl-c-star
-  "+" 'org-ctrl-c-minus
-  "," 'org-switchb
-  "." 'org-goto
-  "@" 'org-cite-insert
-  "." 'consult-org-heading
-  "/" 'consult-org-agenda
-  "A" 'org-archive-subtree-default
-  "e" 'org-export-dispatch
-  "f" 'org-footnote-action
-  "h" 'org-toggle-heading
-  "i" 'org-toggle-item
-  "I" 'org-id-get-create
-  "k" 'org-babel-remove-result
-  ;; "K" #'+org/remove-result-blocks
-  "n" 'org-store-link
-  "o" 'org-set-property
-  "q" 'org-set-tags-command
-  "t" 'org-todo
-  "T" 'org-todo-list
-  "x" 'org-toggle-checkbox
-  "a" '(:ignore t :wk "Attachments")
-  "a a" 'org-attach
-  "a d" 'org-attach-delete-one
-  "a D" 'org-attach-delete-all
-  ;; "a f" #'+org/find-file-in-attachments
-  ;; "a l" #'+org/attach-file-and-insert-link
-  "a n" 'org-attach-new
-  "a o" 'org-attach-open
-  "a O" 'org-attach-open-in-emacs
-  "a r" 'org-attach-reveal
-  "a R" 'org-attach-reveal-in-emacs
-  "a u" 'org-attach-url
-  "a s" 'org-attach-set-directory
-  "a S" 'org-attach-sync
-  "b" '(:ignore t :wk "Tables")
-  "b -" 'org-table-insert-hline
-  "b a" 'org-table-align
-  "b b" 'org-table-blank-field
-  "b c" 'org-table-create-or-convert-from-region
-  "b e" 'org-table-edit-field
-  "b f" 'org-table-edit-formulas
-  "b h" 'org-table-field-info
-  "b s" 'org-table-sort-lines
-  "b r" 'org-table-recalculate
-  "b R" 'org-table-recalculate-buffer-tables
-  ;; TODO: Figure these sub leader bindings out
-  ;; "b s" '(:ignore t :wk "delete")
-  ;; "b s c" 'org-table-delete-column
-  ;; "b s r" 'org-table-kill-row
-  ;; "b i" '(:ignore t :wk "insert")
-  ;; "b i c" 'org-table-insert-column
-  ;; "b i h" 'org-table-insert-hline
-  ;; "b i r" 'org-table-insert-row
-  ;; "b i H" 'org-table-hline-and-move
-  ;; "b t" '(:ignore t :wk "toggle")
-  ;; "b t f" 'org-table-toggle-formula-debugger
-  ;; "b t o" 'org-table-toggle-coordinate-overlays
-  "c" '(:ignore t :wk "clock")
-  "c c" 'org-clock-cancel
-  "c d" 'org-clock-mark-default-task
-  "c e" 'org-clock-modify-effort-estimate
-  "c E" 'org-set-effort
-  "c g" 'org-clock-goto
-  ;; "c G" (cmd! (org-clock-goto 'select))
-  ;; "c l" #'+org/toggle-last-clock
-  "c i" 'org-clock-in
-  "c I" 'org-clock-in-last
-  "c o" 'org-clock-out
-  "c r" 'org-resolve-clocks
-  "c R" 'org-clock-report
-  "c t" 'org-evaluate-time-range
-  "c =" 'org-clock-timestamps-up
-  "c -" 'org-clock-timestamps-down
-  "d" '(:ignore t :wk "date/deadline")
-  "d d" 'org-deadline
-  "d s" 'org-schedule
-  "d t" 'org-time-stamp
-  "d T" 'org-time-stamp-inactive
-  "g" '(:ignore t :wk "goto")
-  "g g" 'org-goto
-  "g g" 'consult-org-heading
-  "g G" 'consult-org-agenda
-  "g c" 'org-clock-goto
-  ;; "g C" (cmd! (org-clock-goto 'select))
-  "g i" 'org-id-goto
-  "g r" 'org-refile-goto-last-stored
-  ;; "g v" #'+org/goto-visible
-  "g x" 'org-capture-goto-last-stored
-  "l" '(:ignore t :wk "links")
-  "l c" 'org-cliplink
-  ;; "l d" #'+org/remove-link
-  "l i" 'org-id-store-link
-  "l l" 'org-insert-link
-  "l L" 'org-insert-all-links
-  "l s" 'org-store-link
-  "l S" 'org-insert-last-stored-link
-  "l t" 'org-toggle-link-display
-  ;; "l y" #'+org/yank-link
-  "P" '(:ignore t :wk "Publish")
-  "P a" 'org-publish-all
-  "P f" 'org-publish-current-file
-  "P p" 'org-publish
-  "P P" 'org-publish-current-project
-  "P s" 'org-publish-sitemap
-  "r" '(:ignore t :wk "refile")
-  ;; "r ." #'+org/refile-to-current-file
-  ;; "r c" #'+org/refile-to-running-clock
-  ;; "r l" #'+org/refile-to-last-location
-  ;; "r f" #'+org/refile-to-file
-  ;; "r o" #'+org/refile-to-other-window
-  ;; "r O" #'+org/refile-to-other-buffer
-  ;; "r v" #'+org/refile-to-visible
-  "r r" 'org-refile
-  "r R" 'org-refile-reverse ; to all `org-refile-targets'
-  "s" '(:ignore t :wk "tree/subtree")
-  "s a" 'org-toggle-archive-tag
-  "s b" 'org-tree-to-indirect-buffer
-  "s c" 'org-clone-subtree-with-time-shift
-  "s d" 'org-cut-subtree
-  "s h" 'org-promote-subtree
-  "s j" 'org-move-subtree-down
-  "s k" 'org-move-subtree-up
-  "s l" 'org-demote-subtree
-  "s n" 'org-narrow-to-subtree
-  "s r" 'org-refile
-  "s s" 'org-sparse-tree
-  "s A" 'org-archive-subtree-default
-  "s N" 'widen
-  "s S" 'org-sort
-  "p" '(:ignore t :wk "priority")
-  "p d" 'org-priority-down
-  "p p" 'org-priority
-  "p u" 'org-priority-up
-  )
+ "#" 'org-update-statistics-cookies
+ "'" 'org-edit-special
+ "*" 'org-ctrl-c-star
+ "+" 'org-ctrl-c-minus
+ "," 'org-switchb
+ "." 'org-goto
+ "@" 'org-cite-insert
+ "." 'consult-org-heading
+ "/" 'consult-org-agenda
+ "A" 'org-archive-subtree-default
+ "e" 'org-export-dispatch
+ "f" 'org-footnote-action
+ "h" 'org-toggle-heading
+ "i" 'org-toggle-item
+ "I" 'org-id-get-create
+ "k" 'org-babel-remove-result
+ ;; "K" #'+org/remove-result-blocks
+ "n" 'org-store-link
+ "o" 'org-set-property
+ "q" 'org-set-tags-command
+ "t" 'org-todo
+ "T" 'org-todo-list
+ "x" 'org-toggle-checkbox
+ "a" '(:ignore t :wk "Attachments")
+ "a a" 'org-attach
+ "a d" 'org-attach-delete-one
+ "a D" 'org-attach-delete-all
+ ;; "a f" #'+org/find-file-in-attachments
+ ;; "a l" #'+org/attach-file-and-insert-link
+ "a n" 'org-attach-new
+ "a o" 'org-attach-open
+ "a O" 'org-attach-open-in-emacs
+ "a r" 'org-attach-reveal
+ "a R" 'org-attach-reveal-in-emacs
+ "a u" 'org-attach-url
+ "a s" 'org-attach-set-directory
+ "a S" 'org-attach-sync
+ "b" '(:ignore t :wk "Tables")
+ "b -" 'org-table-insert-hline
+ "b a" 'org-table-align
+ "b b" 'org-table-blank-field
+ "b c" 'org-table-create-or-convert-from-region
+ "b e" 'org-table-edit-field
+ "b f" 'org-table-edit-formulas
+ "b h" 'org-table-field-info
+ "b s" 'org-table-sort-lines
+ "b r" 'org-table-recalculate
+ "b R" 'org-table-recalculate-buffer-tables
+ ;; TODO: Figure these sub leader bindings out
+ ;; "b s" '(:ignore t :wk "delete")
+ ;; "b s c" 'org-table-delete-column
+ ;; "b s r" 'org-table-kill-row
+ ;; "b i" '(:ignore t :wk "insert")
+ ;; "b i c" 'org-table-insert-column
+ ;; "b i h" 'org-table-insert-hline
+ ;; "b i r" 'org-table-insert-row
+ ;; "b i H" 'org-table-hline-and-move
+ ;; "b t" '(:ignore t :wk "toggle")
+ ;; "b t f" 'org-table-toggle-formula-debugger
+ ;; "b t o" 'org-table-toggle-coordinate-overlays
+ "c" '(:ignore t :wk "clock")
+ "c c" 'org-clock-cancel
+ "c d" 'org-clock-mark-default-task
+ "c e" 'org-clock-modify-effort-estimate
+ "c E" 'org-set-effort
+ "c g" 'org-clock-goto
+ ;; "c G" (cmd! (org-clock-goto 'select))
+ ;; "c l" #'+org/toggle-last-clock
+ "c i" 'org-clock-in
+ "c I" 'org-clock-in-last
+ "c o" 'org-clock-out
+ "c r" 'org-resolve-clocks
+ "c R" 'org-clock-report
+ "c t" 'org-evaluate-time-range
+ "c =" 'org-clock-timestamps-up
+ "c -" 'org-clock-timestamps-down
+ "d" '(:ignore t :wk "date/deadline")
+ "d d" 'org-deadline
+ "d s" 'org-schedule
+ "d t" 'org-time-stamp
+ "d T" 'org-time-stamp-inactive
+ "g" '(:ignore t :wk "goto")
+ "g g" 'org-goto
+ "g g" 'consult-org-heading
+ "g G" 'consult-org-agenda
+ "g c" 'org-clock-goto
+ ;; "g C" (cmd! (org-clock-goto 'select))
+ "g i" 'org-id-goto
+ "g r" 'org-refile-goto-last-stored
+ ;; "g v" #'+org/goto-visible
+ "g x" 'org-capture-goto-last-stored
+ "l" '(:ignore t :wk "links")
+ "l c" 'org-cliplink
+ ;; "l d" #'+org/remove-link
+ "l i" 'org-id-store-link
+ "l l" 'org-insert-link
+ "l L" 'org-insert-all-links
+ "l s" 'org-store-link
+ "l S" 'org-insert-last-stored-link
+ "l t" 'org-toggle-link-display
+ ;; "l y" #'+org/yank-link
+ "P" '(:ignore t :wk "Publish")
+ "P a" 'org-publish-all
+ "P f" 'org-publish-current-file
+ "P p" 'org-publish
+ "P P" 'org-publish-current-project
+ "P s" 'org-publish-sitemap
+ "r" '(:ignore t :wk "refile")
+ ;; "r ." #'+org/refile-to-current-file
+ ;; "r c" #'+org/refile-to-running-clock
+ ;; "r l" #'+org/refile-to-last-location
+ ;; "r f" #'+org/refile-to-file
+ ;; "r o" #'+org/refile-to-other-window
+ ;; "r O" #'+org/refile-to-other-buffer
+ ;; "r v" #'+org/refile-to-visible
+ "r r" 'org-refile
+ "r R" 'org-refile-reverse ; to all `org-refile-targets'
+ "s" '(:ignore t :wk "tree/subtree")
+ "s a" 'org-toggle-archive-tag
+ "s b" 'org-tree-to-indirect-buffer
+ "s c" 'org-clone-subtree-with-time-shift
+ "s d" 'org-cut-subtree
+ "s h" 'org-promote-subtree
+ "s j" 'org-move-subtree-down
+ "s k" 'org-move-subtree-up
+ "s l" 'org-demote-subtree
+ "s n" 'org-narrow-to-subtree
+ "s r" 'org-refile
+ "s s" 'org-sparse-tree
+ "s A" 'org-archive-subtree-default
+ "s N" 'widen
+ "s S" 'org-sort
+ "p" '(:ignore t :wk "priority")
+ "p d" 'org-priority-down
+ "p p" 'org-priority
+ "p u" 'org-priority-up
+ )
 
 (my-local-leader
-  :states '(normal visual)
-  :keymaps 'org-agenda-mode-map
+ :states '(normal visual)
+ :keymaps 'org-agenda-mode-map
 
-  "d" '(:ignore t :wk "date/deadline")
-  "d d" 'org-agenda-deadline
-  "d s" 'org-agenda-schedule
-  "c" '(:ignore t :wk "clock")
-  "c c" 'org-agenda-clock-cancel
-  "c g" 'org-agenda-clock-goto
-  "c i" 'org-agenda-clock-in
-  "c o" 'org-agenda-clock-out
-  "c r" 'org-agenda-clockreport-mode
-  "c s" 'org-agenda-show-clocking-issues
-  "p" '(:ignore t :wk "priority")
-  "p d" 'org-agenda-priority-down
-  "p p" 'org-agenda-priority
-  "p u" 'org-agenda-priority-up
-  "q" 'org-agenda-set-tags
-  "r" 'org-agenda-refile
-  "t" 'org-agenda-todo
-  )
+ "d" '(:ignore t :wk "date/deadline")
+ "d d" 'org-agenda-deadline
+ "d s" 'org-agenda-schedule
+ "c" '(:ignore t :wk "clock")
+ "c c" 'org-agenda-clock-cancel
+ "c g" 'org-agenda-clock-goto
+ "c i" 'org-agenda-clock-in
+ "c o" 'org-agenda-clock-out
+ "c r" 'org-agenda-clockreport-mode
+ "c s" 'org-agenda-show-clocking-issues
+ "p" '(:ignore t :wk "priority")
+ "p d" 'org-agenda-priority-down
+ "p p" 'org-agenda-priority
+ "p u" 'org-agenda-priority-up
+ "q" 'org-agenda-set-tags
+ "r" 'org-agenda-refile
+ "t" 'org-agenda-todo
+ )
 
 ;; Just regular evil key extras
 (evil-define-key 'normal org-agenda-mode-map
@@ -1487,8 +1490,8 @@ falling back on searching your PATH."
 (setq org-todo-keywords
       (quote ((sequence "TODO(t)" "NEXT(n)" "WIP(i)" "|" "DONE(d)")
               (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)"))
-			 )
-	  )
+             )
+      )
 
 (setq org-todo-keyword-faces
       (quote (("TODO" :foreground "red" :weight bold)
@@ -1580,7 +1583,7 @@ falling back on searching your PATH."
               ("h" "Habit" entry (file cadair-capture-file)
                "* NEXT %?\n%U\n%a\nSCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n"))))
 
-; Targets include this file and any file contributing to the agenda - up to 9 levels deep
+                                        ; Targets include this file and any file contributing to the agenda - up to 9 levels deep
 (setq org-refile-targets (quote ((nil :maxlevel . 9)
                                  (org-agenda-files :maxlevel . 9))))
 
@@ -1590,7 +1593,7 @@ falling back on searching your PATH."
 
 (setq org-outline-path-complete-in-steps nil)
 
-; Allow refile to create parent tasks with confirmation
+                                        ; Allow refile to create parent tasks with confirmation
 (setq org-refile-allow-creating-parent-nodes (quote confirm))
 
 (setq org-highest-priority ?A)
@@ -1713,12 +1716,12 @@ falling back on searching your PATH."
                                                             ;; (if bh/hide-scheduled-and-waiting-next-tasks
                                                             ;;     ""
                                                             ;;   " (including WAITING and SCHEDULED tasks)")
-															))
+                                                            ))
                       (org-agenda-skip-function 'bh/skip-non-tasks)
                       (org-tags-match-list-sublevels nil)
                       ;; (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
                       ;; (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
-					  ))
+                      ))
           (tags "-REFILE/"
                 ((org-agenda-overriding-header "Tasks to Archive")
                  ;; (org-agenda-skip-function 'bh/skip-non-archivable-tasks)
@@ -1727,13 +1730,13 @@ falling back on searching your PATH."
 
 (defun cadair-waybar-tooltip ()
   "The default tooltip to send to waybar."
-    (message "boo")
-    (let ((clocked-time (org-clock-get-clocked-time)))
-      (format "%s: %s [%s] %s"
-              (org-clock-waybar--get-task-category)
-              (org-clock-waybar--get-task-title)
-              (org-duration-from-minutes clocked-time)
-              (format "%s" (org-clock-waybar--get-tags)))))
+  (message "boo")
+  (let ((clocked-time (org-clock-get-clocked-time)))
+    (format "%s: %s [%s] %s"
+            (org-clock-waybar--get-task-category)
+            (org-clock-waybar--get-task-title)
+            (org-duration-from-minutes clocked-time)
+            (format "%s" (org-clock-waybar--get-tags)))))
 
 (use-package org-clock-waybar
   :vc (:url "https://gitea.polonkai.eu/gergely/org-clock-waybar.git" :rev "configurable-output")
