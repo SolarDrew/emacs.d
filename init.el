@@ -21,21 +21,21 @@
 ;;(use-package quelpa)
 ;;(use-package quelpa-use-package)
 
-;;(defvar bootstrap-version)
-;;(let ((bootstrap-file
-;;       (expand-file-name
-;;        "straight/repos/straight.el/bootstrap.el"
-;;        (or (bound-and-true-p straight-base-dir)
-;;            user-emacs-directory)))
-;;      (bootstrap-version 7))
-;;  (unless (file-exists-p bootstrap-file)
-;;    (with-current-buffer
-;;        (url-retrieve-synchronously
-;;         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-;;         'silent 'inhibit-cookies)
-;;      (goto-char (point-max))
-;;      (eval-print-last-sexp)))
-;;  (load bootstrap-file nil 'nomessage))
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir)
+            user-emacs-directory)))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
 (use-package evil
   :init ;; Execute code Before a package is loaded
@@ -277,7 +277,7 @@
    "o f" '(consult-org-agenda :wk "Find Agenda Item")
    "o h" '(org-insert-todo-heading :wk "Insert TODO heading")
    "o s" '(org-insert-todo-subheading :wk "Insert TODO subheading")
-   "o t" '(lambda() (interactive)(find-file "~/Notebooks/ToDo.org") :wk "Open ToDo.org")
+   "o t" '(lambda() (interactive)(find-file "~/to-do/all.org") :wk "Open to-do")
    )
 
   (start/leader-keys
@@ -375,8 +375,9 @@
 
   (make-backup-files nil) ;; Stop creating ~ backup files
   (auto-save-default nil) ;; Stop creating # auto save files
-  :hook
-  (prog-mode . (lambda () (hs-minor-mode t))) ;; Enable folding hide/show globally
+  ;; :hook
+  ;; replaced by treesit-fold for now
+  ;; (prog-mode . (lambda () (hs-minor-mode t))) ;; Enable folding hide/show globally
   :config
   ;; Move customization variables to a separate file and load it, avoid filling up init.el with unnecessary variables
   (setq custom-file (locate-user-emacs-file "custom-vars.el"))
@@ -737,6 +738,15 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
    )
   )
 
+(use-package treesit-fold
+  :straight (treesit-fold :type git :host github :repo "emacs-tree-sitter/treesit-fold")
+  :custom
+  (global-treesit-fold-mode t)
+  (global-treesit-fold-indicators-mode nil)
+  (treesit-fold-summary-show t)
+  (treesit-fold-summary-max-length 100)
+  )
+
 (setq major-mode-remap-alist
       '((python-mode . python-ts-mode)))
 
@@ -934,6 +944,7 @@ falling back on searching your PATH."
 
 (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.asdf\\'" . yaml-ts-mode))
 
 (use-package nix-ts-mode
   :mode "\\.nix\\'")
@@ -948,6 +959,11 @@ falling back on searching your PATH."
  "v a" 'pyvenv-workon
  "v d" 'pyvenv-deactivate
  )
+
+(define-derived-mode xonsh-mode python-ts-mode "xonsh" "Major mode for xonsh")
+(add-hook 'xonsh-mode-hook (lambda () (flymake-mode 0)))
+(add-to-list 'auto-mode-alist '("\\.xsh\\'" . xonsh-mode))
+(add-to-list 'auto-mode-alist '("\\.xonshrc\\'" . xonsh-mode))
 
 (use-package magit
   :commands magit-status)
@@ -1219,7 +1235,7 @@ falling back on searching your PATH."
 
 (use-package eat
   :custom
-  (eat-shell "/home/stuart/.nix-profile/bin/xonsh")
+  (shell-file-name "xonsh")
   )
 
 (use-package org
@@ -1477,6 +1493,7 @@ falling back on searching your PATH."
 ;; Some general config
 (setq org-duration-format 'h:mm)
 (setq org-cycle-separator-lines -1)
+(setq org-clock-out-remove-zero-time-clock t)
 
 ;; Always save buffers on clock changes
 (add-hook 'org-clock-in-hook #'save-buffer)

@@ -52,6 +52,7 @@ The repo is also a flake, so if you are mad enough to want to use this you can i
   - [[#language-server][Language Server]]
   - [[#dape][dape]]
   - [[#yasnippet][Yasnippet]]
+  - [[#code-folding][Code Folding]]
   - [[#language-modes][Language modes]]
 - [[#other-packages][Other Packages]]
   - [[#git][Git]]
@@ -145,21 +146,21 @@ With Emacs 29 use-package is now built-in.
 
 *** Straight
 #+begin_src emacs-lisp
-;;(defvar bootstrap-version)
-;;(let ((bootstrap-file
-;;       (expand-file-name
-;;        "straight/repos/straight.el/bootstrap.el"
-;;        (or (bound-and-true-p straight-base-dir)
-;;            user-emacs-directory)))
-;;      (bootstrap-version 7))
-;;  (unless (file-exists-p bootstrap-file)
-;;    (with-current-buffer
-;;        (url-retrieve-synchronously
-;;         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-;;         'silent 'inhibit-cookies)
-;;      (goto-char (point-max))
-;;      (eval-print-last-sexp)))
-;;  (load bootstrap-file nil 'nomessage))
+(defvar bootstrap-version)
+(let ((bootstrap-file
+      (expand-file-name
+       "straight/repos/straight.el/bootstrap.el"
+       (or (bound-and-true-p straight-base-dir)
+           user-emacs-directory)))
+     (bootstrap-version 7))
+ (unless (file-exists-p bootstrap-file)
+   (with-current-buffer
+       (url-retrieve-synchronously
+        "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+        'silent 'inhibit-cookies)
+     (goto-char (point-max))
+     (eval-print-last-sexp)))
+ (load bootstrap-file nil 'nomessage))
 #+end_src
 
 ** Evil Mode
@@ -316,65 +317,65 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
   (start/leader-keys
     "f" '(:ignore t :wk "Find / Files")
     "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
-  	"f C" '(doom/copy-this-file :wk "Copy this file")
+    "f C" '(doom/copy-this-file :wk "Copy this file")
     "f f" '(find-file :wk "Find file")
     "f g" '(consult-ripgrep :wk "Ripgrep search in files")
     "f i" '(consult-imenu :wk "Imenu buffer locations")
     "f l" '(consult-line :wk "Find line")
-  	"f L" '(locate :wk "Locate file")
+    "f L" '(locate :wk "Locate file")
     "f r" '(consult-recent-file :wk "Recent files")
-  	"f R" '(doom/move-this-file :wk "Rename/Move file")
+    "f R" '(doom/move-this-file :wk "Rename/Move file")
     "f s" '(save-buffer :wk "Save Buffer")
     "f S" '(write-file :wk "Save file as...")
     )
 
   (start/leader-keys
     "g" '(:ignore t :wk "Git")
-  	"g s"   '(magit                              :wk "Magit")
-  	"g R"   '(vc-revert                          :wk "Revert file")
-  	"g y"   '(git-link-homepage                  :wk "Copy link to remote")
-  	"g t"   '(git-timemachine-toggle             :wk "Git time machine")
-  	"g /"   '(magit-dispatch                     :wk "Magit dispatch")
-  	"g ."   '(magit-file-dispatch                :wk "Magit file dispatch")
-  	"g '"   '(forge-dispatch                     :wk "Forge dispatch")
-  	"g -"   '(blamer-mode                        :wk "Toggle blamer")
-  	"g b"   '(magit-branch-checkout              :wk "Magit switch branch")
-  	"g b"   '(magit-blame-addition               :wk "Magit blame")
-  	"g g"   '(magit-status                       :wk "Magit status")
-  	"g G"   '(magit-status-here                  :wk "Magit status here")
-  	"g D"   '(magit-file-delete                  :wk "Magit file delete")
-  	"g C"   '(magit-clone                        :wk "Magit clone")
-  	"g F"   '(magit-fetch                        :wk "Magit fetch")
-  	"g L"   '(git-link                           :wk "Link to selection")
-  	"g S"   '(magit-stage-buffer-file            :wk "Git stage this file")
-  	"g U"   '(magit-unstage-buffer-file          :wk "Git unstage this file")
-  	"g f"   '(:ignore t :wk "find")
-  	"g f f" '(magit-find-file                    :wk "Find file")
-  	"g f g" '(magit-find-git-config-file         :wk "Find gitconfig file")
-  	"g f c" '(magit-show-commit                  :wk "Find commit")
-  	"g f i" '(forge-visit-issue                  :wk "Find issue")
-  	"g f p" '(forge-visit-pullreq                :wk "Find pull request")
-  	"g o"   '(:ignore t :wk "open in browser")
-  	"g o r" '(forge-browse-remote                :wk "Browse remote")
-  	"g o c" '(forge-browse-commit                :wk "Browse commit")
-  	"g o i" '(forge-browse-issue                 :wk "Browse an issue")
-  	"g o p" '(forge-browse-pullreq               :wk "Browse a pull request")
-  	"g o I" '(forge-browse-issues                :wk "Browse issues")
-  	"g o P" '(forge-browse-pullreqs              :wk "Browse pull requests")
-  	"g l"   '(:ignore t :wk "list")
-  	;;"g l g" '(+gist:list                         :wk "List gists")
-  	"g l r" '(magit-list-repositories            :wk "List repositories")
-  	"g l s" '(magit-list-submodules              :wk "List submodules")
-  	"g l i" '(forge-list-issues                  :wk "List issues")
-  	"g l p" '(forge-list-pullreqs                :wk "List pull requests")
-  	"g l n" '(forge-list-notifications           :wk "List notifications")
-  	"g c"   '(:ignore t :wk "create")
-  	"g c r" '(magit-init                         :wk "Initialize repo")
-  	"g c R" '(magit-clone                        :wk "Clone repo")
-  	"g c c" '(magit-commit-create                :wk "Commit")
-  	"g c f" '(magit-commit-fixup                 :wk "Fixup")
-  	"g c b" '(magit-branch-and-checkout          :wk "Branch")
-  	"g c i" '(forge-create-issue                 :wk "Issue")
+    "g s"   '(magit                              :wk "Magit")
+    "g R"   '(vc-revert                          :wk "Revert file")
+    "g y"   '(git-link-homepage                  :wk "Copy link to remote")
+    "g t"   '(git-timemachine-toggle             :wk "Git time machine")
+    "g /"   '(magit-dispatch                     :wk "Magit dispatch")
+    "g ."   '(magit-file-dispatch                :wk "Magit file dispatch")
+    "g '"   '(forge-dispatch                     :wk "Forge dispatch")
+    "g -"   '(blamer-mode                        :wk "Toggle blamer")
+    "g b"   '(magit-branch-checkout              :wk "Magit switch branch")
+    "g b"   '(magit-blame-addition               :wk "Magit blame")
+    "g g"   '(magit-status                       :wk "Magit status")
+    "g G"   '(magit-status-here                  :wk "Magit status here")
+    "g D"   '(magit-file-delete                  :wk "Magit file delete")
+    "g C"   '(magit-clone                        :wk "Magit clone")
+    "g F"   '(magit-fetch                        :wk "Magit fetch")
+    "g L"   '(git-link                           :wk "Link to selection")
+    "g S"   '(magit-stage-buffer-file            :wk "Git stage this file")
+    "g U"   '(magit-unstage-buffer-file          :wk "Git unstage this file")
+    "g f"   '(:ignore t :wk "find")
+    "g f f" '(magit-find-file                    :wk "Find file")
+    "g f g" '(magit-find-git-config-file         :wk "Find gitconfig file")
+    "g f c" '(magit-show-commit                  :wk "Find commit")
+    "g f i" '(forge-visit-issue                  :wk "Find issue")
+    "g f p" '(forge-visit-pullreq                :wk "Find pull request")
+    "g o"   '(:ignore t :wk "open in browser")
+    "g o r" '(forge-browse-remote                :wk "Browse remote")
+    "g o c" '(forge-browse-commit                :wk "Browse commit")
+    "g o i" '(forge-browse-issue                 :wk "Browse an issue")
+    "g o p" '(forge-browse-pullreq               :wk "Browse a pull request")
+    "g o I" '(forge-browse-issues                :wk "Browse issues")
+    "g o P" '(forge-browse-pullreqs              :wk "Browse pull requests")
+    "g l"   '(:ignore t :wk "list")
+    ;;"g l g" '(+gist:list                         :wk "List gists")
+    "g l r" '(magit-list-repositories            :wk "List repositories")
+    "g l s" '(magit-list-submodules              :wk "List submodules")
+    "g l i" '(forge-list-issues                  :wk "List issues")
+    "g l p" '(forge-list-pullreqs                :wk "List pull requests")
+    "g l n" '(forge-list-notifications           :wk "List notifications")
+    "g c"   '(:ignore t :wk "create")
+    "g c r" '(magit-init                         :wk "Initialize repo")
+    "g c R" '(magit-clone                        :wk "Clone repo")
+    "g c c" '(magit-commit-create                :wk "Commit")
+    "g c f" '(magit-commit-fixup                 :wk "Fixup")
+    "g c b" '(magit-branch-and-checkout          :wk "Branch")
+    "g c i" '(forge-create-issue                 :wk "Issue")
     "g c p" '(forge-create-pullreq               :wk "Pull request")
     )
 
@@ -424,11 +425,11 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
     "p f" '(project-find-file :wk "Find file")
     "p F" '(project-or-external-find-file :wk "Find file in project or external roots")
     "p b" '(project-switch-to-buffer :wk "Switch to project buffer")
-    "p s" '(project-shell :wk "Run shell in project")
+    "p s" '(eat-project-other-window :wk "Run shell in project")
     "p d" '(project-find-dir :wk "Find directory")
     "p D" '(project-dired :Wk "Dired")
-    "P V" '(Project-Vc-Dir :Wk "Run Vc-Dir")
-    "P C" '(project-compile :wk "Compile Project")
+    "p v" '(project-vc-dir :Wk "Run Vc-Dir")
+    "p c" '(project-compile :wk "Compile Project")
     "p e" '(project-eshell :wk "Run Shell")
     "p k" '(project-kill-buffers :wk "Kill all buffers")
     "p p" '(tabspaces-open-or-create-project-and-workspace :wk "Switch Tabspaces")
@@ -450,7 +451,7 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
 
   (start/leader-keys
     "s" '(:ignore t :wk "Show / Spell")
-    "s e" '(eat :wk "Eat terminal")
+    "s e" '(eat-other-window :wk "Eat terminal")
     "s k" '(browse-kill-ring :wk "Show kill-ring")
     "s c" '(flyspell-correct-word-before-point :wk "Correct word at point")
     "s s" '(flyspell-toggle :wk "Toggle flyspell")
@@ -513,8 +514,9 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
 
   (make-backup-files nil) ;; Stop creating ~ backup files
   (auto-save-default nil) ;; Stop creating # auto save files
-  :hook
-  (prog-mode . (lambda () (hs-minor-mode t))) ;; Enable folding hide/show globally
+  ;; :hook
+  ;; replaced by treesit-fold for now
+  ;; (prog-mode . (lambda () (hs-minor-mode t))) ;; Enable folding hide/show globally
   :config
   ;; Move customization variables to a separate file and load it, avoid filling up init.el with unnecessary variables
   (setq custom-file (locate-user-emacs-file "custom-vars.el"))
@@ -992,6 +994,23 @@ To use it write out the full keyword (or use autocompletion) and press Tab.
   )
 #+end_src
 
+** Code Folding
+
+   We want to use tree-sitter for folding where possible.
+   #+begin_src emacs-lisp
+    (use-package treesit-fold
+      :straight (treesit-fold :type git :host github :repo "emacs-tree-sitter/treesit-fold")
+      :custom
+      (global-treesit-fold-mode t)
+      (global-treesit-fold-indicators-mode nil)
+      (treesit-fold-summary-show t)
+      (treesit-fold-summary-max-length 100)
+   )
+   #+end_src
+
+treesit-fold adds itself to the [[help:evil-fold-list][evil-fold-list]] which lets us use the existing evil ~z~ shortcuts for the folding.
+
+
 ** Language modes
 I am using tree-sitter, with the Language grammars installed by nixos.
 Some of this borrowed from https://gist.github.com/habamax/290cda0e0cdc6118eb9a06121b9bc0d7
@@ -1233,6 +1252,7 @@ A bunch of language specific key binds, using ~,~ as the leader key.
 #+begin_src emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.asdf\\'" . yaml-ts-mode))
 #+end_src
 
 *** nix
@@ -1256,6 +1276,17 @@ A bunch of language specific key binds, using ~,~ as the leader key.
   "v d" 'pyvenv-deactivate
   )
 #+end_src
+
+
+*** xonsh
+
+#+begin_src emacs-lisp
+(define-derived-mode xonsh-mode python-ts-mode "xonsh" "Major mode for xonsh")
+(add-hook 'xonsh-mode-hook (lambda () (flymake-mode 0)))
+(add-to-list 'auto-mode-alist '("\\.xsh\\'" . xonsh-mode))
+(add-to-list 'auto-mode-alist '("\\.xonshrc\\'" . xonsh-mode))
+#+end_src
+
 * Other Packages
 All the package setups that don't need much tweaking.
 
@@ -1644,7 +1675,7 @@ https://github.com/minad/jinx
 #+begin_src emacs-lisp
 (use-package eat
   :custom
-  (eat-shell "/home/stuart/.nix-profile/bin/xonsh")
+  (shell-file-name "xonsh")
   )
 #+end_src
 * Org Mode
@@ -1996,6 +2027,7 @@ Org-Agenda
    ;; Some general config
    (setq org-duration-format 'h:mm)
    (setq org-cycle-separator-lines -1)
+   (setq org-clock-out-remove-zero-time-clock t)
 
    ;; Always save buffers on clock changes
    (add-hook 'org-clock-in-hook #'save-buffer)
