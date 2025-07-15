@@ -53,6 +53,7 @@ The repo is also a flake, so if you are mad enough to want to use this you can i
   - [[#dape][dape]]
   - [[#yasnippet][Yasnippet]]
   - [[#code-folding][Code Folding]]
+  - [[#combobulate][Combobulate]]
   - [[#language-modes][Language modes]]
 - [[#other-packages][Other Packages]]
   - [[#git][Git]]
@@ -87,6 +88,7 @@ The repo is also a flake, so if you are mad enough to want to use this you can i
   - [[#agenda][Agenda]]
   - [[#waybar][Waybar]]
   - [[#org-clock-float][Org Clock Float]]
+- [[#matrix][Matrix]]
 - [[#runtime-performance][Runtime Performance]]
 
 * Important to load first
@@ -191,7 +193,7 @@ Notes:
   (use-package evil-collection
     :after evil
     :custom
-    (evil-collection-mode-list '(dired ibuffer magit forge corfu vertico consult dashboard org ediff))
+    (evil-collection-mode-list '(dired ibuffer magit forge corfu vertico consult dashboard org ediff ement))
     :config
     (evil-collection-init)
     )
@@ -262,6 +264,7 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
   (start/leader-keys
     "a" '(:ignore t :wk "Applications")
     "a r" '(ranger :wk "Ranger")
+	"a e" '(cadair/ement-connect :wk "Matrix")
     )
 
   (start/leader-keys
@@ -326,7 +329,7 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
     "f r" '(consult-recent-file :wk "Recent files")
     "f R" '(doom/move-this-file :wk "Rename/Move file")
     "f s" '(save-buffer :wk "Save Buffer")
-    "f S" '(write-file :wk "Save file as...")
+    "f S" '(evil-write-all :wk "Save all files")
     )
 
   (start/leader-keys
@@ -461,7 +464,8 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
   (start/leader-keys
     "t" '(:ignore t :wk "Toggle")
     "t t" '(visual-line-mode :wk "Toggle truncated lines (wrap)")
-    "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
+    "t l" '(toggle-truncate-lines :wk "Toggle truncate lines")
+    "t L" '(display-line-numbers-mode :wk "Toggle line numbers")
     )
 
   (start/leader-keys
@@ -507,7 +511,7 @@ A keybinding framework to set keybindings easily. Uses https://github.com/noctui
   (scroll-conservatively 10)            ;; Smooth scrolling
   ;;(scroll-margin 8)
 
-  (confirm-kill-emacs 'y-or-n-p)
+  (use-short-answers t)
 
   (tab-width 4)
   (setq-default 'truncate-lines t)
@@ -985,6 +989,7 @@ To use it write out the full keyword (or use autocompletion) and press Tab.
   (prog-mode . yas-minor-mode)
   (rst-mode . yas-minor-mode)
   (markdown-mode . yas-minor-mode)
+  (org-mode . yas-minor-mode)
   :custom
   (yas-snippet-dirs
    '("~/.emacs.d/snippets"                 ;; writeable snippets dir
@@ -1010,7 +1015,51 @@ To use it write out the full keyword (or use autocompletion) and press Tab.
 
 treesit-fold adds itself to the [[help:evil-fold-list][evil-fold-list]] which lets us use the existing evil ~z~ shortcuts for the folding.
 
+** Combobulate
 
+#+begin_src emacs-lisp
+(use-package combobulate
+  :vc (:url "https://github.com/mickeynp/combobulate.git"
+	   :rev "master")
+  :hook ((prog-mode . combobulate-mode)))
+#+end_src
+
+#+begin_src emacs-lisp
+(my-local-leader
+  :states 'normal
+  :keymaps 'combobulate-key-map
+  "o" 'evil-combobulate-state
+  )
+#+end_src
+
+
+Ok, here's an experiment with defining combobulate evil bindings. I'm going to make a combobulate state, where all the motion keys are combobulated.
+#+begin_src emacs-lisp
+(evil-define-state combobulate
+  "Combobulate state"
+  :tag " <C> "
+  :enable (normal)
+  (message (if (evil-combobulate-state-p)
+               "Enabling combobulate state."
+             "Disabling combobulate state.")))
+
+;; Define the bindings for combobulate state
+(evil-define-key 'combobulate 'combobulate-key-map
+  ;; Combobulate
+  "o" 'combobulate
+  
+  ;; Linear navigation 
+  "w" 'combobulate-navigate-logical-next
+  "b" 'combobulate-navigate-logical-previous
+
+  ;; Tree Navigation (hjkl)
+  "h" 'combobulate-navigate-up
+  "j" 'combobulate-navigate-next
+  "k" 'combobulate-navigate-previous 
+  "l" 'combobulate-navigate-down
+
+  )
+#+end_src
 ** Language modes
 I am using tree-sitter, with the Language grammars installed by nixos.
 Some of this borrowed from https://gist.github.com/habamax/290cda0e0cdc6118eb9a06121b9bc0d7
@@ -1285,6 +1334,19 @@ A bunch of language specific key binds, using ~,~ as the leader key.
 (add-hook 'xonsh-mode-hook (lambda () (flymake-mode 0)))
 (add-to-list 'auto-mode-alist '("\\.xsh\\'" . xonsh-mode))
 (add-to-list 'auto-mode-alist '("\\.xonshrc\\'" . xonsh-mode))
+#+END_SRC
+
+*** rust
+
+#+begin_src emacs-lisp
+(use-package rustic
+  :ensure t
+  :config
+  (setq rustic-format-on-save nil)
+  :custom
+  (rustic-cargo-use-last-stored-arguments t)
+  (rustic-lsp-client 'eglot)
+)
 #+end_src
 
 * Other Packages
@@ -1295,9 +1357,24 @@ All the package setups that don't need much tweaking.
 Complete text-based user interface to Git.
 #+begin_src emacs-lisp
 (use-package magit
-  :commands magit-status)
+  :commands magit-status
+  )
+(my-local-leader
+  :states 'normal
+  :keymaps 'git-commit-mode-map
+  "i" '(git-commit-insert-trailer :wk "Insert Trailer")
+  "c" '(with-editor-finish :wk "Commit")
+  "k" '(with-editor-cancel :wk "Abort")
+  )
+
 (use-package forge
   :after magit
+  )
+
+(my-local-leader
+  :states 'normal
+  :keymaps 'forge-post-mode-map
+  "d" 'forge-topic-toggle-draft
   )
 #+end_src
 
@@ -1825,6 +1902,28 @@ https://github.com/minad/org-modern
   )
 #+end_src
 
+****  org-babel
+
+     #+begin_src emacs-lisp
+     (setq org-confirm-babel-evaluate nil)
+     (org-babel-do-load-languages 'org-babel-load-languages
+     							 '((python . t)
+     							   (emacs-lisp . t)
+     							   (org . t)
+     							   (shell . t)
+     							   ))
+     #+end_src
+
+#+begin_src emacs-lisp
+(use-package htmlize)
+#+end_src
+**** org-mode presentations
+     #+begin_src emacs-lisp
+(use-package ox-reveal
+  :vc (:url "https://github.com/Cadair/org-reveal.git"
+       :rev "master"))
+     #+end_src
+
 **** TODO More things from here:  https://github.com/jakebox/jake-emacs?tab=readme-ov-file#org-mode
 
 ** Keybindings
@@ -1852,13 +1951,15 @@ Now let's setup a lot of org-specific keybinds, global ones are in the main keyb
      "e" 'org-export-dispatch
      "f" 'org-footnote-action
      "h" 'org-toggle-heading
-     "i" 'org-toggle-item
      "I" 'org-id-get-create
-     "k" 'org-babel-remove-result
      ;; "K" #'+org/remove-result-blocks
      "n" 'org-store-link
      "o" 'org-set-property
      "q" 'org-set-tags-command
+     "r" '(:ignore t :wk "Org Babel")
+     "r b" 'org-babel-execute-buffer
+     "r e" 'org-babel-execute-maybe
+     "r k" 'org-babel-remove-result
      "t" 'org-todo
      "T" 'org-todo-list
      "x" 'org-toggle-checkbox
@@ -1930,6 +2031,8 @@ Now let's setup a lot of org-specific keybinds, global ones are in the main keyb
      "g r" 'org-refile-goto-last-stored
      ;; "g v" #'+org/goto-visible
      "g x" 'org-capture-goto-last-stored
+     "i" '(:ignore t :wk "Insert")
+     "i b" 'org-insert-structure-template
      "l" '(:ignore t :wk "links")
      "l c" 'org-cliplink
      ;; "l d" #'+org/remove-link
@@ -2371,6 +2474,17 @@ I use [[https://github.com/Alexays/Waybar/][Waybar]] for my sway window manager,
      )
 #+end_src
 
+* Matrix
+Because *I can*.
+
+#+begin_src emacs-lisp
+(use-package ement)
+
+(defun cadair/ement-connect ()
+  (interactive)
+  (ement-connect :user-id "@cadair:cadair.com" :uri-prefix "http://localhost:8009")
+  )
+#+end_src
 * Runtime Performance
 Dial the GC threshold back down so that garbage collection happens more frequently but in less time.
 We also increase Read Process Output Max so emacs can read more data.

@@ -59,7 +59,7 @@
 (use-package evil-collection
   :after evil
   :custom
-  (evil-collection-mode-list '(dired ibuffer magit forge corfu vertico consult dashboard org ediff))
+  (evil-collection-mode-list '(dired ibuffer magit forge corfu vertico consult dashboard org ediff ement))
   :config
   (evil-collection-init)
   )
@@ -126,6 +126,7 @@
   (start/leader-keys
    "a" '(:ignore t :wk "Applications")
    "a r" '(ranger :wk "Ranger")
+   "a e" '(cadair/ement-connect :wk "Matrix")
    )
 
   (start/leader-keys
@@ -179,6 +180,7 @@
    )
 
   (start/leader-keys
+   <<<<<<< HEAD
    "f" '(:ignore t :wk "Find / Files")
    "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
    "f C" '(doom/copy-this-file :wk "Copy this file")
@@ -192,163 +194,186 @@
    "f s" '(save-buffer :wk "Save Buffer")
    "f S" '(write-file :wk "Save file as...")
    )
-
-  (start/leader-keys
-   "g" '(:ignore t :wk "Git")
-   "g s"   '(magit                              :wk "Magit")
-   "g R"   '(vc-revert                          :wk "Revert file")
-   "g y"   '(git-link-homepage                  :wk "Copy link to remote")
-   "g t"   '(git-timemachine-toggle             :wk "Git time machine")
-   "g /"   '(magit-dispatch                     :wk "Magit dispatch")
-   "g ."   '(magit-file-dispatch                :wk "Magit file dispatch")
-   "g '"   '(forge-dispatch                     :wk "Forge dispatch")
-   "g -"   '(blamer-mode                        :wk "Toggle blamer")
-   "g b"   '(magit-branch-checkout              :wk "Magit switch branch")
-   "g b"   '(magit-blame-addition               :wk "Magit blame")
-   "g g"   '(magit-status                       :wk "Magit status")
-   "g G"   '(magit-status-here                  :wk "Magit status here")
-   "g D"   '(magit-file-delete                  :wk "Magit file delete")
-   "g C"   '(magit-clone                        :wk "Magit clone")
-   "g F"   '(magit-fetch                        :wk "Magit fetch")
-   "g L"   '(git-link                           :wk "Link to selection")
-   "g S"   '(magit-stage-buffer-file            :wk "Git stage this file")
-   "g U"   '(magit-unstage-buffer-file          :wk "Git unstage this file")
-   "g f"   '(:ignore t :wk "find")
-   "g f f" '(magit-find-file                    :wk "Find file")
-   "g f g" '(magit-find-git-config-file         :wk "Find gitconfig file")
-   "g f c" '(magit-show-commit                  :wk "Find commit")
-   "g f i" '(forge-visit-issue                  :wk "Find issue")
-   "g f p" '(forge-visit-pullreq                :wk "Find pull request")
-   "g o"   '(:ignore t :wk "open in browser")
-   "g o r" '(forge-browse-remote                :wk "Browse remote")
-   "g o c" '(forge-browse-commit                :wk "Browse commit")
-   "g o i" '(forge-browse-issue                 :wk "Browse an issue")
-   "g o p" '(forge-browse-pullreq               :wk "Browse a pull request")
-   "g o I" '(forge-browse-issues                :wk "Browse issues")
-   "g o P" '(forge-browse-pullreqs              :wk "Browse pull requests")
-   "g l"   '(:ignore t :wk "list")
-   ;;"g l g" '(+gist:list                         :wk "List gists")
-   "g l r" '(magit-list-repositories            :wk "List repositories")
-   "g l s" '(magit-list-submodules              :wk "List submodules")
-   "g l i" '(forge-list-issues                  :wk "List issues")
-   "g l p" '(forge-list-pullreqs                :wk "List pull requests")
-   "g l n" '(forge-list-notifications           :wk "List notifications")
-   "g c"   '(:ignore t :wk "create")
-   "g c r" '(magit-init                         :wk "Initialize repo")
-   "g c R" '(magit-clone                        :wk "Clone repo")
-   "g c c" '(magit-commit-create                :wk "Commit")
-   "g c f" '(magit-commit-fixup                 :wk "Fixup")
-   "g c b" '(magit-branch-and-checkout          :wk "Branch")
-   "g c i" '(forge-create-issue                 :wk "Issue")
-   "g c p" '(forge-create-pullreq               :wk "Pull request")
-   )
-
-  ;; TODO: It would be nice if I could just rebind C-h to SPC h
-  (start/leader-keys
-   "h" '(:ignore t :wk "Help") ;; To get more help use C-h commands (describe variable, function, etc.)
-   "h k" '(describe-key :wk "Describe Key")
-   "h s" '(describe-symbol :wk "Describe Symbol")
-   "h v" '(describe-variable :wk "Describe Variable")
-   "h f" '(describe-function :wk "Describe Function")
-   "h b" '(describe-bindings :wk "Describe Bindings")
-   )
-
-  (start/leader-keys
-   "l" '(:ignore t :wk "Tabspaces")
-   "l C" '(tabspaces-clear-buffers :wk "Clear all Buffers")
-   "l b" '(tabspaces-switch-to-buffer :wk "Switch to Buffer")
-   "l d" '(tabspaces-close-workspace :wk "Close Workspace")
-   "l k" '(tabspaces-kill-buffers-close-workspace :wk "Kill Buffers and Close Workspace")
-   "l o" '(tabspaces-open-or-create-project-and-workspace :wk "Open Project and Workspace")
-   "l r" '(tabspaces-remove-current-buffer :wk "Remove current buffer")
-   "l R" '(tabspaces-restore-session :wk "Restore previous session")
-   "l l" '(tabspaces-switch-or-create-workspace :wk "Switch or Create Workspace")
-   "l t" '(tabspaces-switch-buffer-and-tab :wk "Switch Buffer and tab")
-   ;; General Tab Control
-   "l TAB" '(tab-bar-switch-to-recent-tab :wk "Previous Tab")
-   "l L" '(tab-move :wk "Move Tab Right")
-   "l H" '((lambda () (interactive) (tab-move -1)) :wk "Move Tab Left")
-   )
-
-  (start/leader-keys
-   "o" '(:ignore t :wk "Org Mode")
-   "o a" '(org-agenda :wk "Agenda")
-   "o c" '(org-capture :wk "Capture")
-   "o f" '(consult-org-agenda :wk "Find Agenda Item")
-   "o h" '(org-insert-todo-heading :wk "Insert TODO heading")
-   "o s" '(org-insert-todo-subheading :wk "Insert TODO subheading")
-   "o t" '(lambda() (interactive)(find-file "~/to-do/all.org") :wk "Open to-do")
-   )
-
-  (start/leader-keys
-   "p" '(:ignore t :wk "Projects")
-   "p t" '(treemacs :wk "Treemacs")
-   ;; Copied from project.el
-   "p !" '(project-shell-command :wk "Run command")
-   "p &" '(project-async-shell-command :wk "Run command (async)")
-   "p f" '(project-find-file :wk "Find file")
-   "p F" '(project-or-external-find-file :wk "Find file in project or external roots")
-   "p b" '(project-switch-to-buffer :wk "Switch to project buffer")
-   "p s" '(project-shell :wk "Run shell in project")
-   "p d" '(project-find-dir :wk "Find directory")
-   "p D" '(project-dired :Wk "Dired")
-   "P V" '(Project-Vc-Dir :Wk "Run Vc-Dir")
-   "P C" '(project-compile :wk "Compile Project")
-   "p e" '(project-eshell :wk "Run Shell")
-   "p k" '(project-kill-buffers :wk "Kill all buffers")
-   "p p" '(tabspaces-open-or-create-project-and-workspace :wk "Switch Tabspaces")
-   "p P" '(project-switch-project :wk "Switch Project")
-   "p g" '(project-find-regexp :wk "Find matches for regexp")
-   "p G" '(project-or-external-find-regexp :wk "Find matches for regexp in project or external")
-   "p r" '(project-query-replace-regexp :wk "Replace regexp")
-   "p x" '(project-execute-extended-command :wk "Execute extended command")
-   "p o" '(project-any-command :wk "Execute any command")
-   )
-
-  (start/leader-keys
-   "q" '(:ignore t :wk "Quit / Session")
-   "q q" '(save-buffers-kill-terminal :wk "Quit Emacs")
-   "q r" '((lambda () (interactive)
-             (load-file user-init-file))
-           :wk "Reload Emacs config")
-   )
-
-  (start/leader-keys
-   "s" '(:ignore t :wk "Show / Spell")
-   "s e" '(eat :wk "Eat terminal")
-   "s k" '(browse-kill-ring :wk "Show kill-ring")
-   "s c" '(flyspell-correct-word-before-point :wk "Correct word at point")
-   "s s" '(flyspell-toggle :wk "Toggle flyspell")
-   "s n" '(evil-next-flyspell-error :wk "Next spelling error")
-   )
-
-  (start/leader-keys
-   "t" '(:ignore t :wk "Toggle")
-   "t t" '(visual-line-mode :wk "Toggle truncated lines (wrap)")
-   "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
-   )
-
-  (start/leader-keys
-   "w" '(:ignore t :wk "Windows and Workspaces")
-   "w <left>" '(evil-window-left :wk "Window left")
-   "w <right>" '(evil-window-right :wk "Window right")
-   "w <down>" '(evil-window-down :wk "Window Down")
-   "w <up>" '(evil-window-up :wk "Window Up")
-   "w h" '(evil-window-left :wk "Window left")
-   "w l" '(evil-window-right :wk "Window right")
-   "w j" '(evil-window-down :wk "Window Down")
-   "w k" '(evil-window-up :wk "Window Up")
-   "w /" '(evil-window-vsplit :wk "Vertical Split")
-   "w -" '(evil-window-split :wk "Vertical Split")
-   "w d" '(evil-window-delete :wk "Close window")
-   "w D" '(toggle-window-dedicated :wk "Dedicate window to buffer")
-   )
-
-  (start/leader-keys
-   "x" '(:ignore t :wk "Cleanup?")
-   "x d w" '(delete-trailing-whitespace :wk "Delete trailing whitespace")
-   )
+  =======
+  "f" '(:ignore t :wk "Find / Files")
+  "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
+  "f C" '(doom/copy-this-file :wk "Copy this file")
+  "f f" '(find-file :wk "Find file")
+  "f g" '(consult-ripgrep :wk "Ripgrep search in files")
+  "f i" '(consult-imenu :wk "Imenu buffer locations")
+  "f l" '(consult-line :wk "Find line")
+  "f L" '(locate :wk "Locate file")
+  "f r" '(consult-recent-file :wk "Recent files")
+  "f R" '(doom/move-this-file :wk "Rename/Move file")
+  "f s" '(save-buffer :wk "Save Buffer")
+  "f S" '(evil-write-all :wk "Save all files")
   )
+>>>>>>> 8edf264754cd8727281ff98a75e41237f3d97547
+
+(start/leader-keys
+ "g" '(:ignore t :wk "Git")
+ "g s"   '(magit                              :wk "Magit")
+ "g R"   '(vc-revert                          :wk "Revert file")
+ "g y"   '(git-link-homepage                  :wk "Copy link to remote")
+ "g t"   '(git-timemachine-toggle             :wk "Git time machine")
+ "g /"   '(magit-dispatch                     :wk "Magit dispatch")
+ "g ."   '(magit-file-dispatch                :wk "Magit file dispatch")
+ "g '"   '(forge-dispatch                     :wk "Forge dispatch")
+ "g -"   '(blamer-mode                        :wk "Toggle blamer")
+ "g b"   '(magit-branch-checkout              :wk "Magit switch branch")
+ "g b"   '(magit-blame-addition               :wk "Magit blame")
+ "g g"   '(magit-status                       :wk "Magit status")
+ "g G"   '(magit-status-here                  :wk "Magit status here")
+ "g D"   '(magit-file-delete                  :wk "Magit file delete")
+ "g C"   '(magit-clone                        :wk "Magit clone")
+ "g F"   '(magit-fetch                        :wk "Magit fetch")
+ "g L"   '(git-link                           :wk "Link to selection")
+ "g S"   '(magit-stage-buffer-file            :wk "Git stage this file")
+ "g U"   '(magit-unstage-buffer-file          :wk "Git unstage this file")
+ "g f"   '(:ignore t :wk "find")
+ "g f f" '(magit-find-file                    :wk "Find file")
+ "g f g" '(magit-find-git-config-file         :wk "Find gitconfig file")
+ "g f c" '(magit-show-commit                  :wk "Find commit")
+ "g f i" '(forge-visit-issue                  :wk "Find issue")
+ "g f p" '(forge-visit-pullreq                :wk "Find pull request")
+ "g o"   '(:ignore t :wk "open in browser")
+ "g o r" '(forge-browse-remote                :wk "Browse remote")
+ "g o c" '(forge-browse-commit                :wk "Browse commit")
+ "g o i" '(forge-browse-issue                 :wk "Browse an issue")
+ "g o p" '(forge-browse-pullreq               :wk "Browse a pull request")
+ "g o I" '(forge-browse-issues                :wk "Browse issues")
+ "g o P" '(forge-browse-pullreqs              :wk "Browse pull requests")
+ "g l"   '(:ignore t :wk "list")
+ ;;"g l g" '(+gist:list                         :wk "List gists")
+ "g l r" '(magit-list-repositories            :wk "List repositories")
+ "g l s" '(magit-list-submodules              :wk "List submodules")
+ "g l i" '(forge-list-issues                  :wk "List issues")
+ "g l p" '(forge-list-pullreqs                :wk "List pull requests")
+ "g l n" '(forge-list-notifications           :wk "List notifications")
+ "g c"   '(:ignore t :wk "create")
+ "g c r" '(magit-init                         :wk "Initialize repo")
+ "g c R" '(magit-clone                        :wk "Clone repo")
+ "g c c" '(magit-commit-create                :wk "Commit")
+ "g c f" '(magit-commit-fixup                 :wk "Fixup")
+ "g c b" '(magit-branch-and-checkout          :wk "Branch")
+ "g c i" '(forge-create-issue                 :wk "Issue")
+ "g c p" '(forge-create-pullreq               :wk "Pull request")
+ )
+
+;; TODO: It would be nice if I could just rebind C-h to SPC h
+(start/leader-keys
+ "h" '(:ignore t :wk "Help") ;; To get more help use C-h commands (describe variable, function, etc.)
+ "h k" '(describe-key :wk "Describe Key")
+ "h s" '(describe-symbol :wk "Describe Symbol")
+ "h v" '(describe-variable :wk "Describe Variable")
+ "h f" '(describe-function :wk "Describe Function")
+ "h b" '(describe-bindings :wk "Describe Bindings")
+ )
+
+(start/leader-keys
+ "l" '(:ignore t :wk "Tabspaces")
+ "l C" '(tabspaces-clear-buffers :wk "Clear all Buffers")
+ "l b" '(tabspaces-switch-to-buffer :wk "Switch to Buffer")
+ "l d" '(tabspaces-close-workspace :wk "Close Workspace")
+ "l k" '(tabspaces-kill-buffers-close-workspace :wk "Kill Buffers and Close Workspace")
+ "l o" '(tabspaces-open-or-create-project-and-workspace :wk "Open Project and Workspace")
+ "l r" '(tabspaces-remove-current-buffer :wk "Remove current buffer")
+ "l R" '(tabspaces-restore-session :wk "Restore previous session")
+ "l l" '(tabspaces-switch-or-create-workspace :wk "Switch or Create Workspace")
+ "l t" '(tabspaces-switch-buffer-and-tab :wk "Switch Buffer and tab")
+ ;; General Tab Control
+ "l TAB" '(tab-bar-switch-to-recent-tab :wk "Previous Tab")
+ "l L" '(tab-move :wk "Move Tab Right")
+ "l H" '((lambda () (interactive) (tab-move -1)) :wk "Move Tab Left")
+ )
+
+(start/leader-keys
+ "o" '(:ignore t :wk "Org Mode")
+ "o a" '(org-agenda :wk "Agenda")
+ "o c" '(org-capture :wk "Capture")
+ "o f" '(consult-org-agenda :wk "Find Agenda Item")
+ "o h" '(org-insert-todo-heading :wk "Insert TODO heading")
+ "o s" '(org-insert-todo-subheading :wk "Insert TODO subheading")
+ "o t" '(lambda() (interactive)(find-file "~/to-do/all.org") :wk "Open to-do")
+ )
+
+(start/leader-keys
+ "p" '(:ignore t :wk "Projects")
+ "p t" '(treemacs :wk "Treemacs")
+ ;; Copied from project.el
+ "p !" '(project-shell-command :wk "Run command")
+ "p &" '(project-async-shell-command :wk "Run command (async)")
+ "p f" '(project-find-file :wk "Find file")
+ "p F" '(project-or-external-find-file :wk "Find file in project or external roots")
+ "p b" '(project-switch-to-buffer :wk "Switch to project buffer")
+ "p s" '(project-shell :wk "Run shell in project")
+ "p d" '(project-find-dir :wk "Find directory")
+ "p D" '(project-dired :Wk "Dired")
+ "P V" '(Project-Vc-Dir :Wk "Run Vc-Dir")
+ "P C" '(project-compile :wk "Compile Project")
+ "p e" '(project-eshell :wk "Run Shell")
+ "p k" '(project-kill-buffers :wk "Kill all buffers")
+ "p p" '(tabspaces-open-or-create-project-and-workspace :wk "Switch Tabspaces")
+ "p P" '(project-switch-project :wk "Switch Project")
+ "p g" '(project-find-regexp :wk "Find matches for regexp")
+ "p G" '(project-or-external-find-regexp :wk "Find matches for regexp in project or external")
+ "p r" '(project-query-replace-regexp :wk "Replace regexp")
+ "p x" '(project-execute-extended-command :wk "Execute extended command")
+ "p o" '(project-any-command :wk "Execute any command")
+ )
+
+(start/leader-keys
+ "q" '(:ignore t :wk "Quit / Session")
+ "q q" '(save-buffers-kill-terminal :wk "Quit Emacs")
+ "q r" '((lambda () (interactive)
+           (load-file user-init-file))
+         :wk "Reload Emacs config")
+ )
+
+(start/leader-keys
+ <<<<<<< HEAD
+ "s" '(:ignore t :wk "Show / Spell")
+ "s e" '(eat :wk "Eat terminal")
+ "s k" '(browse-kill-ring :wk "Show kill-ring")
+ "s c" '(flyspell-correct-word-before-point :wk "Correct word at point")
+ "s s" '(flyspell-toggle :wk "Toggle flyspell")
+ "s n" '(evil-next-flyspell-error :wk "Next spelling error")
+ )
+=======
+"t" '(:ignore t :wk "Toggle")
+"t t" '(visual-line-mode :wk "Toggle truncated lines (wrap)")
+"t l" '(toggle-truncate-lines :wk "Toggle truncate lines")
+"t L" '(display-line-numbers-mode :wk "Toggle line numbers")
+)
+>>>>>>> 8edf264754cd8727281ff98a75e41237f3d97547
+
+(start/leader-keys
+ "t" '(:ignore t :wk "Toggle")
+ "t t" '(visual-line-mode :wk "Toggle truncated lines (wrap)")
+ "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
+ )
+
+(start/leader-keys
+ "w" '(:ignore t :wk "Windows and Workspaces")
+ "w <left>" '(evil-window-left :wk "Window left")
+ "w <right>" '(evil-window-right :wk "Window right")
+ "w <down>" '(evil-window-down :wk "Window Down")
+ "w <up>" '(evil-window-up :wk "Window Up")
+ "w h" '(evil-window-left :wk "Window left")
+ "w l" '(evil-window-right :wk "Window right")
+ "w j" '(evil-window-down :wk "Window Down")
+ "w k" '(evil-window-up :wk "Window Up")
+ "w /" '(evil-window-vsplit :wk "Vertical Split")
+ "w -" '(evil-window-split :wk "Vertical Split")
+ "w d" '(evil-window-delete :wk "Close window")
+ "w D" '(toggle-window-dedicated :wk "Dedicate window to buffer")
+ )
+
+(start/leader-keys
+ "x" '(:ignore t :wk "Cleanup?")
+ "x d w" '(delete-trailing-whitespace :wk "Delete trailing whitespace")
+ )
+)
 
 (use-package emacs
   :custom
@@ -368,7 +393,7 @@
   (scroll-conservatively 10)            ;; Smooth scrolling
   ;;(scroll-margin 8)
 
-  (confirm-kill-emacs 'y-or-n-p)
+  (use-short-answers t)
 
   (tab-width 4)
   (setq-default 'truncate-lines t)
@@ -730,6 +755,7 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   (prog-mode . yas-minor-mode)
   (rst-mode . yas-minor-mode)
   (markdown-mode . yas-minor-mode)
+  (org-mode . yas-minor-mode)
   :custom
   (yas-snippet-dirs
    '("~/.emacs.d/snippets"                 ;; writeable snippets dir
@@ -745,6 +771,42 @@ If FORCE-P, overwrite the destination file if it exists, without confirmation."
   (global-treesit-fold-indicators-mode nil)
   (treesit-fold-summary-show t)
   (treesit-fold-summary-max-length 100)
+  )
+
+(use-package combobulate
+  :vc (:url "https://github.com/mickeynp/combobulate.git"
+            :rev "master")
+  :hook ((prog-mode . combobulate-mode)))
+
+(my-local-leader
+ :states 'normal
+ :keymaps 'combobulate-key-map
+ "o" 'evil-combobulate-state
+ )
+
+(evil-define-state combobulate
+  "Combobulate state"
+  :tag " <C> "
+  :enable (normal)
+  (message (if (evil-combobulate-state-p)
+               "Enabling combobulate state."
+             "Disabling combobulate state.")))
+
+;; Define the bindings for combobulate state
+(evil-define-key 'combobulate 'combobulate-key-map
+  ;; Combobulate
+  "o" 'combobulate
+
+  ;; Linear navigation
+  "w" 'combobulate-navigate-logical-next
+  "b" 'combobulate-navigate-logical-previous
+
+  ;; Tree Navigation (hjkl)
+  "h" 'combobulate-navigate-up
+  "j" 'combobulate-navigate-next
+  "k" 'combobulate-navigate-previous
+  "l" 'combobulate-navigate-down
+
   )
 
 (setq major-mode-remap-alist
@@ -965,11 +1027,35 @@ falling back on searching your PATH."
 (add-to-list 'auto-mode-alist '("\\.xsh\\'" . xonsh-mode))
 (add-to-list 'auto-mode-alist '("\\.xonshrc\\'" . xonsh-mode))
 
+(use-package rustic
+  :ensure t
+  :config
+  (setq rustic-format-on-save nil)
+  :custom
+  (rustic-cargo-use-last-stored-arguments t)
+  (rustic-lsp-client 'eglot)
+  )
+
 (use-package magit
-  :commands magit-status)
+  :commands magit-status
+  )
+(my-local-leader
+ :states 'normal
+ :keymaps 'git-commit-mode-map
+ "i" '(git-commit-insert-trailer :wk "Insert Trailer")
+ "c" '(with-editor-finish :wk "Commit")
+ "k" '(with-editor-cancel :wk "Abort")
+ )
+
 (use-package forge
   :after magit
   )
+
+(my-local-leader
+ :states 'normal
+ :keymaps 'forge-post-mode-map
+ "d" 'forge-topic-toggle-draft
+ )
 
 (use-package diff-hl
   :hook ((dired-mode         . diff-hl-dired-mode-unless-remote)
@@ -1309,10 +1395,25 @@ falling back on searching your PATH."
   (org-mode-hook . org-modern-mode)
   )
 
+(setq org-confirm-babel-evaluate nil)
+(org-babel-do-load-languages 'org-babel-load-languages
+                             '((python . t)
+                               (emacs-lisp . t)
+                               (org . t)
+                               (shell . t)
+                               ))
+
+(use-package htmlize)
+
+(use-package ox-reveal
+  :vc (:url "https://github.com/Cadair/org-reveal.git"
+            :rev "master"))
+
 (my-local-leader
  :states '(normal visual)
  :keymaps 'org-mode-map
 
+ <<<<<<< HEAD
  "#" 'org-update-statistics-cookies
  "'" 'org-edit-special
  "*" 'org-ctrl-c-star
@@ -1450,6 +1551,149 @@ falling back on searching your PATH."
  "p p" 'org-priority
  "p u" 'org-priority-up
  )
+=======
+"#" 'org-update-statistics-cookies
+"'" 'org-edit-special
+"*" 'org-ctrl-c-star
+"+" 'org-ctrl-c-minus
+"," 'org-switchb
+"." 'org-goto
+"@" 'org-cite-insert
+"." 'consult-org-heading
+"/" 'consult-org-agenda
+"A" 'org-archive-subtree-default
+"e" 'org-export-dispatch
+"f" 'org-footnote-action
+"h" 'org-toggle-heading
+"I" 'org-id-get-create
+;; "K" #'+org/remove-result-blocks
+"n" 'org-store-link
+"o" 'org-set-property
+"q" 'org-set-tags-command
+"r" '(:ignore t :wk "Org Babel")
+"r b" 'org-babel-execute-buffer
+"r e" 'org-babel-execute-maybe
+"r k" 'org-babel-remove-result
+"t" 'org-todo
+"T" 'org-todo-list
+"x" 'org-toggle-checkbox
+"a" '(:ignore t :wk "Attachments")
+"a a" 'org-attach
+"a d" 'org-attach-delete-one
+"a D" 'org-attach-delete-all
+;; "a f" #'+org/find-file-in-attachments
+;; "a l" #'+org/attach-file-and-insert-link
+"a n" 'org-attach-new
+"a o" 'org-attach-open
+"a O" 'org-attach-open-in-emacs
+"a r" 'org-attach-reveal
+"a R" 'org-attach-reveal-in-emacs
+"a u" 'org-attach-url
+"a s" 'org-attach-set-directory
+"a S" 'org-attach-sync
+"b" '(:ignore t :wk "Tables")
+"b -" 'org-table-insert-hline
+"b a" 'org-table-align
+"b b" 'org-table-blank-field
+"b c" 'org-table-create-or-convert-from-region
+"b e" 'org-table-edit-field
+"b f" 'org-table-edit-formulas
+"b h" 'org-table-field-info
+"b s" 'org-table-sort-lines
+"b r" 'org-table-recalculate
+"b R" 'org-table-recalculate-buffer-tables
+;; TODO: Figure these sub leader bindings out
+;; "b s" '(:ignore t :wk "delete")
+;; "b s c" 'org-table-delete-column
+;; "b s r" 'org-table-kill-row
+;; "b i" '(:ignore t :wk "insert")
+;; "b i c" 'org-table-insert-column
+;; "b i h" 'org-table-insert-hline
+;; "b i r" 'org-table-insert-row
+;; "b i H" 'org-table-hline-and-move
+;; "b t" '(:ignore t :wk "toggle")
+;; "b t f" 'org-table-toggle-formula-debugger
+;; "b t o" 'org-table-toggle-coordinate-overlays
+"c" '(:ignore t :wk "clock")
+"c c" 'org-clock-cancel
+"c d" 'org-clock-mark-default-task
+"c e" 'org-clock-modify-effort-estimate
+"c E" 'org-set-effort
+"c g" 'org-clock-goto
+;; "c G" (cmd! (org-clock-goto 'select))
+;; "c l" #'+org/toggle-last-clock
+"c i" 'org-clock-in
+"c I" 'org-clock-in-last
+"c o" 'org-clock-out
+"c r" 'org-resolve-clocks
+"c R" 'org-clock-report
+"c t" 'org-evaluate-time-range
+"c =" 'org-clock-timestamps-up
+"c -" 'org-clock-timestamps-down
+"d" '(:ignore t :wk "date/deadline")
+"d d" 'org-deadline
+"d s" 'org-schedule
+"d t" 'org-time-stamp
+"d T" 'org-time-stamp-inactive
+"g" '(:ignore t :wk "goto")
+"g g" 'org-goto
+"g g" 'consult-org-heading
+"g G" 'consult-org-agenda
+"g c" 'org-clock-goto
+;; "g C" (cmd! (org-clock-goto 'select))
+"g i" 'org-id-goto
+"g r" 'org-refile-goto-last-stored
+;; "g v" #'+org/goto-visible
+"g x" 'org-capture-goto-last-stored
+"i" '(:ignore t :wk "Insert")
+"i b" 'org-insert-structure-template
+"l" '(:ignore t :wk "links")
+"l c" 'org-cliplink
+;; "l d" #'+org/remove-link
+"l i" 'org-id-store-link
+"l l" 'org-insert-link
+"l L" 'org-insert-all-links
+"l s" 'org-store-link
+"l S" 'org-insert-last-stored-link
+"l t" 'org-toggle-link-display
+;; "l y" #'+org/yank-link
+"P" '(:ignore t :wk "Publish")
+"P a" 'org-publish-all
+"P f" 'org-publish-current-file
+"P p" 'org-publish
+"P P" 'org-publish-current-project
+"P s" 'org-publish-sitemap
+"r" '(:ignore t :wk "refile")
+;; "r ." #'+org/refile-to-current-file
+;; "r c" #'+org/refile-to-running-clock
+;; "r l" #'+org/refile-to-last-location
+;; "r f" #'+org/refile-to-file
+;; "r o" #'+org/refile-to-other-window
+;; "r O" #'+org/refile-to-other-buffer
+;; "r v" #'+org/refile-to-visible
+"r r" 'org-refile
+"r R" 'org-refile-reverse ; to all `org-refile-targets'
+"s" '(:ignore t :wk "tree/subtree")
+"s a" 'org-toggle-archive-tag
+"s b" 'org-tree-to-indirect-buffer
+"s c" 'org-clone-subtree-with-time-shift
+"s d" 'org-cut-subtree
+"s h" 'org-promote-subtree
+"s j" 'org-move-subtree-down
+"s k" 'org-move-subtree-up
+"s l" 'org-demote-subtree
+"s n" 'org-narrow-to-subtree
+"s r" 'org-refile
+"s s" 'org-sparse-tree
+"s A" 'org-archive-subtree-default
+"s N" 'widen
+"s S" 'org-sort
+"p" '(:ignore t :wk "priority")
+"p d" 'org-priority-down
+"p p" 'org-priority
+"p u" 'org-priority-up
+)
+>>>>>>> 8edf264754cd8727281ff98a75e41237f3d97547
 
 (my-local-leader
  :states '(normal visual)
@@ -1780,6 +2024,13 @@ falling back on searching your PATH."
   :custom
   (org-clock-float-email (plist-get (nth 0 (auth-source-search :max 1 :host "api.float.com")) :user))
   (org-clock-float-api-token (auth-info-password (nth 0 (auth-source-search :max 1 :host "api.float.com"))))
+  )
+
+(use-package ement)
+
+(defun cadair/ement-connect ()
+  (interactive)
+  (ement-connect :user-id "@cadair:cadair.com" :uri-prefix "http://localhost:8009")
   )
 
 ;; Make gc pauses faster by decreasing the threshold.
